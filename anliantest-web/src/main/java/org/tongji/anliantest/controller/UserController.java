@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class UserController extends AbstractController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String login(){
-		return "ui/page/home";
+		return "home";
 	}
 }
