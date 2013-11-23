@@ -10,10 +10,25 @@
   <artifactId>anliantest-persist</artifactId>
   <name>Anlian Test Persist Module</name>
   <dependencies>
+    <!-- Anliantest Module -->
+  	<dependency>
+  		<groupId>org.tongji.anliantest</groupId>
+  		<artifactId>anliantest-model</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+    <!-- Hibernate -->
   	<dependency>
   		<groupId>org.hibernate</groupId>
   		<artifactId>hibernate-core</artifactId>
-  		<version>4.2.7.SP1</version>
   	</dependency>
+  	<!-- Spring -->
+  	<dependency>
+	 	<groupId>org.springframework</groupId>
+	 	<artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+       	<groupId>org.springframework</groupId>
+		<artifactId>spring-orm</artifactId>
+	</dependency>
   </dependencies>
 </project>

@@ -7,8 +7,8 @@
 </head>
 <body>
 	<form action="user/login" method="POST">
-		<input id="number" name="number" type="text"/>
-		<input id="password" name="password" type="password"/>
+		<input id="epNumber" name="epNumber" type="text"/>
+		<input id="epPassword" name="epPassword" type="password"/>
 		<input type="submit" value="登录" />
 	</form>
 </body>

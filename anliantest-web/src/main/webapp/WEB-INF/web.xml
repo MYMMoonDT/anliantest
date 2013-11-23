@@ -5,6 +5,28 @@
 		<welcome-file>/WEB-INF/ui/page/login.jsp</welcome-file>
 	</welcome-file-list>
 	
+	<context-param> 
+  		<param-name>webAppRootKey</param-name> 
+  		<param-value>webApp.root</param-value> 
+	</context-param> 
+	
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:./config/applicationContext.xml</param-value>
+	</context-param>
+	
+	<context-param> 
+  		<param-name>log4jConfigLocation</param-name> 
+  		<param-value>classpath:./config/log4j.properties</param-value> 
+	</context-param> 
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener> 
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class> 
+    </listener> 
+	
 	<filter>
         <filter-name>CharacterEncodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -27,7 +49,7 @@
 	    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>  
 	    <init-param>  
 	        <param-name>contextConfigLocation</param-name>  
-	        <param-value>classpath*:/config/spring-mvc-servlet.xml</param-value>  
+	        <param-value>classpath*:./config/anliantest-mvc.xml</param-value>  
 	    </init-param>  
 	    <load-on-startup>1</load-on-startup>  
 	</servlet>

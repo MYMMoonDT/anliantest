@@ -1,6 +1,6 @@
 package org.tongji.anliantest.model;
 
-// Generated 2013-11-20 5:24:58 by Hibernate Tools 3.4.0.CR1
+// Generated 2013-11-23 6:49:31 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,21 +23,24 @@ public class EmployeeInfo implements java.io.Serializable {
 	private DepartmentInfo departmentInfo;
 	private String epNumber;
 	private String epName;
+	private String epPassword;
 	private String epTitle;
 
 	public EmployeeInfo() {
 	}
 
-	public EmployeeInfo(String epNumber, String epName) {
+	public EmployeeInfo(String epNumber, String epName, String epPassword) {
 		this.epNumber = epNumber;
 		this.epName = epName;
+		this.epPassword = epPassword;
 	}
 
 	public EmployeeInfo(DepartmentInfo departmentInfo, String epNumber,
-			String epName, String epTitle) {
+			String epName, String epPassword, String epTitle) {
 		this.departmentInfo = departmentInfo;
 		this.epNumber = epNumber;
 		this.epName = epName;
+		this.epPassword = epPassword;
 		this.epTitle = epTitle;
 	}
 
@@ -78,6 +81,15 @@ public class EmployeeInfo implements java.io.Serializable {
 
 	public void setEpName(String epName) {
 		this.epName = epName;
+	}
+
+	@Column(name = "EP_PASSWORD", nullable = false, length = 100)
+	public String getEpPassword() {
+		return this.epPassword;
+	}
+
+	public void setEpPassword(String epPassword) {
+		this.epPassword = epPassword;
 	}
 
 	@Column(name = "EP_Title", length = 100)
