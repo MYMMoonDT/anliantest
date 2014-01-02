@@ -8,7 +8,7 @@ import edu.tongji.anliantest.model.EmployeeInfo;
 import edu.tongji.anliantest.service.EmployeeService;
 
 @Controller
-public class EmployeeController extends AbstractController {
+public class EmployeeController extends BaseController {
 	@Autowired
 	private EmployeeService employeeService;
 	
@@ -24,7 +24,11 @@ public class EmployeeController extends AbstractController {
 		}else if(!dbEmployee.getEmployeePassword().equals(employee.getEmployeePassword())){
 			return "login";
 		}else{
-			return "home";
+			return "redirect:home";
 		}
+	}
+	@RequestMapping(value = "/home")
+	public String homePage(){
+		return "home";
 	}
 }
