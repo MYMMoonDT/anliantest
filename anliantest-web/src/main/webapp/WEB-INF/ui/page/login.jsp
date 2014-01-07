@@ -14,6 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="ui/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="ui/bootstrap/css/bootstrap-theme.min.css">
 <link rel="stylesheet" href="ui/css/login.css">
 
 <script src="ui/js/jquery/jquery-1.10.2.min.js"></script>

@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  font-family: 'Microsoft YaHei', Arial, 'Lucida Grande', Tahoma, sans-serif;
+}
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body .h1,
+body .h2,
+body .h3,
+body .h4,
+body .h5,
+body .h6 {
+  font-family: 'Microsoft YaHei', Arial, 'Lucida Grande', Tahoma, sans-serif;
+  margin: 0;
+  padding: 0;
+}
