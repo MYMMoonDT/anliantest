@@ -1,0 +1,12 @@
+table thead th {
+  font-size: 16px;
+}
+table tbody tr {
+  height: 40px;
+}
+.form-customer .panel-heading {
+  font-size: 16px;
+}
+.form-customer .panel-body label {
+  font-size: 16px;
+}
