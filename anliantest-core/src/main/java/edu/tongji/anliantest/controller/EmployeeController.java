@@ -1,8 +1,11 @@
 package edu.tongji.anliantest.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import edu.tongji.anliantest.model.EmployeeInfo;
 import edu.tongji.anliantest.service.EmployeeService;
@@ -17,15 +20,19 @@ public class EmployeeController extends BaseController {
 		return "login";
 	}
 	@RequestMapping(value = "/checkLogin")
-	public String checkLogin(EmployeeInfo employee){
+	public ModelAndView checkLogin(HttpServletRequest request, EmployeeInfo employee){
 		EmployeeInfo dbEmployee = employeeService.getEmployeeByEmployeeNum(employee.getEmployeeNumber());
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("forward:login");
 		if(dbEmployee == null){
-			return "login";
+			mav.addObject("errorMsg", "用户名不存在");
 		}else if(!dbEmployee.getEmployeePassword().equals(employee.getEmployeePassword())){
-			return "login";
+			mav.addObject("errorMsg", "用户密码不正确");
 		}else{
-			return "redirect:home";
+			setSessionEmployee(request, dbEmployee);
+			mav.setViewName("redirect:home");
 		}
+		return mav;
 	}
 	@RequestMapping(value = "/home")
 	public String homePage(){

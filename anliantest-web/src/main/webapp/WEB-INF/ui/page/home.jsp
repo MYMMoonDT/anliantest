@@ -29,10 +29,10 @@
 		</div>
 		<div class="row">
 			<div class="col-md-3">
-				
+				<c:import url="../component/navTree.jsp"></c:import>
 			</div>
 			<div class="col-md-9">
-				
+				<c:import url="../component/tableTemplate.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">

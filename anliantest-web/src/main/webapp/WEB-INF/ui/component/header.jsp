@@ -41,7 +41,11 @@
     </form> -->
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">admin <b class="caret"></b></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        	<span class="glyphicon glyphicon-user"></span>
+        	${EMPLOYEE_CONTEXT.employeeName}
+        	<b class="caret"></b>
+        </a>
         <ul class="dropdown-menu">
           <li><a href="#">设置</a></li>
           <li class="divider"></li>
