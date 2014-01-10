@@ -7,18 +7,18 @@
 		<form role="form">
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>建设项目名称</label> <input type="text" class="form-control"></input>
+					<label>建设项目名称</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-6 form-group">
-					<label>项目编号</label> <input type="text" class="form-control"></input>
+					<label>项目编号</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>类比企业名称</label> <input type="text" class="form-control"></input>
+					<label>类比企业名称</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-6 form-group">
-					<label>编写人</label> <input type="text" class="form-control"></input>
+					<label>编写人</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
@@ -43,10 +43,10 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>审核人签字</label> <input type="text" class="form-control"></input>
+					<label>审核人签字</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-6 form-group">
-					<label>审核时间</label> <input type="text" class="form-control"></input>
+					<label>审核时间</label> <input type="date" class="form-control">
 				</div>
 			</div>			
 		</form>

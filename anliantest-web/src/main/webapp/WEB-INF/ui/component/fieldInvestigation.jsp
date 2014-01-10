@@ -7,31 +7,31 @@
 		<form role="form">
 			<div class="row">
 				<div class="col-sm-8 form-group">
-					<label>建设单位</label> <input type="text" class="form-control"></input>
+					<label>建设单位</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>受理编号</label> <input type="text" class="form-control"></input>
+					<label>受理编号</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-8 form-group">
-					<label>建设项目</label> <input type="text" class="form-control"></input>
+					<label>建设项目</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>报告编号</label> <input type="text" class="form-control"></input>
+					<label>报告编号</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-8 form-group">
-					<label>单位地址</label> <input type="text" class="form-control"></input>
+					<label>单位地址</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>委托单位类型</label> <input type="text" class="form-control"></input>
+					<label>委托单位类型</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-8 form-group">
-					<label>所属行业</label> <input type="text" class="form-control"></input>
+					<label>所属行业</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
@@ -41,10 +41,10 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>管理人员</label> <input type="text" class="form-control"></input>
+					<label>管理人员</label> <input type="number" class="form-control">
 				</div>
 				<div class="col-sm-6 form-group">
-					<label>生产人员</label> <input type="text" class="form-control"></input>
+					<label>生产人员</label> <input type="number" class="form-control">
 				</div>
 			</div>
 			<div class="row">
@@ -58,32 +58,32 @@
 					</div>
 				</div>
 				<div class="col-sm-3 form-group">
-					<label>部门名称</label> <input type="text" class="form-control"></input>
+					<label>部门名称</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-3 form-group">
-					<label>人数</label> <input type="text" class="form-control"></input>
+					<label>人数</label> <input type="number" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-4 form-group">
-					<label>联系人1</label> <input type="text" class="form-control"></input>
+					<label>联系人1</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>工作部门</label> <input type="text" class="form-control"></input>
+					<label>工作部门</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>联系电话</label> <input type="text" class="form-control"></input>
+					<label>联系电话</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-4 form-group">
-					<label>联系人2</label> <input type="text" class="form-control"></input>
+					<label>联系人2</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>工作部门</label> <input type="text" class="form-control"></input>
+					<label>工作部门</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>联系电话</label> <input type="text" class="form-control"></input>
+					<label>联系电话</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
@@ -150,13 +150,13 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-4 form-group">
-					<label>调查人员</label> <input type="text" class="form-control"></input>
+					<label>调查人员</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>陪同人员</label> <input type="text" class="form-control"></input>
+					<label>陪同人员</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-4 form-group">
-					<label>日期</label> <input type="text" class="form-control"></input>
+					<label>日期</label> <input type="date" class="form-control">
 				</div>
 			</div>
 			<div class="row">			
@@ -181,7 +181,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>车间名称</label> <input type="text" class="form-control"></input>
+					<label>车间名称</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">			
@@ -191,7 +191,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>检测点</label> <input type="text" class="form-control"></input>
+					<label>检测点</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-12 form-group">
 					<label>检测布点图<input type="file"></label> 
@@ -199,7 +199,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>车间名称</label> <input type="text" class="form-control"></input>
+					<label>车间名称</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">			
@@ -209,7 +209,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label>检测点</label> <input type="text" class="form-control"></input>
+					<label>检测点</label> <input type="text" class="form-control">
 				</div>
 				<div class="col-sm-12 form-group">
 					<label>检测布点图<input type="file"></label> 

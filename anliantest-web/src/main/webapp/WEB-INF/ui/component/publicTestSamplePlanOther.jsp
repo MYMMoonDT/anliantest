@@ -2,17 +2,9 @@
 	pageEncoding="UTF-8"%>
 <link rel="stylesheet" href="ui/css/form.css">
 <div class="panel panel-default">
-	<div class="panel-heading">公共场所卫生检测通知单</div>
+	<div class="panel-heading">公共场所卫生检测采样方案（其他类）</div>
 	<div class="panel-body">
 		<form>
-			<div class="row">
-				<div class="col-sm-8 form-group">
-					<label>项目名称</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-4 form-group">
-					<label>项目编号</label> <input type="text" class="form-control">
-				</div>
-			</div>
 			<div class="row">
 				<div class="col-sm-12 form-group">
 					<label>单位名称</label> <input type="text" class="form-control">
@@ -24,6 +16,19 @@
 				</div>
 			</div>
 			<div class="row">
+				<div class="col-sm-12 form-group">
+					<label>项目名称</label> <input type="text" class="form-control">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6 form-group">
+					<label>项目编号</label> <input type="text" class="form-control">
+				</div>
+				<div class="col-sm-6 form-group">
+					<label>测试日期</label> <input type="date" class="form-control">
+				</div>
+			</div>
+			<div class="row">
 				<div class="col-sm-4 form-group">
 					<label>联系人</label> <input type="text" class="form-control">
 				</div>
@@ -32,13 +37,16 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-12 form-group">
-					<label>检测时间</label> <input type="date" class="form-control">
+				<div class="col-sm-6 form-group">
+					<label>传真</label> <input type="text" class="form-control">
+				</div>
+				<div class="col-sm-6 form-group">
+					<label>Email</label> <input type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-12 form-group">
-					<label>报告提交时间</label> <input type="date" class="form-control">
+					<h3>噪 声</h3>
 				</div>
 			</div>
 			<div class="row">
@@ -46,10 +54,12 @@
 					<table class="table table-bordered" style="TABLE-LAYOUT: fixed">
 						<thead>
 							<tr>
-								<th>检测地点</th>
-								<th>检测指标</th>
-								<th>检测点数</th>
-								<th>样品数</th>
+								<th>序号</th>
+								<th>测试地点</th>
+								<th>测试项目</th>
+								<th>测试及检测依据</th>
+								<th>测试仪器</th>
+								<th>备注</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -58,20 +68,12 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
 								<td></td>
 								<td></td>
 							</tr>
 							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -82,104 +84,12 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
 								<td></td>
 								<td></td>
 							</tr>
 							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -190,22 +100,129 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-4 form-group">
-					<label>通知人</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-4 form-group">
-					<label>审核人</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-4 form-group">
-					<label>接收人</label> <input type="text" class="form-control">
+				<div class="col-sm-12 form-group">
+					<h3>噪采光系数</h3>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-4 form-group">
-					<label>提交日期</label> <input type="date" class="form-control">
+				<div class="col-sm-12 form-group">
+					<table class="table table-bordered" style="TABLE-LAYOUT: fixed">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th>测试地点</th>
+								<th>测试项目</th>
+								<th>测试及检测依据</th>
+								<th>测试仪器</th>
+								<th>备注</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
-				<div class="col-sm-4 col-sm-offset-4 form-group">
-					<label>接收时间</label> <input type="date" class="form-control">
+			</div>
+			<div class="row">
+				<div class="col-sm-12 form-group">
+					<h3>照 度</h3>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 form-group">
+					<table class="table table-bordered" style="TABLE-LAYOUT: fixed">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th>测试地点</th>
+								<th>测试项目</th>
+								<th>测试及检测依据</th>
+								<th>测试仪器</th>
+								<th>备注</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6 form-group">
+					<label>方案编制人</label> <input type="text" class="form-control">
+				</div>
+				<div class="col-sm-6 form-group">
+					<label>&nbsp;</label> <input type="date" class="form-control">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6 form-group">
+					<label>审核人</label> <input type="text" class="form-control">
+				</div>
+				<div class="col-sm-6 form-group">
+					<label>&nbsp;</label> <input type="date" class="form-control">
 				</div>
 			</div>
 		</form>

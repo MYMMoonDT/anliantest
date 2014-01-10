@@ -2,54 +2,24 @@
 	pageEncoding="UTF-8"%>
 <link rel="stylesheet" href="ui/css/form.css">
 <div class="panel panel-default">
-	<div class="panel-heading">公共场所卫生检测通知单</div>
+	<div class="panel-heading">实验室仪器设备使用记录表</div>
 	<div class="panel-body">
-		<form>
-			<div class="row">
-				<div class="col-sm-8 form-group">
-					<label>项目名称</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-4 form-group">
-					<label>项目编号</label> <input type="text" class="form-control">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-12 form-group">
-					<label>单位名称</label> <input type="text" class="form-control">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-12 form-group">
-					<label>单位地址</label> <input type="text" class="form-control">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-4 form-group">
-					<label>联系人</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-8 form-group">
-					<label>联系电话</label> <input type="text" class="form-control">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-12 form-group">
-					<label>检测时间</label> <input type="date" class="form-control">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-12 form-group">
-					<label>报告提交时间</label> <input type="date" class="form-control">
-				</div>
-			</div>
+		<form>			
 			<div class="row">
 				<div class="col-sm-12 form-group">
 					<table class="table table-bordered" style="TABLE-LAYOUT: fixed">
 						<thead>
 							<tr>
-								<th>检测地点</th>
-								<th>检测指标</th>
-								<th>检测点数</th>
-								<th>样品数</th>
+								<th>日期</th>
+								<th>时间</th>
+								<th>样品名称</th>
+								<th>样品编号</th>
+								<th>样品数量</th>
+								<th>使用目的</th>
+								<th>使用前状态</th>
+								<th>使用后状态</th>
+								<th>使用者</th>
+								<th>备注</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -58,14 +28,8 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -76,14 +40,8 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -94,14 +52,8 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -112,14 +64,8 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -130,14 +76,8 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -148,14 +88,8 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
@@ -166,20 +100,80 @@
 								<td></td>
 								<td></td>
 								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr contenteditable="true">
 								<td></td>
 								<td></td>
 								<td></td>
 								<td></td>
 							</tr>
 							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr contenteditable="true">
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
 								<td></td>
 								<td></td>
 								<td></td>
@@ -189,25 +183,7 @@
 					</table>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-sm-4 form-group">
-					<label>通知人</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-4 form-group">
-					<label>审核人</label> <input type="text" class="form-control">
-				</div>
-				<div class="col-sm-4 form-group">
-					<label>接收人</label> <input type="text" class="form-control">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-4 form-group">
-					<label>提交日期</label> <input type="date" class="form-control">
-				</div>
-				<div class="col-sm-4 col-sm-offset-4 form-group">
-					<label>接收时间</label> <input type="date" class="form-control">
-				</div>
-			</div>
+
 		</form>
 	</div>
 </div>
