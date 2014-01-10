@@ -4,9 +4,9 @@ table thead th {
 table tbody tr {
   height: 40px;
 }
-.form-company .panel-heading {
+.panel-heading {
   font-size: 16px;
 }
-.form-company .panel-body label {
+.panel-body label {
   font-size: 16px;
 }

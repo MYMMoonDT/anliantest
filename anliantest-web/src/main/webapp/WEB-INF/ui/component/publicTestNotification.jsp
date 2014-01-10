@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <link rel="stylesheet" href="ui/css/form.css">
-<div class="panel panel-default">
+<div class="panel panel-default form-customer">
 	<div class="panel-heading">客户资料登记单</div>
 	<div class="panel-body">
 		<form role="form">

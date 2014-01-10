@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="ui/css/fieldInvestigation.css">
-<div class="panel panel-default form-field">
+<link rel="stylesheet" href="ui/css/form.css">
+<div class="panel panel-default">
 	<div class="panel-heading">职业病危害评价现场调查表</div>
 	<div class="panel-body">
 		<form role="form">
