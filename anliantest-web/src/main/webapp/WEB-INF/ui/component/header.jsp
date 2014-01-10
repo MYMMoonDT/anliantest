@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<% 
+    String context = request.getContextPath();
+    request.setAttribute("context",context);
+%>
 <link rel="stylesheet" href="ui/css/header.css">
 <nav class="navbar navbar-default" role="navigation">
   <!-- Brand and toggle get grouped for better mobile display -->
@@ -49,7 +52,7 @@
         <ul class="dropdown-menu">
           <li><a href="#">设置</a></li>
           <li class="divider"></li>
-          <li><a href="#">退出</a></li>
+          <li><a href="${context}/doLogout">退出</a></li>
         </ul>
       </li>
     </ul>
