@@ -57,7 +57,6 @@
 	  			</div>
   			</div>
   			<div class = "row">
-  				
   				<div class = "container">
   					<label>审核记录：</label>
   					<textarea rows="5" cols="90" ></textarea>

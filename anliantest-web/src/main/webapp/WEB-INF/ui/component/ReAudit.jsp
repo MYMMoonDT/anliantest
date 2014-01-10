@@ -52,7 +52,6 @@
 		  			<div class="form-group">
 		  				<label>时间</label>
 		  				<input type="text" class="form-control">
-		  				
 		  			</div>
 	  			</div>
   			</div>
