@@ -17,8 +17,9 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6 form-group">
-					<label class="checkbox-inline"> <input type="checkbox">预评
-					</label> <label class="checkbox-inline"> <input type="checkbox">控评
+					<label class="radio-inline"> <input type="radio" name="optionsRadios">预评
+					</label>
+					<label class="radio-inline"> <input type="radio" name="optionsRadios">控评
 					</label>
 				</div>
 			</div>
@@ -130,5 +131,4 @@
 			</div>
 		</form>
 	</div>
-</div>
 </div>
