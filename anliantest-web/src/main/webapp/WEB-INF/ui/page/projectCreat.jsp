@@ -8,18 +8,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>项目管理</title>
+<title>新建项目</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="ui/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="ui/bootstrap/css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="ui/plugin/DataTables/css/jquery.dataTables.css">
 <link rel="stylesheet" href="ui/css/home.css">
 
 <script src="ui/js/jquery/jquery-1.10.2.min.js"></script>
 <script src="ui/bootstrap/js/bootstrap.min.js"></script>
-<script src="ui/plugin/DataTables/js/jquery.dataTables.js"></script>
+
 </head>
 <body>
 	<div class="container">
@@ -35,7 +34,7 @@
 				</c:import>
 			</div>
 			<div class="col-md-9">
-				<c:import url="../component/panel/projectList.jsp"></c:import>
+				
 			</div>
 		</div>
 		<div class="row">
