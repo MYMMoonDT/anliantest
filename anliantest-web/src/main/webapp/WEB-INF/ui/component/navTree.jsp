@@ -5,16 +5,16 @@
     String context = request.getContextPath();
     request.setAttribute("context",context);
 %>
-<link rel="stylesheet" href="ui/css/navTree.css">
+<link rel="stylesheet" href="${context}/ui/css/navTree.css">
 <div class="panel panel-default">
   	<div class="panel-body">
 		<ul class="nav nav-pills nav-stacked nav-tree">
 		  	<c:choose>
 			  	<c:when test="${param.nav == 'home'}">
-			  		<li class="active"><a href="${context}/home">待办事宜</a></li>
+			  		<li class="active"><a href="${context}/home"><span class="badge pull-right">5</span>待办事宜</a></li>
 			  	</c:when>
 			  	<c:otherwise>
-			  		<li><a href="${context}/home">待办事宜</a></li>
+			  		<li><a href="${context}/home"><span class="badge pull-right">5</span>待办事宜</a></li>
 			  	</c:otherwise>
 		  	</c:choose>
 

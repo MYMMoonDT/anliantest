@@ -46,8 +46,4 @@ public class EmployeeController extends BaseController {
 	public String homePage(){
 		return "home";
 	}
-	@RequestMapping(value = "/home_test")
-	public String homeTestPage(){
-		return "home_test";
-	}
 }

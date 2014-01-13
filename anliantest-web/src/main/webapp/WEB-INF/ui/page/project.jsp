@@ -12,13 +12,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="ui/bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="ui/bootstrap/css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="ui/css/home.css">
+<link rel="stylesheet" href="${context}/ui/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="${context}/ui/bootstrap/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="${context}/ui/css/home.css">
 
-<script src="ui/js/jquery/jquery-1.10.2.min.js"></script>
-<script src="ui/bootstrap/js/bootstrap.min.js"></script>
-
+<script src="${context}/ui/js/jquery/jquery-1.10.2.min.js"></script>
+<script src="${context}/ui/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
 	<div class="container">
@@ -34,7 +33,7 @@
 				</c:import>
 			</div>
 			<div class="col-md-9">
-				
+				<c:import url="../component/panel/projectList.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">
