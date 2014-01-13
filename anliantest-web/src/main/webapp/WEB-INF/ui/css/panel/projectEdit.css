@@ -1,0 +1,25 @@
+#project-tab {
+  font-size: 16px;
+}
+#project-content {
+  margin-top: 20px;
+}
+#project-content #projectProcess {
+  margin-left: 30px;
+}
+#project-content #projectProcess .button {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 20px 0;
+  text-decoration: none;
+}
+#project-content #projectProcess .button.button-3d-action:hover,
+#project-content #projectProcess .button.button-3d-primary:hover {
+  color: #FFF;
+}
+#project-content #projectProcess .button.button-3d:hover {
+  color: #666;
+}
+#project-content #projectProcess .button.button-pill {
+  margin-top: 60px;
+}

@@ -24,6 +24,6 @@ body .h6 {
 body .panel .panel-heading {
   font-size: 16px;
 }
-body .panel .panel-body label {
-  font-size: 16px;
+body label {
+  font-size: 15px;
 }
