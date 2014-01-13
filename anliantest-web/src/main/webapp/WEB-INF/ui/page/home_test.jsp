@@ -32,7 +32,7 @@
 				<c:import url="../component/navTree.jsp"></c:import>
 			</div>
 			<div class="col-md-9">
-				<c:import url="../component/publicTestSampleRecordAir.jsp"></c:import>
+				<c:import url="../component/contractReviewForm.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">
