@@ -33,7 +33,15 @@
 			</div>
 			<div class="col-md-9">
 				<!-- 包含编写的表单，测试显示效果 -->
-				<c:import url="../component/temp/SampleEnabledApplication.jsp"></c:import>
+				<!-- -->
+				
+				<c:import url="../component/form/step1/contractReviewForm.jsp"></c:import>
+				
+				
+				<!-- "../component/form/step1/contractReviewForm.jsp" -->
+				<!-- "../component/temp/SampleEnabledApplication.jsp" -->
+				
+				
 			</div>
 		</div>
 		<div class="row">

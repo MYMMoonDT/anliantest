@@ -77,7 +77,15 @@
 						</tbody>
 					</table>
 					<div class="row">
-					技术负责人签字：<input type="text">
+					<div class="col-sm-4 form-group">
+						<label>技术负责人签字：</label> <input type="text" class="form-inline">
+					</div>
+					<div class="col-sm-4 form-group">
+						
+					</div>
+					<div class="col-sm-4 form-group">
+						<label>日期：</label> <input type="date" class="form-inline">
+					</div>
 					</div>
 				</div>
 			</div>
