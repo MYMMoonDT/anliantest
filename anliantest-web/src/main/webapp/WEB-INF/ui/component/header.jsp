@@ -5,7 +5,7 @@
     String context = request.getContextPath();
     request.setAttribute("context",context);
 %>
-<link rel="stylesheet" href="ui/css/header.css">
+<link rel="stylesheet" href="${context}/ui/css/header.css">
 <nav class="navbar navbar-default" role="navigation">
   <!-- Brand and toggle get grouped for better mobile display -->
   <div class="navbar-header">

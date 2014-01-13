@@ -33,7 +33,7 @@
 			</div>
 			<div class="col-md-9">
 				<!-- 包含编写的表单，测试显示效果 -->
-				<c:import url="../component/temp/customerInfoRegister.jsp"></c:import>
+				<c:import url="../component/temp/SampleEnabledApplication.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">
