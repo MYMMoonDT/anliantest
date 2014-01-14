@@ -18,7 +18,7 @@
 				  	<div class="tab-pane active" id="projectProcess">
 				  		<div class="row">
 				  			<div class="col-sm-2">
-				  				<a href="#" class="button button-circle button-3d-action">1.项目录入</a>
+				  				<a href="${context}/project/process/step1" class="button button-circle button-3d-action">1.项目录入</a>
 				  			</div>
 				  			<div class="col-sm-1">
 				  				<a href="#" class="button button-3d-action button-pill"></a>

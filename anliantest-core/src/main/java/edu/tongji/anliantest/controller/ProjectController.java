@@ -15,4 +15,9 @@ public class ProjectController extends BaseController {
 	public String editProjectPage(){
 		return "projectEdit";
 	}
+	
+	@RequestMapping(value = "/process/step1")
+	public String processStep1Page(){
+		return "project_step1";
+	}
 }	
