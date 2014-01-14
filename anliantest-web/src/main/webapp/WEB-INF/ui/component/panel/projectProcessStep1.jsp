@@ -19,9 +19,9 @@
 			<div class="panel-body">
 				<div class="row">
 					<div class="col-sm-12">
-						<button id="creat_project_btn" type="button" class="btn btn-primary">创建</button>
-						<button id="view_edit_project_btn" type="button" class="btn btn-primary">查看/编辑</button>
-						<button id="delete_project_btn" type="button" class="btn btn-primary">删除</button>
+						<button id="creat_record_file_btn" type="button" class="btn btn-primary">创建</button>
+						<button id="view_edit_record_file_btn" type="button" class="btn btn-primary">查看/编辑</button>
+						<button id="delete_record_file_btn" type="button" class="btn btn-primary">删除</button>
 					</div>
 				</div>
 				<div class="row">
