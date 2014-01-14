@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <link rel="stylesheet" href="${context}/ui/plugin/DataTables/media/css/jquery.dataTables.css">
 <link rel="stylesheet" href="${context}/ui/plugin/DataTables/media/css/jquery.dataTables_themeroller.css">
-<link rel="stylesheet" href="${context}/ui/css/panel/projectList.css">
+<link rel="stylesheet" href="${context}/ui/css/dataTable.css">
 <script src="${context}/ui/plugin/DataTables/media/js/jquery.dataTables.js"></script>
 <script src="${context}/ui/js/panel/projectList.js"></script>
 <div class="panel panel-default">
