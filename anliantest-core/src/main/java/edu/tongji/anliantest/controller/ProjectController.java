@@ -20,6 +20,13 @@ public class ProjectController extends BaseController {
 	public String processStep1Page(){
 		return "project_step1";
 	}
+	@RequestMapping(value = "/process/step7")
+	public String processStep7Page(){
+		return "project_step7";
+	}@RequestMapping(value = "/process/step8")
+	public String processStep8Page(){
+		return "project_step8";
+	}
 	
 	@RequestMapping(value = "/process/step1/entrustAgreement")
 	public String processStep1EntrustAgreementPage(){

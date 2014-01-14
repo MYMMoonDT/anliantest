@@ -56,7 +56,7 @@
 				  				<a href="#" class="button button-3d button-pill"></a>
 				  			</div>
 				  			<div class="col-sm-2">
-				  				<a href="#" class="button button-3d button-circle">7.报告书编制</a>
+				  				<a href="${context}/project/process/step7" class="button button-3d button-circle">7.报告书编制</a>
 				  			</div>
 				  			<div class="col-sm-1">
 				  				<a href="#" class="button button-3d button-pill"></a>
@@ -64,7 +64,7 @@
 				  		</div>
 				  		<div class="row">
 				  			<div class="col-sm-2">
-				  				<a href="#" class="button button-3d button-circle">8.报告书初审</a>
+				  				<a href="${context}/project/process/step8" class="button button-3d button-circle">8.报告书初审</a>
 				  			</div>
 				  			<div class="col-sm-1">
 				  				<a href="#" class="button button-3d button-pill"></a>
