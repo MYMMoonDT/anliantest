@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="ui/css/form.css">
+<% 
+    String context = request.getContextPath();
+    request.setAttribute("context",context);
+%>
+<link rel="stylesheet" href="${context}/ui/css/form.css">
 <!-- 
 本表单对应文件： 杭州安联卫生检测技术服务有限公司 委托协议书
 表码：                       ALJC/JL07-01

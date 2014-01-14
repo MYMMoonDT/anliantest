@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="${context}/ui/css/dataTable.css">
 <script src="${context}/ui/plugin/DataTables/media/js/jquery.dataTables.js"></script>
 <script src="${context}/ui/js/panel/projectProcessStep.js"></script>
+<script src="${context}/ui/js/panel/projectProcessStep1.js"></script>
 <div class="panel panel-default">
 	<div class="panel-heading">项目流程-1.项目录入</div>
 	<div class="panel-body">
@@ -87,6 +88,23 @@
 									</td>
 									<td>
 										合同评审记录
+									</td>
+									<td>
+										完成
+									</td>
+									<td>
+										XXX
+									</td>
+									<td>
+										2014.1.4
+									</td>
+								</tr>
+								<tr>
+									<td>
+										XX公司合同更改申请单
+									</td>
+									<td>
+										合同更改申请单
 									</td>
 									<td>
 										完成
