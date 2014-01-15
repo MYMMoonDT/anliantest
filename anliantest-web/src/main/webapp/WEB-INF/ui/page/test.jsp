@@ -35,7 +35,7 @@
 				<!-- 包含编写的表单，测试显示效果 -->
 				<!-- -->
 				
-				<c:import url="../component/form/step1/entrustAgreement.jsp"></c:import>
+				<c:import url="../component/form/step1/contractModifyApplication.jsp"></c:import>
 				
 				
 				<!-- "../component/form/step1/contractReviewForm.jsp" -->
