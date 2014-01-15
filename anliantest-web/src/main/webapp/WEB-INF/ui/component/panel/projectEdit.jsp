@@ -30,13 +30,13 @@
 				  				<a href="#" class="button button-3d-action button-pill"></a>
 				  			</div>
 				  			<div class="col-sm-2">
-				  				<a href="#" class="button button-circle button-3d-action">3.项目前期准备</a>
+				  				<a href="${context}/project/process/step3" class="button button-circle button-3d-action">3.项目前期准备</a>
 				  			</div>
 				  			<div class="col-sm-1">
 				  				<a href="#" class="button button-3d-action button-pill"></a>
 				  			</div>
 				  			<div class="col-sm-3">
-				  				<a href="#" class="button button-circle button-3d-action">4.检测环节</a>
+				  				<a href="${context}/project/process/step4" class="button button-circle button-3d-action">4.检测环节</a>
 				  			</div>
 				  		</div>
 				  		<div class="row">

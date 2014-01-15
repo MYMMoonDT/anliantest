@@ -1,6 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="ui/css/form.css">
+<% 
+    String context = request.getContextPath();
+    request.setAttribute("context",context);
+%>
+<link rel="stylesheet" href="${context}/ui/css/form.css">
+<!-- 
+本表单对应文件：公共场所卫生检测采样方案（空气质量: CO2 / CO/新风量/换气率）
+表码：                      ALJC/JL26-05
+ -->
 <div class="panel panel-default">
 	<div class="panel-heading">公共场所卫生检测采样方案（空气质量: CO<sub>2</sub> / CO/新风量/换气率）</div>
 	<div class="panel-body">

@@ -1,10 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="ui/css/form.css">
+<% 
+    String context = request.getContextPath();
+    request.setAttribute("context",context);
+%>
+<link rel="stylesheet" href="${context}/ui/css/form.css">
+<!-- 
+本表单对应文件：客户资料登记单
+表码：                       ALJC/JL32-02
+ -->
 <div class="panel panel-default">
 	<div class="panel-heading">客户资料登记单</div>
 	<div class="panel-body">
-		<form role="form">
+		<form>
 			<div class="row">
 				<div class="col-sm-6 form-group">
 					<label>客户名称</label> <input type="text" class="form-control"></input>

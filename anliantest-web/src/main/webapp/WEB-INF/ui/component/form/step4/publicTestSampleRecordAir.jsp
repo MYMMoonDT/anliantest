@@ -1,6 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<link rel="stylesheet" href="ui/css/form.css">
+<% 
+    String context = request.getContextPath();
+    request.setAttribute("context",context);
+%>
+<link rel="stylesheet" href="${context}/ui/css/form.css">
+<!-- 
+本表单对应文件：杭州安联卫生检测技术服务有限公司 实验室仪器设备使用记录表
+表码：                   ALJC/JL26-07-01
+ -->
 <div class="panel panel-default">
 	<div class="panel-heading">公共场所空气质量检测采样记录表</div>
 	<div class="panel-body">
