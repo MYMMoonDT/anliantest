@@ -28,6 +28,10 @@ public class ProjectController extends BaseController {
 	public String processStep4Page(){
 		return "project_step4";
 	}
+	@RequestMapping(value = "/process/step5")
+	public String processStep5Page(){
+		return "project_step5";
+	}
 	@RequestMapping(value = "/process/step7")
 	public String processStep7Page(){
 		return "project_step7";
@@ -94,5 +98,32 @@ public class ProjectController extends BaseController {
 	@RequestMapping(value = "/process/step4/publicTestSampleRecordAir")
 	public String processStep4PublicTestSampleRecordAirPage(){
 		return "form/step4/project_step4_publicTestSampleRecordAir";
+	}
+	@RequestMapping(value = "/process/step5/sampleRegestration")
+	public String processStep5RegestrationPage(){
+		return "form/step5/project_step5_sampleRegestration";
+	}
+	@RequestMapping(value = "/process/step5/testSampleExceptionHandle")
+	public String processStep5TestSampleExceptionHandlePage(){
+		return "form/step5/project_step5_testSampleExceptionHandle";
+	}
+	@RequestMapping(value = "/process/step5/sendReceiveRecord")
+	public String procesStep5SendReceiveRecordPage(){
+		return "form/step5/project_step5_sendReceiveRecord";
+	}
+	
+	@RequestMapping(value = "/process/step5/sampleTreatment")
+	public String procesStep5SampleTreatmentPage(){
+		return "form/step5/project_step5_sampleTreatment";
+	}
+	
+	@RequestMapping(value = "/process/step5/sampleEnabledApplication")
+	public String procesStep5SampleEnabledApplicationPage(){
+		return "form/step5/project_step5_sampleEnabledApplication";
+	}
+	
+	@RequestMapping(value = "/process/step5/originalRecord")
+	public String procesStep5OriginalRecordPage(){
+		return "form/step5/project_step5_originalRecord";
 	}
 }	
