@@ -20,6 +20,10 @@ public class ProjectController extends BaseController {
 	public String processStep1Page(){
 		return "project_step1";
 	}
+	@RequestMapping(value = "/process/step2")
+	public String processStep2Page(){
+		return "project_step2";
+	}
 	@RequestMapping(value = "/process/step3")
 	public String processStep3Page(){
 		return "project_step3";
