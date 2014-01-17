@@ -55,6 +55,31 @@ public class ProjectController extends BaseController {
 		return "form/step1/project_step1_contractModifyApplication";
 	}
 	
+	@RequestMapping(value = "/process/step1/contractModifyNotification")
+	public String processStep1ContractModifyNotificationPage(){
+		return "form/step1/project_step1_contractModifyNotification";
+	}
+	
+	@RequestMapping(value = "process/step1/techServiceContractPublicPlace")
+	public String processStep1TechServiceContractPublicPlace(){
+		return "form/step1/project_step1_techServiceContractPublicPlace";
+	}
+	
+	@RequestMapping(value = "process/step1/techServiceContractWorkPlace")
+	public String processStep1TechServiceContractWorkPlace(){
+		return "form/step1/project_step1_techServiceContractWorkPlace";
+	}
+	
+	@RequestMapping(value = "process/step1/techServiceContractConstrProjDiseasePreAssess")
+	public String processStep1TechServiceContractConstrProjDiseasePreAssess(){
+		return "form/step1/project_step1_techServiceContractConstrProjDiseasePreAssess";
+	}
+	
+	@RequestMapping(value = "process/step1/techServiceContractConstrProjDiseaseCtrlEffect")
+	public String processStep1TechServiceContractConstrProjDiseaseCtrlEffect(){
+		return "form/step1/project_step1_techServiceContractConstrProjDiseaseCtrlEffect";
+	}
+	
 	@RequestMapping(value = "/process/step3/customerInfoRegister")
 	public String processStep3CustomerInfoRegisterPage(){
 		return "form/step3/project_step3_customerInfoRegister";
