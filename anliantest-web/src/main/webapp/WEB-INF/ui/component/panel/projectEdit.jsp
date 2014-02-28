@@ -41,7 +41,7 @@
 				  		</div>
 				  		<div class="row">
 				  			<div class="col-sm-1">
-				  				<a href="#" class="button button-3d-primary button-pill"></a>
+				  				<a href="#" class="button button-3d-action button-pill"></a>
 				  			</div>
 				  			<div class="col-sm-2">
 				  				<a href="${context}/project/process/step5" class="button button-circle button-3d-action">5.实验环节</a>
