@@ -9,5 +9,12 @@
   </parent>
   <artifactId>anliantest-utils</artifactId>
   <name>anliantest-utils</name>
-  
+
+		<dependencies>
+			<dependency>
+				<groupId>net.sf.jacob-project</groupId>
+				<artifactId>jacob</artifactId>
+				<version>1.14.3</version>
+			</dependency>
+		</dependencies>
 </project>

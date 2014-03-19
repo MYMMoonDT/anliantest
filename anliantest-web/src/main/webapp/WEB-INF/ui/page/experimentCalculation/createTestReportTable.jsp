@@ -24,22 +24,22 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				<c:import url="../component/header.jsp"></c:import>
+				<c:import url="../../component/header.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3">
-				<c:import url="../component/navTree.jsp">
+				<c:import url="../../component/navTree.jsp">
 					<c:param name="nav" value="experiment"/>
 				</c:import>
 			</div>
 			<div class="col-md-9">
-				
+				<c:import url="../../component/experimentCalculation/createTestReportTable.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<c:import url="../component/footer.jsp"></c:import>
+				<c:import url="../../component/footer.jsp"></c:import>
 			</div>
 		</div>
 	</div>

@@ -1,9 +1,15 @@
 package edu.tongji.anliantest.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 
 import edu.tongji.anliantest.model.EmployeeInfo;
 
@@ -24,5 +30,10 @@ public class BaseController {
 		Assert.hasLength(url, "url not null");
 		Assert.isTrue(url.startsWith("/"), "start with /");
 		return request.getContextPath() + url;
+	}
+	
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true)); 
 	}
 }
