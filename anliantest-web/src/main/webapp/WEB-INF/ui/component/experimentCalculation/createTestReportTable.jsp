@@ -50,10 +50,18 @@
 			</div>
 			<div class="row">			
 				<div class="col-sm-6 form-group">
-					<label>采样日期</label> <input name="sampleTime" type="date" class="form-control">
-				</div>			
+					<label>采样日期</label> <input name="sampleTimeStart" type="date" class="form-control">
+				</div>
 				<div class="col-sm-6 form-group">
-					<label>接受日期</label> <input name="receiveTime" type="date" class="form-control">
+					<label>至</label> <input name="sampleTimeEnd" type="date" class="form-control">
+				</div>
+			</div>
+			<div class="row">		
+				<div class="col-sm-6 form-group">
+					<label>接受日期</label> <input name="receiveTimeStart" type="date" class="form-control">
+				</div>
+				<div class="col-sm-6 form-group">
+					<label>至</label> <input name="receiveTimeEnd" type="date" class="form-control">
 				</div>
 			</div>
 			<div class="row">			

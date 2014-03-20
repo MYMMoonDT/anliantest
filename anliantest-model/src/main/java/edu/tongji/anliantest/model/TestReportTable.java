@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-17 22:45:30 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 13:38:08 by Hibernate Tools 3.4.0.CR1
 
 import java.util.Date;
 import java.util.HashSet;
@@ -36,8 +36,10 @@ public class TestReportTable implements java.io.Serializable {
 	private String testUnitName;
 	private String testUnitAddress;
 	private String entrustUnitName;
-	private Date sampleTime;
-	private Date receiveTime;
+	private Date sampleTimeStart;
+	private Date sampleTimeEnd;
+	private Date receiveTimeStart;
+	private Date receiveTimeEnd;
 	private Date testTimeStart;
 	private Date testTimeEnd;
 	private Date reportTime;
@@ -56,9 +58,10 @@ public class TestReportTable implements java.io.Serializable {
 			EmployeeInfo employeeInfoByPreparerId, String testReportNum,
 			String sampleName, Integer sampleNum, String sampleStatus,
 			String testProperty, String testUnitName, String testUnitAddress,
-			String entrustUnitName, Date sampleTime, Date receiveTime,
-			Date testTimeStart, Date testTimeEnd, Date reportTime,
-			Date tableTime, Set<TestReportItem> testReportItems) {
+			String entrustUnitName, Date sampleTimeStart, Date sampleTimeEnd,
+			Date receiveTimeStart, Date receiveTimeEnd, Date testTimeStart,
+			Date testTimeEnd, Date reportTime, Date tableTime,
+			Set<TestReportItem> testReportItems) {
 		this.tableId = tableId;
 		this.employeeInfoBySignerId = employeeInfoBySignerId;
 		this.projectInfo = projectInfo;
@@ -72,8 +75,10 @@ public class TestReportTable implements java.io.Serializable {
 		this.testUnitName = testUnitName;
 		this.testUnitAddress = testUnitAddress;
 		this.entrustUnitName = entrustUnitName;
-		this.sampleTime = sampleTime;
-		this.receiveTime = receiveTime;
+		this.sampleTimeStart = sampleTimeStart;
+		this.sampleTimeEnd = sampleTimeEnd;
+		this.receiveTimeStart = receiveTimeStart;
+		this.receiveTimeEnd = receiveTimeEnd;
 		this.testTimeStart = testTimeStart;
 		this.testTimeEnd = testTimeEnd;
 		this.reportTime = reportTime;
@@ -206,23 +211,43 @@ public class TestReportTable implements java.io.Serializable {
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "sample_time", length = 19)
-	public Date getSampleTime() {
-		return this.sampleTime;
+	@Column(name = "sample_time_start", length = 19)
+	public Date getSampleTimeStart() {
+		return this.sampleTimeStart;
 	}
 
-	public void setSampleTime(Date sampleTime) {
-		this.sampleTime = sampleTime;
+	public void setSampleTimeStart(Date sampleTimeStart) {
+		this.sampleTimeStart = sampleTimeStart;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "receive_time", length = 19)
-	public Date getReceiveTime() {
-		return this.receiveTime;
+	@Column(name = "sample_time_end", length = 19)
+	public Date getSampleTimeEnd() {
+		return this.sampleTimeEnd;
 	}
 
-	public void setReceiveTime(Date receiveTime) {
-		this.receiveTime = receiveTime;
+	public void setSampleTimeEnd(Date sampleTimeEnd) {
+		this.sampleTimeEnd = sampleTimeEnd;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "receive_time_start", length = 19)
+	public Date getReceiveTimeStart() {
+		return this.receiveTimeStart;
+	}
+
+	public void setReceiveTimeStart(Date receiveTimeStart) {
+		this.receiveTimeStart = receiveTimeStart;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "receive_time_end", length = 19)
+	public Date getReceiveTimeEnd() {
+		return this.receiveTimeEnd;
+	}
+
+	public void setReceiveTimeEnd(Date receiveTimeEnd) {
+		this.receiveTimeEnd = receiveTimeEnd;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)

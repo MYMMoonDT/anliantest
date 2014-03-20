@@ -126,7 +126,7 @@ public class TestDataProcessTable implements java.io.Serializable {
 		this.tableNum = tableNum;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testDataProcessTable")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "testDataProcessTable")
 	public Set<TestDataProcessGroup> getTestDataProcessGroups() {
 		return this.testDataProcessGroups;
 	}

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import edu.tongji.anliantest.dao.HarmfulSubstanceNationalStandardTableDao;
 import edu.tongji.anliantest.model.HarmfulSubstanceNationalStandardTable;
+import edu.tongji.anliantest.model.TestReportItem;
 
 @Service
 public class HarmfulSubstanceNationalStandardService {
@@ -23,5 +24,13 @@ public class HarmfulSubstanceNationalStandardService {
 	
 	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTableById(int id) {
 		return harmfulSubstanceNationalStandardTableDao.get(id);
+	}
+	
+	public void addItem(HarmfulSubstanceNationalStandardTable item) {
+		harmfulSubstanceNationalStandardTableDao.save(item);
+	}
+	
+	public long getItemCount() {
+		return harmfulSubstanceNationalStandardTableDao.getItemCount();
 	}
 }

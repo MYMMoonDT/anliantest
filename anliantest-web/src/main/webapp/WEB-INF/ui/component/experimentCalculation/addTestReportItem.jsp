@@ -24,7 +24,7 @@
 					</select>
 				</div>
 				<div class="col-sm-6 form-group" id="detail" >
-					<label>因素名称</label> <input name="testSubstanceDetailedName" type="text" class="form-control">
+					<label>具体信息</label> <input name="testSubstanceDetailedName" type="text" class="form-control">
 				</div>
 			</div>
 			<div class="row">

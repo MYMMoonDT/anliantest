@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-18 17:58:00 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 13:25:31 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import javax.persistence.Column;
@@ -38,6 +38,7 @@ public class TestDataResultItem implements java.io.Serializable {
 	private String testResult;
 	private Integer testResultRangeScale;
 	private String resultType;
+	private Integer testTouchTimeScale;
 
 	public TestDataResultItem() {
 	}
@@ -55,7 +56,8 @@ public class TestDataResultItem implements java.io.Serializable {
 			BigDecimal ctwa, BigDecimal cstel, BigDecimal om, Integer macScale,
 			Integer ctwaScale, Integer cstelScale, Integer omScale,
 			BigDecimal testResultRangeStart, BigDecimal testResultRangeEnd,
-			String testResult, Integer testResultRangeScale, String resultType) {
+			String testResult, Integer testResultRangeScale, String resultType,
+			Integer testTouchTimeScale) {
 		this.itemId = itemId;
 		this.harmfulSubstanceNationalStandardTable = harmfulSubstanceNationalStandardTable;
 		this.testDataResultTable = testDataResultTable;
@@ -76,6 +78,7 @@ public class TestDataResultItem implements java.io.Serializable {
 		this.testResult = testResult;
 		this.testResultRangeScale = testResultRangeScale;
 		this.resultType = resultType;
+		this.testTouchTimeScale = testTouchTimeScale;
 	}
 
 	@Id
@@ -260,6 +263,15 @@ public class TestDataResultItem implements java.io.Serializable {
 
 	public void setResultType(String resultType) {
 		this.resultType = resultType;
+	}
+
+	@Column(name = "test_touch_time_scale")
+	public Integer getTestTouchTimeScale() {
+		return this.testTouchTimeScale;
+	}
+
+	public void setTestTouchTimeScale(Integer testTouchTimeScale) {
+		this.testTouchTimeScale = testTouchTimeScale;
 	}
 
 }

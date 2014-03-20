@@ -30,7 +30,7 @@ import edu.tongji.anliantest.service.HarmfulSubstanceNationalStandardService;
 import edu.tongji.anliantest.service.TestDataProcessService;
 import edu.tongji.anliantest.service.TestDataResultService;
 import edu.tongji.anliantest.service.TestReportService;
-import edu.tongji.anliantest.utils.StudyJacob;
+import edu.tongji.anliantest.utils.DocumentGeneration;
 
 @Controller
 public class ExperimentCalcController extends BaseController {
@@ -157,6 +157,7 @@ public class ExperimentCalcController extends BaseController {
 		resultItem.setTestWorkshopJob(groupList.get(0).getTestWorkshopJob());
 		resultItem.setTestSampleCount(sampleCount);
 		resultItem.setTestTouchTime(groupTouchTime);
+		resultItem.setTestTouchTimeScale(reportItemList.get(0).getTestTouchTimeScale());
 		resultItem.setTestResultRangeScale(reportItemList.get(0).getTestResultScale());
 		resultItem.setSubstanceDetailedName(reportItemList.get(0).getSubstanceDetailedName());
 		if (range.getStart() != null) {
@@ -287,6 +288,7 @@ public class ExperimentCalcController extends BaseController {
 				processTableItem.setTestResultType(reportItem.getTestResultType());
 				processTableItem.setTestSampleNum(reportItem.getTestSampleNum());
 				processTableItem.setTestTouchTime(reportItem.getTestTouchTime());
+				processTableItem.setTestTouchTimeScale(reportItem.getTestTouchTimeScale());
 				testDataProcessService.addItem(processTableItem);
 				BigDecimal calculatedResult = reportItem.getTestResult().multiply(BigDecimal.valueOf(reportItem.getTestCollectTime()/15));
 				if (hasLess && hasEqual) {
@@ -396,12 +398,14 @@ public class ExperimentCalcController extends BaseController {
 					if (data.getTestResult()[i][j] != "") {
 						TestReportItem temp = new TestReportItem();
 						temp.setItemId(reportItemIdBegin+offset);
-						temp.setTestTouchTime(data.getTestTouchTime()[i][j]);
+						temp.setTestTouchTime(BigDecimal.valueOf(Double.valueOf(data.getTestTouchTime()[i][j])));
+						String touchTime = data.getTestTouchTime()[i][j];
+						temp.setTestTouchTimeScale(touchTime.length() - touchTime.indexOf('.') - 1);
 						temp.setTestCollectTime(data.getTestCollectTime()[i][j]);
 						temp.setTestReportTable(reportTable);
 						
 						String testResult = data.getTestResult()[i][j];
-						int scale = testResult.length() - testResult.indexOf('.') - 1;
+
 						if (Character.isDigit(testResult.charAt(0))) {
 							temp.setTestResult(BigDecimal.valueOf(Double.valueOf(testResult)));
 							temp.setTestResultType("=");
@@ -420,7 +424,7 @@ public class ExperimentCalcController extends BaseController {
 						temp.setTestSubstance(harmfulSubstanceNationalStandardService.getStandardNameById(data.getTestSubstanceId()));
 						temp.setTestTime(data.getTestTime()[i]);
 						temp.setTestWorkshopJob(data.getTestWorkshopJob());
-						temp.setTestResultScale(scale);
+						temp.setTestResultScale(testResult.length() - testResult.indexOf('.') - 1);
 						temp.setSubstanceDetailedName(data.getTestSubstanceDetailedName().length() == 0 ? null : data.getTestSubstanceDetailedName());
 						reportItemList.add(temp);
 						offset++;
@@ -461,106 +465,31 @@ public class ExperimentCalcController extends BaseController {
             e.printStackTrace();  
         }  
 	}
+
+	@RequestMapping(value = "/getHarmfulData1")
+	public void getHarmfulData1FromDoc() throws Exception {
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount());
+		for (HarmfulSubstanceNationalStandardTable item : list) {
+			harmfulSubstanceNationalStandardService.addItem(item);
+		}
+	}
 	
-	public void getHarmfulData(String[] args) throws Exception {
-		StudyJacob jacob = new StudyJacob();
-		jacob.openDocument("C:\\2.doc");
-
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
-		int tableIndex = 1;
-		int prevIndex = 0;
-		int tableCol = jacob.getColumnsCount(tableIndex);
-		int tableRow = jacob.getRowsCount(tableIndex);
-		for (int row = 3; row <= tableRow - 1; row++) {
-			HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable();
-			try {
-				String s = jacob.getCellString(tableIndex, row, 1);
-				if (s.length() == 0)
-					continue;
-				prevIndex = Integer.valueOf(s);
-				System.out.println("[" + row + "," + 1 + "] (" + s + ")");
-			} catch (Exception e) {
-				System.out.println("[" + row + "," + 1 + "] (" + prevIndex
-						+ ")");
-			}
-
-			item.setSubstanceEnglishName(jacob
-					.getCellString(tableIndex, row, 2));
-			item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 3));
-			item.setSubstanceChineseName(jacob
-					.getCellString(tableIndex, row, 4));
-			ValueAndScale vs = new ValueAndScale();
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 5))) {
-				item.setMac(vs.getValue());
-				item.setMacScale(vs.getScale());
-			}
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 6))) {
-				item.setPcTwa(vs.getValue());
-				item.setPcTwaScale(vs.getScale());
-			}
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 7))) {
-				item.setPcStel(vs.getValue());
-				item.setPcStelScale(vs.getScale());
-			}
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 8))) {
-				item.setOm(vs.getValue());
-				item.setOmScale(vs.getScale());
-			}
-			item.setSubstanceComment(jacob.getCellString(tableIndex, row, 9));
-			list.add(item);
-		}
-		System.out.println(list.toString());
-		System.out.println("col:" + tableCol + "\trow:" + tableRow);
-		String s = jacob.getCellString(tableIndex, 51, 1);
-		System.out.println("s: " + s);
-		jacob.close();
-		jacob.closeDocument();
-	}
-
-	private boolean getValueAndScaleFromString(ValueAndScale vs, String s) {
-		if (s == null || s.equals("-")) {
-			return false;
-		} else {
-			vs.setValue(new BigDecimal(Double.valueOf(s)));
-			int index = s.indexOf('.');
-			if (index != -1) {
-				vs.setScale(s.length() - index - 1);
-			}
-			return true;
+	@RequestMapping(value = "/getHarmfulData2")
+	public void getHarmfulData2FromDoc() throws Exception {
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount());
+		for (HarmfulSubstanceNationalStandardTable item : list) {
+			harmfulSubstanceNationalStandardService.addItem(item);
 		}
 	}
 
-}
-
-class ValueAndScale {
-	private BigDecimal value;
-	private int scale;
-
-	public ValueAndScale() {
+	@RequestMapping(value = "/generateTables")
+	public void generateTables(HttpServletRequest request) {
+		//TODO REMOVE
+		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
+		generateProcessTableToDoc(processTableId);
 	}
 
-	public ValueAndScale(BigDecimal value, int scale) {
-		this.value = value;
-		this.scale = scale;
-	}
-
-	public BigDecimal getValue() {
-		return value;
-	}
-
-	public void setValue(BigDecimal value) {
-		this.value = value;
-	}
-
-	public int getScale() {
-		return scale;
-	}
-
-	public void setScale(int scale) {
-		this.scale = scale;
+	private void generateProcessTableToDoc(int processTableId) {
+		DocumentGeneration.generateProcessTable(testDataProcessService.getProcessTableById(processTableId));
 	}
 }

@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-18 17:58:00 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 13:11:15 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -31,10 +31,11 @@ public class TestReportItem implements java.io.Serializable {
 	private Integer testSampleId;
 	private String testSampleNum;
 	private BigDecimal testResult;
+	private Integer testResultScale;
 	private String testResultType;
 	private BigDecimal testTouchTime;
+	private Integer testTouchTimeScale;
 	private Integer testCollectTime;
-	private Integer testResultScale;
 
 	public TestReportItem() {
 	}
@@ -47,9 +48,9 @@ public class TestReportItem implements java.io.Serializable {
 			String testWorkshopJob, String testSubstance,
 			Integer testSubstanceId, String substanceDetailedName,
 			Date testTime, Integer testSampleId, String testSampleNum,
-			BigDecimal testResult, String testResultType,
-			BigDecimal testTouchTime, Integer testCollectTime,
-			Integer testResultScale) {
+			BigDecimal testResult, Integer testResultScale,
+			String testResultType, BigDecimal testTouchTime,
+			Integer testTouchTimeScale, Integer testCollectTime) {
 		this.itemId = itemId;
 		this.testReportTable = testReportTable;
 		this.testWorkshopJob = testWorkshopJob;
@@ -60,10 +61,11 @@ public class TestReportItem implements java.io.Serializable {
 		this.testSampleId = testSampleId;
 		this.testSampleNum = testSampleNum;
 		this.testResult = testResult;
+		this.testResultScale = testResultScale;
 		this.testResultType = testResultType;
 		this.testTouchTime = testTouchTime;
+		this.testTouchTimeScale = testTouchTimeScale;
 		this.testCollectTime = testCollectTime;
-		this.testResultScale = testResultScale;
 	}
 
 	@Id
@@ -159,6 +161,15 @@ public class TestReportItem implements java.io.Serializable {
 		this.testResult = testResult;
 	}
 
+	@Column(name = "test_result_scale")
+	public Integer getTestResultScale() {
+		return this.testResultScale;
+	}
+
+	public void setTestResultScale(Integer testResultScale) {
+		this.testResultScale = testResultScale;
+	}
+
 	@Column(name = "test_result_type", length = 2)
 	public String getTestResultType() {
 		return this.testResultType;
@@ -177,6 +188,15 @@ public class TestReportItem implements java.io.Serializable {
 		this.testTouchTime = testTouchTime;
 	}
 
+	@Column(name = "test_touch_time_scale")
+	public Integer getTestTouchTimeScale() {
+		return this.testTouchTimeScale;
+	}
+
+	public void setTestTouchTimeScale(Integer testTouchTimeScale) {
+		this.testTouchTimeScale = testTouchTimeScale;
+	}
+
 	@Column(name = "test_collect_time")
 	public Integer getTestCollectTime() {
 		return this.testCollectTime;
@@ -184,15 +204,6 @@ public class TestReportItem implements java.io.Serializable {
 
 	public void setTestCollectTime(Integer testCollectTime) {
 		this.testCollectTime = testCollectTime;
-	}
-
-	@Column(name = "test_result_scale")
-	public Integer getTestResultScale() {
-		return this.testResultScale;
-	}
-
-	public void setTestResultScale(Integer testResultScale) {
-		this.testResultScale = testResultScale;
 	}
 
 }

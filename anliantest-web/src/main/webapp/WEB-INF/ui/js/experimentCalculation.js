@@ -108,14 +108,28 @@
 //		});	
 //	});
 //};
-var ParticlesNotOtherwiseRegulatedId = 0;
+var ParticlesNotOtherwiseRegulatedId = 461;
+var PercentIdList = [439, 440, 441, 442, 443, 444];
 function setDetailVisibility() {
 	$("#detail").find("input").val("");
-	if ($("#substance").val() == ParticlesNotOtherwiseRegulatedId) {
+	var id = $("#substance").val();
+	if (id == ParticlesNotOtherwiseRegulatedId) {
+		$("#detail").show();
+	} else if (inList(id, PercentIdList)){
 		$("#detail").show();
 	} else {
 		$("#detail").hide();
 	}
+}
+
+function inList(target, list) {
+	var isIn = false;
+	for (var i = 0; i < list.length; i++) {
+		if (target == list[i]) {
+			isIn = true;
+		}
+	}
+	return isIn;
 }
 $(function loadSelector() {
 	$("#substance").bind("change", setDetailVisibility);

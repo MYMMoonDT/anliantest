@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-18 17:58:00 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 13:25:31 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -88,7 +88,7 @@ public class TestDataProcessGroup implements java.io.Serializable {
 		this.groupId = groupId;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "substance_id")
 	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTable() {
 		return this.harmfulSubstanceNationalStandardTable;
@@ -228,7 +228,7 @@ public class TestDataProcessGroup implements java.io.Serializable {
 		this.resultType = resultType;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testDataProcessGroup")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "testDataProcessGroup")
 	public Set<TestDataProcessItem> getTestDataProcessItems() {
 		return this.testDataProcessItems;
 	}

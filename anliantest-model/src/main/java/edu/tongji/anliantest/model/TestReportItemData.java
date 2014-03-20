@@ -1,6 +1,5 @@
 package edu.tongji.anliantest.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class TestReportItemData {
@@ -13,36 +12,15 @@ public class TestReportItemData {
 	private Integer testSampleId;
 	private String testSampleNum;
 	private String[][] testResult;
-	private BigDecimal[][] testTouchTime;
+	private String[][] testTouchTime;
 	private Integer[][] testCollectTime;
 	private String testSubstanceDetailedName;
 	
 	public TestReportItemData() {
 		this.testResult = new String[3][4];
-		this.testTouchTime = new BigDecimal[3][4];
+		this.testTouchTime = new String[3][4];
 		this.testCollectTime = new Integer[3][4];
 	}
-
-	public TestReportItemData(int itemId, String testWorkshopJob,
-			String testSubstance, Integer testSubstanceId, Date[] testTime,
-			Integer testSampleId, String testSampleNum, String[][] testResult,
-			BigDecimal[][] testTouchTime, Integer[][] testCollectTime,
-			String testSubstanceDetailedName) {
-		super();
-		this.itemId = itemId;
-		this.testWorkshopJob = testWorkshopJob;
-		this.testSubstance = testSubstance;
-		this.testSubstanceId = testSubstanceId;
-		this.testTime = testTime;
-		this.testSampleId = testSampleId;
-		this.testSampleNum = testSampleNum;
-		this.testResult = testResult;
-		this.testTouchTime = testTouchTime;
-		this.testCollectTime = testCollectTime;
-		this.testSubstanceDetailedName = testSubstanceDetailedName;
-	}
-
-
 
 	public int getItemId() {
 		return itemId;
@@ -108,11 +86,11 @@ public class TestReportItemData {
 		this.testResult = testResult;
 	}
 
-	public BigDecimal[][] getTestTouchTime() {
+	public String[][] getTestTouchTime() {
 		return testTouchTime;
 	}
 
-	public void setTestTouchTime(BigDecimal[][] testTouchTime) {
+	public void setTestTouchTime(String[][] testTouchTime) {
 		this.testTouchTime = testTouchTime;
 	}
 
@@ -132,4 +110,5 @@ public class TestReportItemData {
 		this.testSubstanceDetailedName = testSubstanceDetailedName;
 	}
 
+	
 }

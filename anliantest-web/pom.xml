@@ -24,6 +24,11 @@
 			<artifactId>anliantest-model</artifactId>
 			<version>${anliantest.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>edu.tongji.anliantest</groupId>
+			<artifactId>anliantest-utils</artifactId>
+			<version>${anliantest.version}</version>
+		</dependency>
 
 		<!-- start Spring Dependency -->
 		<dependency>
