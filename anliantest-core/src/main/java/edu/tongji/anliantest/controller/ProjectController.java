@@ -1,11 +1,53 @@
 package edu.tongji.anliantest.controller;
 
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import edu.tongji.anliantest.model.EmployeeInfo;
+import edu.tongji.anliantest.model.ProjectInfo;
+import edu.tongji.anliantest.service.EmployeeService;
+import edu.tongji.anliantest.service.ProjectInfoService;
 
 @Controller
 @RequestMapping(value = "/project")
 public class ProjectController extends BaseController {
+	
+	@Autowired
+	private EmployeeService employeeService;
+	@Autowired
+	private ProjectInfoService projectInfoService;
+	
+	@RequestMapping(value="/createProject")//创建项目
+	public ModelAndView createProject(HttpServletRequest request, ProjectInfo projectInfo){
+		ModelAndView mad = new ModelAndView();
+		
+		EmployeeInfo businessEmployee = employeeService.getEmployeeByEmployeeName((String) request.getAttribute("businessEmployee"));
+		EmployeeInfo projectEmployee = employeeService.getEmployeeByEmployeeName((String) request.getAttribute("projectEmployee"));
+		projectInfo.setEmployeeInfoByBusinessEmployeeId(businessEmployee);//业务负责人
+		projectInfo.setEmployeeInfoByProjectEmployeeId(projectEmployee);//项目负责人
+		projectInfo.setProjectCreateTime(new Date());//创建日期
+		projectInfoService.addProject(projectInfo);//持久化
+		
+		mad.addObject("projectInfo",projectInfo);
+		mad.setViewName("forward:process/step1/contractReviewForm");
+		
+		return mad;
+	}
+	
+	@RequestMapping(value="/addContractReviewRecord")//创建合同评审记录
+	public ModelAndView addContractReviewRecord(){
+		ModelAndView mad = new ModelAndView();
+		
+		return mad;
+	}
+	
 	@RequestMapping(value = "/create")
 	public String createProjectPage(){
 		return "projectCreate";

@@ -15,4 +15,8 @@ public class EmployeeService {
 	public EmployeeInfo getEmployeeByEmployeeNum(String employeeNum){
 		return employeeeDao.getEmployeeByEmployeeNum(employeeNum);
 	}
+	
+	public EmployeeInfo getEmployeeByEmployeeName(String employeeName){
+		return employeeeDao.getEmployeeByEmployeeName(employeeName);
+	}
 }
