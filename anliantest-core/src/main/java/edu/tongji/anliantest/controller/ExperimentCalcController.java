@@ -390,6 +390,14 @@ public class ExperimentCalcController extends BaseController {
 		return dayCount;
 	}
 
+	private int getScaleFromNumStr(String num) {
+		int index = num.indexOf('.');
+		if (index == -1)
+			return 0;
+		else
+			return num.length() - index - 1;
+	}
+	
 	private ArrayList<TestReportItem> getReportItemListFromInput(
 			HttpServletRequest request, TestReportItemData data, Range<BigDecimal> range) {
 		ArrayList<TestReportItem> reportItemList = new ArrayList<TestReportItem>();
@@ -407,7 +415,7 @@ public class ExperimentCalcController extends BaseController {
 						temp.setItemId(reportItemIdBegin+offset);
 						temp.setTestTouchTime(BigDecimal.valueOf(Double.valueOf(data.getTestTouchTime()[i][j])));
 						String touchTime = data.getTestTouchTime()[i][j];
-						temp.setTestTouchTimeScale(touchTime.length() - touchTime.indexOf('.') - 1);
+						temp.setTestTouchTimeScale(getScaleFromNumStr(touchTime));
 						temp.setTestCollectTime(data.getTestCollectTime()[i][j]);
 						temp.setTestReportTable(reportTable);
 						
@@ -432,7 +440,7 @@ public class ExperimentCalcController extends BaseController {
 						temp.setTestSubstance(harmfulSubstanceNationalStandardService.getStandardNameById(data.getTestSubstanceId()));
 						temp.setTestTime(data.getTestTime()[i]);
 						temp.setTestWorkshopJob(data.getTestWorkshopJob());
-						temp.setTestResultScale(testResult.length() - testResult.indexOf('.') - 1);
+						temp.setTestResultScale(getScaleFromNumStr(testResult));
 						temp.setSubstanceDetailedName(data.getTestSubstanceDetailedName().length() == 0 ? null : data.getTestSubstanceDetailedName());
 						reportItemList.add(temp);
 						offset++;
@@ -496,11 +504,18 @@ public class ExperimentCalcController extends BaseController {
 		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
 		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
 		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
-		String fileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + "有毒物质 计算结果表.doc";
-		generateProcessTableToDoc(processTable, fileName);
+		String processFileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + "有毒物质 计算结果表.doc";
+		//generateProcessTableToDoc(processTable, processFileName);
+		int resultTableId = 4;//getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
+		TestDataResultTable resultTable = testDataResultService.getResultTableByid(resultTableId);
+		String resultFileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + " 结果与评价.doc";
+		generateResultTableToDoc(resultTable, resultFileName);
 	}
 
 	private void generateProcessTableToDoc(TestDataProcessTable processTable, String fileName) {
 		documentGeneration.generateProcessTable(processTable, fileName);
+	}
+	private void generateResultTableToDoc(TestDataResultTable resultTable, String fileName) {
+		documentGeneration.generateResultTable(resultTable, fileName);
 	}
 }

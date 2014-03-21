@@ -36,4 +36,10 @@ public class ValueAndScale {
 			return null;
 		return value.setScale(scale).toString();
 	}
+	
+	public String toTypeString(String type) {
+		if (value == null || scale == null)
+			return null;
+		return type + value.setScale(scale).toString();
+	}
 }

@@ -70,7 +70,7 @@ public class TestDataResultTable implements java.io.Serializable {
 		this.tableName = tableName;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testDataResultTable")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "testDataResultTable")
 	public Set<TestDataResultItem> getTestDataResultItems() {
 		return this.testDataResultItems;
 	}

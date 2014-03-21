@@ -91,7 +91,7 @@ public class TestDataResultItem implements java.io.Serializable {
 		this.itemId = itemId;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "substance_id")
 	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTable() {
 		return this.harmfulSubstanceNationalStandardTable;

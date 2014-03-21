@@ -13,31 +13,342 @@ import edu.tongji.anliantest.model.HarmfulSubstanceNationalStandardTable;
 import edu.tongji.anliantest.model.TestDataProcessGroup;
 import edu.tongji.anliantest.model.TestDataProcessItem;
 import edu.tongji.anliantest.model.TestDataProcessTable;
+import edu.tongji.anliantest.model.TestDataResultItem;
+import edu.tongji.anliantest.model.TestDataResultTable;
 
 public class DocumentGeneration {
-//	StudyJacob jacob;
-//	
-//	public DocumentGeneration() {
-//		this.jacob = new StudyJacob();
-//	}
-	
-//	public static void main(String[] args) {
-//		
-//	}
 	private int ParticlesNotOtherwiseRegulatedId = 461;
 	private int[] PercentIdList = {439, 440, 441, 442, 443, 444};
-	
-	private void setPage(StudyJacob jacob) {
-		jacob.setPageOrientation(1);
-		Dispatch pageSetup = jacob.getPageSetup();
-		Dispatch.put(pageSetup, "TopMargin", jacob.centimetersToPoints(0.8));
-		Dispatch.put(pageSetup, "BottomMargin", jacob.centimetersToPoints(0.8));
-		Dispatch.put(pageSetup, "LeftMargin", jacob.centimetersToPoints(1.27));
-		Dispatch.put(pageSetup, "RightMargin", jacob.centimetersToPoints(1.27));
+
+	public void generateResultTable(TestDataResultTable resultTable, String fileName) {
+		StudyJacob jacob = new StudyJacob();
+		jacob.createNewDocument();
+		setPage(jacob, 3.17, 2.54);
+		Dispatch font = jacob.getFont();
+		Dispatch.put(font, "Name", new Variant("仿宋"));
+		Dispatch.put(font, "Name", new Variant("Times New Roman"));
 		
+		addResultDataToTable(resultTable, jacob);
+		
+		
+		jacob.save("C:\\"+fileName);
+		jacob.closeDocument();
+		jacob.close();
+	}
+	
+	private void addResultDataToTable(TestDataResultTable resultTable,
+			StudyJacob jacob) {
+		int tableCol = 14;
+		int tableRow = 1;
+		Dispatch table = jacob.insertTable(tableCol, tableRow);
+		Dispatch borders = Dispatch.get(table, "Borders").toDispatch();
+		Dispatch.put(borders, "InsideLineStyle", new Variant(1));
+		Dispatch.put(borders, "OutsideLineStyle", new Variant(1));
+		
+		jacob.setTableAlignCenter();
+		
+		//Dispatch font = jacob.getFont();
+		//Dispatch.put(font, "Bold", new Variant(true));
+		tableRow = addResultTableHeadingRows(jacob);
+		//font = jacob.getFont();
+		//Dispatch.put(font, "Bold", new Variant(false));
+		
+		int cellRowIdx = tableRow, cellColIdx = 1;
+		int mergeRowBegin = cellRowIdx;
+		Iterator<TestDataResultItem> itemIt = resultTable.getTestDataResultItems().iterator();
+		while (itemIt.hasNext()) {
+			TestDataResultItem item = itemIt.next();
+			jacob.putTxtToCell(cellRowIdx, 1, item.getTestWorkshopJob());
+			HarmfulSubstanceNationalStandardTable substance = item.getHarmfulSubstanceNationalStandardTable();
+			jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
+			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
+			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeEnd(), item.getTestResultRangeScale()));
+			String type = item.getResultType().equals("=") ? "" : "<";
+			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(item.getCstel(), item.getCstelScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(item.getOm(), item.getOmScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(substance.getMac(), substance.getMacScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult().toString());
+			
+			if (itemIt.hasNext()) {
+				jacob.addRow();
+				tableRow++;
+				cellRowIdx++;
+			}
+		}
+		
+//		for (int row = mergeRowBegin + 1; row <= cellRowIdx; row++) {
+//			//for (int col = 1; col <= tableCol; col++) {
+//			int col = 1;
+//				String mergeStr;
+//				try {
+//					mergeStr = jacob.getCellString(mergeRowBegin, col);
+//
+//					if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
+//						jacob.deleteCellTxt(row, col);
+//						jacob.mergeCell(mergeRowBegin, col, row, col);
+//					} else {
+//						jacob.putTxtToCell(row, col, mergeStr);
+//						continue;
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			//}
+//		}
+		String prevStr = "";
+		int prevRowIdx = 1;
+		for (cellRowIdx = 1; cellRowIdx <= tableRow; cellRowIdx++) {
+			String curStr;
+			try {
+				curStr = jacob.getCellString(cellRowIdx, cellColIdx);
+				if (curStr.equals(prevStr)
+						&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
+					jacob.deleteCellTxt(cellRowIdx, cellColIdx);
+					jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
+				} else {
+					prevRowIdx = cellRowIdx;
+					prevStr = curStr;
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+	}
+
+	private String getRangeString(BigDecimal start, BigDecimal end, int scale) {
+		StringBuffer temp = new StringBuffer();
+		if (start != null) {
+			temp.append(new ValueAndScale(start, scale).toString());
+			temp.append("-");
+		} else {
+			temp.append("<");
+		}
+		temp.append(new ValueAndScale(end, scale));
+		return temp.toString();
+	}
+	private int addResultTableHeadingRows(StudyJacob jacob) {		
+		jacob.addRow();
+		jacob.addRow();
+		jacob.setRowHeadingFormat(1);
+		jacob.setRowHeadingFormat(2);
+
+		jacob.setRowBold(1);
+		jacob.setRowBold(2);
+		
+		jacob.setColumnWidth(4.21, 1);
+		jacob.setColumnWidth(2.75, 2);
+		jacob.setColumnWidth(1.37, 3);
+		jacob.setColumnWidth(1.27, 4);
+		jacob.setColumnWidth(3.17, 5);
+		jacob.setColumnWidth(1.27, 6);
+		jacob.setColumnWidth(1.51, 7);
+		jacob.setColumnWidth(1.65, 8);
+		jacob.setColumnWidth(1.53, 9);
+		jacob.setColumnWidth(1.48, 10);
+		jacob.setColumnWidth(1.26, 11);
+		jacob.setColumnWidth(1.49, 12);
+		jacob.setColumnWidth(1.51, 13);
+		jacob.setColumnWidth(1.56, 14);
+		jacob.setRowsHeight(0.7);
+		jacob.setRowHeight(0.66, 1);
+		jacob.setRowHeight(0.66, 2);
+		
+		jacob.putTxtToCell(1, 1, "检测地点");
+		jacob.mergeCell(1, 1, 2, 1);
+		jacob.putTxtToCell(1, 2, "检测\n项目");
+		jacob.mergeCell(1, 2, 2, 2);
+		jacob.putTxtToCell(1, 3, "样品数（个）");
+		jacob.mergeCell(1, 3, 2, 3);
+		jacob.putTxtToCell(1, 4, "接触时间(h/d)");
+		jacob.mergeCell(1, 4, 2, 4);
+		jacob.putTxtToCell(1, 5, "检测结果\n（mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("）");
+		jacob.mergeCell(1, 5, 1, 9);
+		jacob.putTxtToCell(1, 6, "职业接触限值（mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("）");
+		jacob.mergeCell(1, 6, 1, 9);
+		jacob.putTxtToCell(1, 7, "评价\n结论");
+		jacob.mergeCell(1, 7, 2, 14);
+		jacob.putTxtToCell(2, 5, "范围");
+		jacob.putTxtToCell(2, 6, "C");
+		jacob.insertSubText("MAC");
+		jacob.putTxtToCell(2, 7, "C");
+		jacob.insertSubText("TWA");
+		jacob.putTxtToCell(2, 8, "C");
+		jacob.insertSubText("STEL");
+		jacob.putTxtToCell(2, 9, "超限倍数");
+		jacob.putTxtToCell(2, 10, "MAC");
+		jacob.putTxtToCell(2, 11, "PC-\nTWA");
+		jacob.putTxtToCell(2, 12, "PC-\nSTEL");
+		jacob.putTxtToCell(2, 13, "最大超限倍数");
+		return 3;
+	}
+	
+	public void generateProcessTable(TestDataProcessTable processTable, String fileName) {
+		StudyJacob jacob = new StudyJacob();
+		jacob.createNewDocument();
+		setPage(jacob, 0.8, 1.27);
 		Dispatch font = jacob.getFont();
 		Dispatch.put(font, "Name", new Variant("宋体"));
 		Dispatch.put(font, "Name", new Variant("Times New Roman"));
+
+		// TODO Add projectNum
+		setHeader(jacob, processTable.getTableNum(), "");
+		setNote(jacob);	
+		addProcessDataToTable(processTable, jacob);
+		jacob.breakHeaderFooterLink();
+		
+		jacob.save("C:\\"+fileName);
+		jacob.closeDocument();
+		jacob.close();
+	}
+
+	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
+			StudyJacob jacob = new StudyJacob();
+			jacob.openDocument("C:\\2.doc");
+	
+			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
+			int tableIndex = 1;
+			int prevIndex = 0;
+	//		int tableCol = jacob.getColumnsCount(tableIndex);
+			int tableRow = jacob.getRowsCount(tableIndex);
+			int substanceId = substanceIdBegin;
+			for (int row = 3; row <= tableRow - 1; row++) {
+				try {
+					String s = jacob.getCellString(tableIndex, row, 1);
+					if (s == null)
+						continue;
+					prevIndex = Integer.valueOf(s);
+					System.out.println("[" + row + "," + 1 + "] (" + s + ")");
+				} catch (Exception e) {
+					System.out.println("[" + row + "," + 1 + "] (" + prevIndex
+							+ ")");
+				}
+	
+				HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
+				item.setSubstanceEnglishName(jacob
+						.getCellString(tableIndex, row, 2));
+				item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 3));
+				item.setSubstanceChineseName(jacob
+						.getCellString(tableIndex, row, 4));
+				ValueAndScale vs = new ValueAndScale();
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 5))) {
+					item.setMac(vs.getValue());
+					item.setMacScale(vs.getScale());
+				}
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 6))) {
+					item.setPcTwa(vs.getValue());
+					item.setPcTwaScale(vs.getScale());
+				}
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 7))) {
+					item.setPcStel(vs.getValue());
+					item.setPcStelScale(vs.getScale());
+				}
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 8))) {
+					item.setOm(vs.getValue());
+					item.setOmScale(vs.getScale());
+				}
+				String comment = jacob.getCellString(tableIndex, row, 9);
+				if (comment != null && comment.equals("-")) {
+					comment = null;
+				}
+				item.setSubstanceComment(comment);
+				list.add(item);
+	//			harmfulSubstanceNationalStandardService.addItem(item);
+			}
+			System.out.println("row:" + tableRow);
+	
+			jacob.close();
+			jacob.closeDocument();
+			return list;
+		}
+
+	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
+			StudyJacob jacob = new StudyJacob();
+			jacob.openDocument("C:\\2.doc");
+	
+			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
+			int tableIndex = 2;
+			int prevIndex = 0;
+	//		int tableCol = jacob.getColumnsCount(tableIndex);
+			int tableRow = jacob.getRowsCount(tableIndex);
+			int substanceId = substanceIdBegin;
+			for (int row = 3; row <= tableRow - 1; row++) {
+				try {
+					String s = jacob.getCellString(tableIndex, row, 1);
+					if (s == null)
+						continue;
+					prevIndex = Integer.valueOf(s);
+					System.out.println("[" + row + "," + 1 + "] (" + s + ")");
+				} catch (Exception e) {
+					System.out.println("[" + row + "," + 1 + "] (" + prevIndex
+							+ ")");
+				}
+	
+				HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
+				item.setSubstanceEnglishName(jacob
+						.getCellString(tableIndex, row, 3));
+				item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 4));
+				ValueAndScale vs = new ValueAndScale();
+	
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 7))) {
+					item.setOm(vs.getValue());
+					item.setOmScale(vs.getScale());
+				}
+				String comment = jacob.getCellString(tableIndex, row, 8);
+				if (comment != null && comment.equals("-")) {
+					comment = null;
+				}
+				item.setSubstanceComment(comment);
+	
+				String name = jacob.getCellString(tableIndex, row, 2);
+				item.setSubstanceChineseName(name+"（总尘）");
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 5))) {
+					item.setPcTwa(vs.getValue());
+					item.setPcTwaScale(vs.getScale());
+				}
+				list.add(item);
+	//			harmfulSubstanceNationalStandardService.addItem(item);
+	
+				item.setSubstanceId(substanceId++);
+				item.setSubstanceChineseName(name+"（呼尘）");
+				if (getValueAndScaleFromString(vs,
+						jacob.getCellString(tableIndex, row, 6))) {
+					item.setPcTwa(vs.getValue());
+					item.setPcTwaScale(vs.getScale());
+				}
+				
+				list.add(item);
+	//			harmfulSubstanceNationalStandardService.addItem(item);
+			}
+			System.out.println("row:" + tableRow);
+	
+			jacob.close();
+			jacob.closeDocument();
+			return list;
+		}
+
+	private void setPage(StudyJacob jacob, double verticalMargin, double horizontalMargin) {
+		jacob.setPageOrientation(1);
+		Dispatch pageSetup = jacob.getPageSetup();
+		Dispatch.put(pageSetup, "TopMargin", jacob.centimetersToPoints(verticalMargin));
+		Dispatch.put(pageSetup, "BottomMargin", jacob.centimetersToPoints(verticalMargin));
+		Dispatch.put(pageSetup, "LeftMargin", jacob.centimetersToPoints(horizontalMargin));
+		Dispatch.put(pageSetup, "RightMargin", jacob.centimetersToPoints(horizontalMargin));
 	}
 
 	private static void setHeader(StudyJacob jacob, String tableNum, String projectNum) {
@@ -73,7 +384,7 @@ public class DocumentGeneration {
 		jacob.switchToMainDoc();
 	}
 	
-	private int addTableHeadingRows(StudyJacob jacob) {		
+	private int addProcessTableHeadingRows(StudyJacob jacob) {		
 		jacob.addRow();
 		jacob.addRow();
 		jacob.setRowHeadingFormat(1);
@@ -135,7 +446,7 @@ public class DocumentGeneration {
 		return 3;
 	}
 	
-	private static void writeNote(StudyJacob jacob) {
+	private static void setNote(StudyJacob jacob) {
 		jacob.insertBoldText("注：");
 		jacob.insertText("有毒物质C");
 		jacob.insertSubText("STEL");
@@ -186,21 +497,6 @@ public class DocumentGeneration {
 		jacob.insertText("\t\t8---时间加权平均容许浓度规定的8h\n");
 	}
 	
-	public void generateProcessTable(TestDataProcessTable processTable, String fileName) {
-		StudyJacob jacob = new StudyJacob();
-		jacob.createNewDocument();
-		setPage(jacob);
-		// TODO Add projectNum
-		setHeader(jacob, processTable.getTableNum(), "");
-		writeNote(jacob);	
-		addProcessDataToTable(processTable, jacob);
-		//jacob.breakHeaderFooterLink();
-		
-		jacob.save("C:\\"+fileName);
-		jacob.closeDocument();
-		jacob.close();
-	}
-
 	private void addProcessDataToTable(TestDataProcessTable processTable,
 			StudyJacob jacob) {
 		int tableCol = 15;
@@ -208,12 +504,11 @@ public class DocumentGeneration {
 		Dispatch table = jacob.insertTable(tableCol, tableRow);
 		Dispatch borders = Dispatch.get(table, "Borders").toDispatch();
 		Dispatch.put(borders, "InsideLineStyle", new Variant(1));
-		//Dispatch.put(borders, "InsideLineWidth", new Variant(8));
 		Dispatch.put(borders, "OutsideLineStyle", new Variant(1));
 		
 		jacob.setTableAlignCenter();
 		
-		tableRow = addTableHeadingRows(jacob);
+		tableRow = addProcessTableHeadingRows(jacob);
 		ArrayList<Integer> colsNotToMerge = new ArrayList<Integer>();
 		colsNotToMerge.add(4);
 		colsNotToMerge.add(5);
@@ -228,11 +523,12 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 1, dateFormat.format(group.getTestDataTime()));
 			jacob.putTxtToCell(cellRowIdx, 2, group.getTestWorkshopJob());
 			HarmfulSubstanceNationalStandardTable substance = group.getHarmfulSubstanceNationalStandardTable();
-			jacob.putTxtToCell(cellRowIdx, 3, substance.getSubstanceChineseName() + getDetailedName(group, substance));
-			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(group.getMac(), group.getMacScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(group.getCtwa(), group.getCtwaScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(group.getCstel(), group.getCstelScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(group.getOm(), group.getOmScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 3, substance.getSubstanceChineseName() + getDetailedName(group.getSubstanceDetailedName(), substance.getSubstanceId()));
+			String type = group.getResultType().equals("=") ? "" : "<";
+			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(group.getMac(), group.getMacScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(group.getCtwa(), group.getCtwaScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(group.getCstel(), group.getCstelScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(group.getOm(), group.getOmScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getMac(), substance.getMacScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
@@ -245,7 +541,7 @@ public class DocumentGeneration {
 				TestDataProcessItem item = itemIt.next();
 				jacob.putTxtToCell(cellRowIdx, 4, item.getTestSampleNum());
 				jacob.putTxtToCell(cellRowIdx, 5, new ValueAndScale(item.getTestResult(), item.getTestResultScale()).toString());
-				jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getTestTouchTime(), item.getTestResultScale()).toString());
+				jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
 				if (itemIt.hasNext() || groupIt.hasNext())
 					jacob.addRow();
 				tableRow++;
@@ -314,148 +610,18 @@ public class DocumentGeneration {
 	}
 
 	private String getDetailedName(
-			TestDataProcessGroup group, HarmfulSubstanceNationalStandardTable substance) {
-		int substanceId = substance.getSubstanceId();
+			String detailedName, int substanceId) {
+		if (detailedName == null) return "";
+
 		if (substanceId == this.ParticlesNotOtherwiseRegulatedId) {
-			return "（" + group.getSubstanceDetailedName() + "）";
+			return "（" + detailedName + "）";
 		}
 		for (int i = 0; i < this.PercentIdList.length; i++) {
 			if (this.PercentIdList[i] == substanceId) {
-				return "（" + group.getSubstanceDetailedName() + "%）";
+				return "（" + detailedName + "%）";
 			}
 		}
 		return "";
-	}
-
-	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
-		StudyJacob jacob = new StudyJacob();
-		jacob.openDocument("C:\\2.doc");
-
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
-		int tableIndex = 1;
-		int prevIndex = 0;
-//		int tableCol = jacob.getColumnsCount(tableIndex);
-		int tableRow = jacob.getRowsCount(tableIndex);
-		int substanceId = substanceIdBegin;
-		for (int row = 3; row <= tableRow - 1; row++) {
-			try {
-				String s = jacob.getCellString(tableIndex, row, 1);
-				if (s == null)
-					continue;
-				prevIndex = Integer.valueOf(s);
-				System.out.println("[" + row + "," + 1 + "] (" + s + ")");
-			} catch (Exception e) {
-				System.out.println("[" + row + "," + 1 + "] (" + prevIndex
-						+ ")");
-			}
-
-			HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
-			item.setSubstanceEnglishName(jacob
-					.getCellString(tableIndex, row, 2));
-			item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 3));
-			item.setSubstanceChineseName(jacob
-					.getCellString(tableIndex, row, 4));
-			ValueAndScale vs = new ValueAndScale();
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 5))) {
-				item.setMac(vs.getValue());
-				item.setMacScale(vs.getScale());
-			}
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 6))) {
-				item.setPcTwa(vs.getValue());
-				item.setPcTwaScale(vs.getScale());
-			}
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 7))) {
-				item.setPcStel(vs.getValue());
-				item.setPcStelScale(vs.getScale());
-			}
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 8))) {
-				item.setOm(vs.getValue());
-				item.setOmScale(vs.getScale());
-			}
-			String comment = jacob.getCellString(tableIndex, row, 9);
-			if (comment != null && comment.equals("-")) {
-				comment = null;
-			}
-			item.setSubstanceComment(comment);
-			list.add(item);
-//			harmfulSubstanceNationalStandardService.addItem(item);
-		}
-		System.out.println("row:" + tableRow);
-
-		jacob.close();
-		jacob.closeDocument();
-		return list;
-	}
-
-	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
-		StudyJacob jacob = new StudyJacob();
-		jacob.openDocument("C:\\2.doc");
-
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
-		int tableIndex = 2;
-		int prevIndex = 0;
-//		int tableCol = jacob.getColumnsCount(tableIndex);
-		int tableRow = jacob.getRowsCount(tableIndex);
-		int substanceId = substanceIdBegin;
-		for (int row = 3; row <= tableRow - 1; row++) {
-			try {
-				String s = jacob.getCellString(tableIndex, row, 1);
-				if (s == null)
-					continue;
-				prevIndex = Integer.valueOf(s);
-				System.out.println("[" + row + "," + 1 + "] (" + s + ")");
-			} catch (Exception e) {
-				System.out.println("[" + row + "," + 1 + "] (" + prevIndex
-						+ ")");
-			}
-
-			HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
-			item.setSubstanceEnglishName(jacob
-					.getCellString(tableIndex, row, 3));
-			item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 4));
-			ValueAndScale vs = new ValueAndScale();
-
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 7))) {
-				item.setOm(vs.getValue());
-				item.setOmScale(vs.getScale());
-			}
-			String comment = jacob.getCellString(tableIndex, row, 8);
-			if (comment != null && comment.equals("-")) {
-				comment = null;
-			}
-			item.setSubstanceComment(comment);
-
-			String name = jacob.getCellString(tableIndex, row, 2);
-			item.setSubstanceChineseName(name+"（总尘）");
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 5))) {
-				item.setPcTwa(vs.getValue());
-				item.setPcTwaScale(vs.getScale());
-			}
-			list.add(item);
-//			harmfulSubstanceNationalStandardService.addItem(item);
-
-			item.setSubstanceId(substanceId++);
-			item.setSubstanceChineseName(name+"（呼尘）");
-			if (getValueAndScaleFromString(vs,
-					jacob.getCellString(tableIndex, row, 6))) {
-				item.setPcTwa(vs.getValue());
-				item.setPcTwaScale(vs.getScale());
-			}
-			
-			list.add(item);
-//			harmfulSubstanceNationalStandardService.addItem(item);
-		}
-		System.out.println("row:" + tableRow);
-
-		jacob.close();
-		jacob.closeDocument();
-		return list;
 	}
 
 	private boolean getValueAndScaleFromString(ValueAndScale vs, String s) {

@@ -1303,6 +1303,13 @@ public class StudyJacob {
 		this.setRowsHeight(rowHeight);
 	}
 
+	public void setRowBold(int rowIndex) {
+		this.getRow(rowIndex);
+		Dispatch.call(row, "Select");
+		Dispatch font = Dispatch.get(selection, "Font").toDispatch();
+		Dispatch.put(font, "Bold", new Variant(true));
+	}
+	
 	/**
 	 * 设置当前表格指定行的行高
 	 * 
