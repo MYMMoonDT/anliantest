@@ -1,11 +1,12 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-20 13:25:31 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 17:07:37 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -228,6 +230,7 @@ public class TestDataProcessGroup implements java.io.Serializable {
 		this.resultType = resultType;
 	}
 
+	@OrderBy("itemId")
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "testDataProcessGroup")
 	public Set<TestDataProcessItem> getTestDataProcessItems() {
 		return this.testDataProcessItems;

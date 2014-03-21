@@ -46,6 +46,13 @@ public class ExperimentCalcController extends BaseController {
 	private HarmfulSubstanceNationalStandardService harmfulSubstanceNationalStandardService;
 	@Autowired
 	private TestDataResultService testDataResultService;
+	
+	DocumentGeneration documentGeneration;
+	
+	public ExperimentCalcController() {
+		super();
+		documentGeneration = new DocumentGeneration();
+	}
 
 	@RequestMapping(value = "/experimentCalculation")
 	public String experimentCalculationPage(){
@@ -419,7 +426,8 @@ public class ExperimentCalcController extends BaseController {
 						if (range.getStart() != null) {
 							range.setStart(range.getStart().min(temp.getTestResult()));
 						}
-						temp.setTestSampleNum(data.getTestSampleNum()+"-"+(offset+1<10?"0":"")+String.valueOf(offset+1));
+						//+"-"+(offset+1<10?"0":"")+String.valueOf(offset+1)
+						temp.setTestSampleNum(data.getTestSampleNum()[i][j]);
 						temp.setTestSubstanceId(data.getTestSubstanceId());
 						temp.setTestSubstance(harmfulSubstanceNationalStandardService.getStandardNameById(data.getTestSubstanceId()));
 						temp.setTestTime(data.getTestTime()[i]);
@@ -468,7 +476,7 @@ public class ExperimentCalcController extends BaseController {
 
 	@RequestMapping(value = "/getHarmfulData1")
 	public void getHarmfulData1FromDoc() throws Exception {
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount());
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = documentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount());
 		for (HarmfulSubstanceNationalStandardTable item : list) {
 			harmfulSubstanceNationalStandardService.addItem(item);
 		}
@@ -476,7 +484,7 @@ public class ExperimentCalcController extends BaseController {
 	
 	@RequestMapping(value = "/getHarmfulData2")
 	public void getHarmfulData2FromDoc() throws Exception {
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount());
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = documentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount());
 		for (HarmfulSubstanceNationalStandardTable item : list) {
 			harmfulSubstanceNationalStandardService.addItem(item);
 		}
@@ -486,10 +494,13 @@ public class ExperimentCalcController extends BaseController {
 	public void generateTables(HttpServletRequest request) {
 		//TODO REMOVE
 		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
-		generateProcessTableToDoc(processTableId);
+		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
+		String fileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + "有毒物质 计算结果表.doc";
+		generateProcessTableToDoc(processTable, fileName);
 	}
 
-	private void generateProcessTableToDoc(int processTableId) {
-		DocumentGeneration.generateProcessTable(testDataProcessService.getProcessTableById(processTableId));
+	private void generateProcessTableToDoc(TestDataProcessTable processTable, String fileName) {
+		documentGeneration.generateProcessTable(processTable, fileName);
 	}
 }

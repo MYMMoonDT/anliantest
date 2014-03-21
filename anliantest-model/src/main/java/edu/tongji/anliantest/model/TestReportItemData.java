@@ -10,13 +10,14 @@ public class TestReportItemData {
 	private Integer testSubstanceId;
 	private Date[] testTime;
 	private Integer testSampleId;
-	private String testSampleNum;
+	private String[][] testSampleNum;
 	private String[][] testResult;
 	private String[][] testTouchTime;
 	private Integer[][] testCollectTime;
 	private String testSubstanceDetailedName;
 	
 	public TestReportItemData() {
+		this.testSampleNum = new String[3][4];
 		this.testResult = new String[3][4];
 		this.testTouchTime = new String[3][4];
 		this.testCollectTime = new Integer[3][4];
@@ -70,11 +71,11 @@ public class TestReportItemData {
 		this.testSampleId = testSampleId;
 	}
 
-	public String getTestSampleNum() {
+	public String[][] getTestSampleNum() {
 		return testSampleNum;
 	}
 
-	public void setTestSampleNum(String testSampleNum) {
+	public void setTestSampleNum(String[][] testSampleNum) {
 		this.testSampleNum = testSampleNum;
 	}
 

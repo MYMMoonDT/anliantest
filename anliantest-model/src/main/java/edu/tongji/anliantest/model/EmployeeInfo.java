@@ -1,7 +1,9 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2013-12-8 15:43:04 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 17:07:37 by Hibernate Tools 3.4.0.CR1
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +12,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -27,6 +30,27 @@ public class EmployeeInfo implements java.io.Serializable {
 	private String employeePassword;
 	private String employeeTitle;
 	private String employeeAvatar;
+	private Set<TestReportTable> testReportTablesForSignerId = new HashSet<TestReportTable>(
+			0);
+	private Set<TestReportTable> testReportTablesForPreparerId = new HashSet<TestReportTable>(
+			0);
+	private Set<ProjectInfo> projectInfosForBusinessEmployeeId = new HashSet<ProjectInfo>(
+			0);
+	private Set<TestDataProcessTable> testDataProcessTablesForReviewerId = new HashSet<TestDataProcessTable>(
+			0);
+	private Set<TestDataProcessTable> testDataProcessTablesForCalculaterId = new HashSet<TestDataProcessTable>(
+			0);
+	private Set<SamplePlanTable> samplePlanTablesForPlanReviewEmployeeId = new HashSet<SamplePlanTable>(
+			0);
+	private Set<TestReportTable> testReportTablesForReviewerId = new HashSet<TestReportTable>(
+			0);
+	private Set<ProjectInfo> projectInfosForProjectEmployeeId = new HashSet<ProjectInfo>(
+			0);
+	private Set<WorkTaskTable> workTaskTables = new HashSet<WorkTaskTable>(0);
+	private Set<ContractReviewRecordTable> contractReviewRecordTables = new HashSet<ContractReviewRecordTable>(
+			0);
+	private Set<SamplePlanTable> samplePlanTablesForPlanWriteEmployeeId = new HashSet<SamplePlanTable>(
+			0);
 
 	public EmployeeInfo() {
 	}
@@ -40,13 +64,35 @@ public class EmployeeInfo implements java.io.Serializable {
 
 	public EmployeeInfo(DepartmentInfo departmentInfo, String employeeNumber,
 			String employeeName, String employeePassword, String employeeTitle,
-			String employeeAvatar) {
+			String employeeAvatar,
+			Set<TestReportTable> testReportTablesForSignerId,
+			Set<TestReportTable> testReportTablesForPreparerId,
+			Set<ProjectInfo> projectInfosForBusinessEmployeeId,
+			Set<TestDataProcessTable> testDataProcessTablesForReviewerId,
+			Set<TestDataProcessTable> testDataProcessTablesForCalculaterId,
+			Set<SamplePlanTable> samplePlanTablesForPlanReviewEmployeeId,
+			Set<TestReportTable> testReportTablesForReviewerId,
+			Set<ProjectInfo> projectInfosForProjectEmployeeId,
+			Set<WorkTaskTable> workTaskTables,
+			Set<ContractReviewRecordTable> contractReviewRecordTables,
+			Set<SamplePlanTable> samplePlanTablesForPlanWriteEmployeeId) {
 		this.departmentInfo = departmentInfo;
 		this.employeeNumber = employeeNumber;
 		this.employeeName = employeeName;
 		this.employeePassword = employeePassword;
 		this.employeeTitle = employeeTitle;
 		this.employeeAvatar = employeeAvatar;
+		this.testReportTablesForSignerId = testReportTablesForSignerId;
+		this.testReportTablesForPreparerId = testReportTablesForPreparerId;
+		this.projectInfosForBusinessEmployeeId = projectInfosForBusinessEmployeeId;
+		this.testDataProcessTablesForReviewerId = testDataProcessTablesForReviewerId;
+		this.testDataProcessTablesForCalculaterId = testDataProcessTablesForCalculaterId;
+		this.samplePlanTablesForPlanReviewEmployeeId = samplePlanTablesForPlanReviewEmployeeId;
+		this.testReportTablesForReviewerId = testReportTablesForReviewerId;
+		this.projectInfosForProjectEmployeeId = projectInfosForProjectEmployeeId;
+		this.workTaskTables = workTaskTables;
+		this.contractReviewRecordTables = contractReviewRecordTables;
+		this.samplePlanTablesForPlanWriteEmployeeId = samplePlanTablesForPlanWriteEmployeeId;
 	}
 
 	@Id
@@ -113,6 +159,115 @@ public class EmployeeInfo implements java.io.Serializable {
 
 	public void setEmployeeAvatar(String employeeAvatar) {
 		this.employeeAvatar = employeeAvatar;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoBySignerId")
+	public Set<TestReportTable> getTestReportTablesForSignerId() {
+		return this.testReportTablesForSignerId;
+	}
+
+	public void setTestReportTablesForSignerId(
+			Set<TestReportTable> testReportTablesForSignerId) {
+		this.testReportTablesForSignerId = testReportTablesForSignerId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByPreparerId")
+	public Set<TestReportTable> getTestReportTablesForPreparerId() {
+		return this.testReportTablesForPreparerId;
+	}
+
+	public void setTestReportTablesForPreparerId(
+			Set<TestReportTable> testReportTablesForPreparerId) {
+		this.testReportTablesForPreparerId = testReportTablesForPreparerId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByBusinessEmployeeId")
+	public Set<ProjectInfo> getProjectInfosForBusinessEmployeeId() {
+		return this.projectInfosForBusinessEmployeeId;
+	}
+
+	public void setProjectInfosForBusinessEmployeeId(
+			Set<ProjectInfo> projectInfosForBusinessEmployeeId) {
+		this.projectInfosForBusinessEmployeeId = projectInfosForBusinessEmployeeId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByReviewerId")
+	public Set<TestDataProcessTable> getTestDataProcessTablesForReviewerId() {
+		return this.testDataProcessTablesForReviewerId;
+	}
+
+	public void setTestDataProcessTablesForReviewerId(
+			Set<TestDataProcessTable> testDataProcessTablesForReviewerId) {
+		this.testDataProcessTablesForReviewerId = testDataProcessTablesForReviewerId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByCalculaterId")
+	public Set<TestDataProcessTable> getTestDataProcessTablesForCalculaterId() {
+		return this.testDataProcessTablesForCalculaterId;
+	}
+
+	public void setTestDataProcessTablesForCalculaterId(
+			Set<TestDataProcessTable> testDataProcessTablesForCalculaterId) {
+		this.testDataProcessTablesForCalculaterId = testDataProcessTablesForCalculaterId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByPlanReviewEmployeeId")
+	public Set<SamplePlanTable> getSamplePlanTablesForPlanReviewEmployeeId() {
+		return this.samplePlanTablesForPlanReviewEmployeeId;
+	}
+
+	public void setSamplePlanTablesForPlanReviewEmployeeId(
+			Set<SamplePlanTable> samplePlanTablesForPlanReviewEmployeeId) {
+		this.samplePlanTablesForPlanReviewEmployeeId = samplePlanTablesForPlanReviewEmployeeId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByReviewerId")
+	public Set<TestReportTable> getTestReportTablesForReviewerId() {
+		return this.testReportTablesForReviewerId;
+	}
+
+	public void setTestReportTablesForReviewerId(
+			Set<TestReportTable> testReportTablesForReviewerId) {
+		this.testReportTablesForReviewerId = testReportTablesForReviewerId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByProjectEmployeeId")
+	public Set<ProjectInfo> getProjectInfosForProjectEmployeeId() {
+		return this.projectInfosForProjectEmployeeId;
+	}
+
+	public void setProjectInfosForProjectEmployeeId(
+			Set<ProjectInfo> projectInfosForProjectEmployeeId) {
+		this.projectInfosForProjectEmployeeId = projectInfosForProjectEmployeeId;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfo")
+	public Set<WorkTaskTable> getWorkTaskTables() {
+		return this.workTaskTables;
+	}
+
+	public void setWorkTaskTables(Set<WorkTaskTable> workTaskTables) {
+		this.workTaskTables = workTaskTables;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfo")
+	public Set<ContractReviewRecordTable> getContractReviewRecordTables() {
+		return this.contractReviewRecordTables;
+	}
+
+	public void setContractReviewRecordTables(
+			Set<ContractReviewRecordTable> contractReviewRecordTables) {
+		this.contractReviewRecordTables = contractReviewRecordTables;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInfoByPlanWriteEmployeeId")
+	public Set<SamplePlanTable> getSamplePlanTablesForPlanWriteEmployeeId() {
+		return this.samplePlanTablesForPlanWriteEmployeeId;
+	}
+
+	public void setSamplePlanTablesForPlanWriteEmployeeId(
+			Set<SamplePlanTable> samplePlanTablesForPlanWriteEmployeeId) {
+		this.samplePlanTablesForPlanWriteEmployeeId = samplePlanTablesForPlanWriteEmployeeId;
 	}
 
 }

@@ -19,7 +19,7 @@ public class StudyJacob {
 	/**
 	 * word中的当前文档
 	 */
-	private static Dispatch document = null;
+	//private static Dispatch document = null;
 	// private static Dispatch textFrame = null;
 	//
 	/**
@@ -50,6 +50,8 @@ public class StudyJacob {
 	 * 表格中的某一列
 	 */
 	private Dispatch column;
+	private Dispatch font;
+
 	/**
 	 * 打开word时同时要打开的文档，不指定时将新建一个空白文档
 	 */
@@ -121,6 +123,33 @@ public class StudyJacob {
 		documents = null;
 	}
 
+	public void switchToHeader() {
+		switchToView(1);
+	}
+	
+	public void switchToMainDoc() {
+		switchToView(0);
+	}
+	
+	public void switchToView(int seekViewIdx) {
+		Dispatch activeWindow = Dispatch.get(doc, "ActiveWindow").toDispatch();
+		Dispatch activePane = Dispatch.get(activeWindow, "ActivePane").toDispatch();
+		Dispatch view = Dispatch.get(activePane, "View").toDispatch();
+		Dispatch.put(view, "SeekView", seekViewIdx);
+	}
+	
+	public void setPageOrientation(int orientation) {
+		Dispatch pageSetup = Dispatch.get(doc, "PageSetup").toDispatch();
+		Dispatch.put(pageSetup, "Orientation", new Variant(orientation));
+	}
+
+	public Dispatch getPageSetup() {
+		return Dispatch.get(doc, "PageSetup").toDispatch();
+	}
+	
+	public Dispatch getSelection() {
+		return selection;
+	}
 	/**
 	 * 把插入点移动到文件首位置
 	 * 
@@ -131,6 +160,15 @@ public class StudyJacob {
 		Dispatch.call(selection, "HomeKey", new Variant(6));
 	}
 
+	public void breakHeaderFooterLink() {
+		//2 -- wdSectionBreakNextPage
+		Dispatch.call(selection, "InsertBreak", 2);
+		switchToHeader();
+		Dispatch headerFooter = Dispatch.get(selection, "HeaderFooter").toDispatch();
+		Dispatch.put(headerFooter, "LinkToPrevious", new Variant(false));
+		switchToMainDoc();
+	}
+	
 	/**
 	 * 在当前插入点插入字符串
 	 * 
@@ -138,10 +176,50 @@ public class StudyJacob {
 	 *            要插入的新字符串
 	 */
 	public void insertText(String newText) {
-		Dispatch.put(selection, "Text", newText);
-		Dispatch.call(selection, "MoveRight");
+		if (newText == null) return;
+		Dispatch.call(selection, "TypeText", newText);
+		//Dispatch.call(selection, "MoveRight");
 	}
 
+	public void insertSpace(int spaceCount) {
+		for (int i = 0; i < spaceCount; i++) {
+			insertText(" ");
+		}
+	}
+	
+	public void insertBoldText(String newText) {
+		getFont();
+		Dispatch.put(font, "Bold", new Variant(true));
+		insertText(newText);
+		Dispatch.put(font, "Bold", new Variant(false));	
+	}
+	
+	public void insertSuperText(String newText) {
+		getFont();
+		Dispatch.put(font, "Superscript", new Variant(true));
+		insertText(newText);
+		Dispatch.put(font, "Superscript", new Variant(false));		
+	}
+	
+	public void insertSubText(String newText) {
+		getFont();
+		Dispatch.put(font, "Subscript", new Variant(true));
+		insertText(newText);
+		Dispatch.put(font, "Subscript", new Variant(false));		
+	}
+
+	public void insertPageNum() {
+		Dispatch range = Dispatch.get(selection, "Range").toDispatch();
+		Dispatch fields = Dispatch.get(selection, "Fields").toDispatch();
+		Dispatch.call(fields, "Add", range, -1, "PAGE  \\* Arabic  \\* MERGEFORMAT", new Variant(false));
+	}
+	
+	public void insertNumPages() {
+		Dispatch range = Dispatch.get(selection, "Range").toDispatch();
+		Dispatch fields = Dispatch.get(selection, "Fields").toDispatch();
+		Dispatch.call(fields, "Add", range, -1, "NUMPAGES  \\* Arabic  \\* MERGEFORMAT", new Variant(false));
+	}
+	
 	/**
 	 * 在当前插入点插入图片
 	 * 
@@ -232,11 +310,14 @@ public class StudyJacob {
 	 */
 	public String getCellString(int tableIndex, int cellRowIdx, int cellColIdx)
 			throws Exception {
-		// 所有表格
-		Dispatch tables = Dispatch.get(doc, "Tables").toDispatch();
-		// 要取数据的表格
-		Dispatch table = Dispatch.call(tables, "Item", new Variant(tableIndex))
-				.toDispatch();
+		getTable(tableIndex);
+		return getCellString(tableIndex, cellRowIdx, cellColIdx);
+		//Dispatch.call(cell, "Select");
+		//return Dispatch.get(selection, "Text").toString();
+	}
+	
+	public String getCellString(int cellRowIdx, int cellColIdx)
+			throws Exception {
 		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
 				new Variant(cellColIdx)).toDispatch();
 		Dispatch cellRange = Dispatch.get(cell, "Range").toDispatch();
@@ -250,8 +331,6 @@ public class StudyJacob {
 			if (temp.length() == 0) temp = null;
 			return temp;
 		}
-		//Dispatch.call(cell, "Select");
-		//return Dispatch.get(selection, "Text").toString();
 	}
 
 	/**
@@ -314,25 +393,45 @@ public class StudyJacob {
 	 */
 	public void putTxtToCell(int tableIndex, int cellRowIdx, int cellColIdx,
 			String txt) {
-		// 所有表格
-		Dispatch tables = Dispatch.get(doc, "Tables").toDispatch();
-		// 要填充的表格
-		Dispatch table = Dispatch.call(tables, "Item", new Variant(tableIndex))
-				.toDispatch();
-		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
-				new Variant(cellColIdx)).toDispatch();
-		Dispatch.call(cell, "Select");
-		Dispatch.put(selection, "Text", txt);
+		getTable(tableIndex);
+		putTxtToCell(cellRowIdx, cellColIdx, txt);
 	}
 
 	public void putTxtToCell(int cellRowIdx, int cellColIdx,
 			String txt) {
-		if (txt == "null") return;
+		if (txt == null) txt = "-";
 		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
 				new Variant(cellColIdx)).toDispatch();
 		Dispatch.call(cell, "Select");
-		Dispatch.put(selection, "Text", txt);
+		Dispatch.call(selection, "TypeText", txt);
 	}
+	
+	public void deleteCellTxt(int cellRowIdx, int cellColIdx) {
+		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
+				new Variant(cellColIdx)).toDispatch();
+		Dispatch.call(cell, "Select");
+		Dispatch.call(selection, "Delete");
+	}
+	
+	public Dispatch getFont() {
+		font = Dispatch.get(selection, "Font").toDispatch();
+		return font;
+	}
+
+//	public void putSuperTxtToCell(int cellRowIdx, int cellColIdx,
+//			String txt) {
+//		getFont();
+//		Dispatch.put(font, "Superscript", new Variant(true));
+//		putTxtToCell(cellRowIdx, cellColIdx, txt);
+//		Dispatch.put(font, "Superscript", new Variant(false));	
+//	}
+//	
+//	public void insertSubTxtToCell(String txt) {
+//		getFont();
+//		Dispatch.put(font, "Subscript", new Variant(true));
+//		Dispatch.call(selection, "TypeText", txt);
+//		Dispatch.put(font, "Subscript", new Variant(false));
+//	}
 	
 	/**
 	 * 
@@ -622,17 +721,24 @@ public class StudyJacob {
 	 * @param columnIndex
 	 * @throws 如果不是整齐的表格不能使用
 	 */
-	public void setColumnWidth(float columnWidth, int columnIndex) {
-		if (columnWidth < 11) {
-			columnWidth = 120;
+	public void setColumnWidth(double columnWidth, int columnIndex) {
+		if (columnWidth < 0) {
+			columnWidth = 0;
 		}
-		if (columns == null || column == null) {
+		if (columns == null) {
 			this.getColumns();
-			this.getColumn(columnIndex);
 		}
-		Dispatch.put(column, "Width", new Variant(columnWidth));
+		this.getColumn(columnIndex);
+		// Auto 1 Percent 2 Points 3
+		Dispatch.put(column, "PreferredWidthType", new Variant(3));
+		Variant points = centimetersToPoints(columnWidth);
+		Dispatch.put(column, "Width", points);
 	}
 
+	public Variant centimetersToPoints(double centimeters) {
+		return  Dispatch.call(word, "CentimetersToPoints", new Variant(centimeters));
+	}
+	
 	/**
 	 * 设置指定表格指定列的背景色
 	 * 
@@ -865,7 +971,22 @@ public class StudyJacob {
 		Dispatch rows = Dispatch.get(table, "Rows").toDispatch();
 		Dispatch.call(rows, "Add");
 	}
-
+	public void addRow() {
+		// 表格的所有行
+		Dispatch rows = Dispatch.get(table, "Rows").toDispatch();
+		Dispatch.call(rows, "Add");
+	}
+	public void deleteRow(int rowIdx) {
+		// 表格的所有行
+		Dispatch rows = Dispatch.get(table, "Rows").toDispatch();
+		Dispatch row = Dispatch.call(rows, "Item", new Variant(rowIdx)).toDispatch();
+		Dispatch.call(row, "Delete");
+	}
+	
+	public void deleteCell(int cellRow, int cellColumn) {
+		getCell(cellRow, cellColumn);
+		Dispatch.call(cell, "Delete");
+	}
 	/**
 	 * 增加一列
 	 * 
@@ -878,6 +999,12 @@ public class StudyJacob {
 		// 要填充的表格
 		Dispatch table = Dispatch.call(tables, "Item", new Variant(tableIndex))
 				.toDispatch();
+		// 表格的所有行
+		Dispatch cols = Dispatch.get(table, "Columns").toDispatch();
+		Dispatch.call(cols, "Add").toDispatch();
+		Dispatch.call(cols, "AutoFit");
+	}
+	public void addCol() {
 		// 表格的所有行
 		Dispatch cols = Dispatch.get(table, "Columns").toDispatch();
 		Dispatch.call(cols, "Add").toDispatch();
@@ -1157,11 +1284,11 @@ public class StudyJacob {
 	 * 
 	 * @param rowHeight
 	 */
-	public void setRowHeight(float rowHeight) {
+	public void setRowsHeight(double rowHeight) {
 		if (rowHeight > 0) {
 			if (rows == null)
 				this.getRows();
-			Dispatch.put(rows, "Height", new Variant(rowHeight));
+			Dispatch.put(rows, "Height", centimetersToPoints(rowHeight));
 		}
 	}
 
@@ -1171,9 +1298,9 @@ public class StudyJacob {
 	 * @param tableIndex
 	 * @param rowHeight
 	 */
-	public void setRowHeight(int tableIndex, float rowHeight) {
+	public void setRowsHeight(int tableIndex, double rowHeight) {
 		this.getRows(tableIndex);
-		this.setRowHeight(rowHeight);
+		this.setRowsHeight(rowHeight);
 	}
 
 	/**
@@ -1182,16 +1309,24 @@ public class StudyJacob {
 	 * @param rowHeight
 	 * @param rowIndex
 	 */
-	public void setRowHeight(float rowHeight, int rowIndex) {
+	public void setRowHeight(double rowHeight, int rowIndex) {
 		if (rowHeight > 0) {
-			if (rows == null || row == null) {
-				this.getRows();
-				this.getRow(rowIndex);
+			if (rows == null) {
+				this.getRows();	
 			}
-			Dispatch.put(row, "Height", new Variant(rowHeight));
+			this.getRow(rowIndex);
+			Dispatch.put(row, "Height", centimetersToPoints(rowHeight));
 		}
 	}
 
+	public void setRowHeadingFormat(int rowIndex) {
+		if (rows == null) {
+			this.getRows();
+		}
+		this.getRow(rowIndex);
+		Dispatch.put(row, "HeadingFormat", true);
+	}
+	
 	/**
 	 * 设置指定表格的指定行的行高
 	 * 
@@ -1210,7 +1345,7 @@ public class StudyJacob {
 	 * @param columnWidth
 	 *            列宽 取值范围：10<columnWidth 默认值：120
 	 */
-	public void setColumnWidth(float columnWidth) {
+	public void setColumnsWidth(float columnWidth) {
 		if (columnWidth < 11) {
 			columnWidth = 120;
 		}
@@ -1219,15 +1354,25 @@ public class StudyJacob {
 		Dispatch.put(columns, "Width", new Variant(columnWidth));
 	}
 
+//	public void setColumnWidth(int colIndx, float columnWidth) {
+//		if (columnWidth < 0) {
+//			columnWidth = 0;
+//		}
+//		if (columns == null)
+//			this.getColumns();
+//		column = Dispatch.call(columns, "Item", new Variant(colIndx)).toDispatch();
+//		Dispatch.put(column, "Width", new Variant(columnWidth));
+//	}
+	
 	/**
 	 * 设置指定表格的所有列的列宽
 	 * 
 	 * @param tableIndex
 	 * @param columnWidth
 	 */
-	public void setColumnWidth(int tableIndex, float columnWidth) {
+	public void setColumnsWidth(int tableIndex, float columnWidth) {
 		this.getColumns(tableIndex);
-		this.setColumnWidth(columnWidth);
+		this.setColumnsWidth(columnWidth);
 	}
 
 	/**
@@ -1343,13 +1488,23 @@ public class StudyJacob {
 	 */
 	public void mergeCell(int fstCellRowIndex, int fstCellColIndex,
 			int secCellRowIndex, int secCellColIndex) {
-		Dispatch fstCell = Dispatch.call(table, "Cell",
-				new Variant(fstCellRowIndex), new Variant(fstCellColIndex))
-				.toDispatch();
-		Dispatch secCell = Dispatch.call(table, "Cell",
-				new Variant(secCellRowIndex), new Variant(secCellColIndex))
-				.toDispatch();
-		Dispatch.call(fstCell, "Merge", secCell);
+		Dispatch fstCell = getCell(fstCellRowIndex, fstCellColIndex);
+		Dispatch secCell = getCell(secCellRowIndex, secCellColIndex);
+			Dispatch.call(fstCell, "Merge", secCell);
+	}
+	
+	public boolean isInOnePage(int fstCellRowIndex, int fstCellColIndex,
+			int secCellRowIndex, int secCellColIndex) {
+		getCell(fstCellRowIndex, fstCellColIndex);
+		int fstPage = Dispatch.call(selection, "Information", 3).getInt();
+		getCell(secCellRowIndex, secCellColIndex);
+		int secPage = Dispatch.call(selection, "Information", 3).getInt();
+		//System.out.println("1:"+fstPage+" 2:"+secPage);
+		if (fstPage == secPage) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -1437,6 +1592,14 @@ public class StudyJacob {
 		return count;
 	}
 
+	public void setTableAlignCenter() {
+		Dispatch.call(table, "Select");
+		Dispatch format = Dispatch.get(selection, "ParagraphFormat").toDispatch();
+		Dispatch.put(format, "Alignment", new Variant(1));
+		Dispatch cells = Dispatch.get(selection, "Cells").toDispatch();
+		Dispatch.put(cells, "VerticalAlignment", new Variant(1));
+	}
+	
 	public static void main(String[] args) {
 		long time1 = System.currentTimeMillis();
 		int i = 0;

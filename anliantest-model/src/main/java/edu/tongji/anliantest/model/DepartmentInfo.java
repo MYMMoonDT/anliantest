@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2013-12-8 15:43:04 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-20 17:07:37 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +23,9 @@ public class DepartmentInfo implements java.io.Serializable {
 	private Integer departmentId;
 	private String departmentName;
 	private String departmentDesc;
+	private Set<ContractReviewRecordItem> contractReviewRecordItems = new HashSet<ContractReviewRecordItem>(
+			0);
+	private Set<WorkTaskItem> workTaskItems = new HashSet<WorkTaskItem>(0);
 	private Set<EmployeeInfo> employeeInfos = new HashSet<EmployeeInfo>(0);
 
 	public DepartmentInfo() {
@@ -33,9 +36,12 @@ public class DepartmentInfo implements java.io.Serializable {
 	}
 
 	public DepartmentInfo(String departmentName, String departmentDesc,
-			Set<EmployeeInfo> employeeInfos) {
+			Set<ContractReviewRecordItem> contractReviewRecordItems,
+			Set<WorkTaskItem> workTaskItems, Set<EmployeeInfo> employeeInfos) {
 		this.departmentName = departmentName;
 		this.departmentDesc = departmentDesc;
+		this.contractReviewRecordItems = contractReviewRecordItems;
+		this.workTaskItems = workTaskItems;
 		this.employeeInfos = employeeInfos;
 	}
 
@@ -66,6 +72,25 @@ public class DepartmentInfo implements java.io.Serializable {
 
 	public void setDepartmentDesc(String departmentDesc) {
 		this.departmentDesc = departmentDesc;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "departmentInfo")
+	public Set<ContractReviewRecordItem> getContractReviewRecordItems() {
+		return this.contractReviewRecordItems;
+	}
+
+	public void setContractReviewRecordItems(
+			Set<ContractReviewRecordItem> contractReviewRecordItems) {
+		this.contractReviewRecordItems = contractReviewRecordItems;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "departmentInfo")
+	public Set<WorkTaskItem> getWorkTaskItems() {
+		return this.workTaskItems;
+	}
+
+	public void setWorkTaskItems(Set<WorkTaskItem> workTaskItems) {
+		this.workTaskItems = workTaskItems;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "departmentInfo")
