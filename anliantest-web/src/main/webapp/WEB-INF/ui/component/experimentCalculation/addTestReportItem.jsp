@@ -265,7 +265,7 @@
 			</div>
 			<button type="submit" class="btn btn-default">继续</button>
 		</form>
-<!-- 		<button id="next_btn" type="button" class="btn btn-default">继续</button> -->
-<!-- 		<button id="finish_btn" type="button" class="btn btn-primary">完成</button> -->
+		<button id="process_btn" type="button" class="btn btn-primary">生成并下载计算结果表</button>
+		<button id="result_btn" type="button" class="btn btn-primary">生成并下载结果与评价表</button>
 	</div>
 </div>

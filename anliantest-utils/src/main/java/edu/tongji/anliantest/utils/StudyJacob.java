@@ -68,7 +68,7 @@ public class StudyJacob {
 	public StudyJacob() {
 		if (word == null) {
 			word = new ActiveXComponent("Word.Application");
-			word.setProperty("Visible", new Variant(true));
+			word.setProperty("Visible", new Variant(false));
 		}
 		if (documents == null) {
 			documents = word.getProperty("Documents").toDispatch();

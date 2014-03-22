@@ -23,7 +23,7 @@ public class TestDataResultService {
 		return testDataResultTableDao.getTableCount();
 	}
 	
-	public TestDataResultTable getResultTableByid(int id) {
+	public TestDataResultTable getResultTableById(int id) {
 		return testDataResultTableDao.get(id);
 	}
 

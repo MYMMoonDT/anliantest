@@ -1,9 +1,15 @@
 package edu.tongji.anliantest.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -158,7 +164,7 @@ public class ExperimentCalcController extends BaseController {
 		
 		int resultItemId = (int)testDataResultService.getItemCount();
 		TestDataResultItem resultItem = new TestDataResultItem(resultItemId);
-		TestDataResultTable resultTable = testDataResultService.getResultTableByid(this.getSessionTableId(request, RESULT_TABLE_ID_CONTEXT));
+		TestDataResultTable resultTable = testDataResultService.getResultTableById(this.getSessionTableId(request, RESULT_TABLE_ID_CONTEXT));
 		resultItem.setTestDataResultTable(resultTable);
 		resultItem.setHarmfulSubstanceNationalStandardTable(groupList.get(0).getHarmfulSubstanceNationalStandardTable());
 		resultItem.setTestWorkshopJob(groupList.get(0).getTestWorkshopJob());
@@ -498,24 +504,93 @@ public class ExperimentCalcController extends BaseController {
 		}
 	}
 
-	@RequestMapping(value = "/generateTables")
-	public void generateTables(HttpServletRequest request) {
-		//TODO REMOVE
-		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
+	@RequestMapping(value = "/downloadResultTable")
+	public void downloadResultTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		StringBuffer strBuffer = new StringBuffer();
+		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
+		strBuffer.append("\\WEB-INF\\tempDocs\\");
 		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
-		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
-		String processFileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + "有毒物质 计算结果表.doc";
-		//generateProcessTableToDoc(processTable, processFileName);
+		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
+		strBuffer.append(" 结果与评价.doc"); 
 		int resultTableId = 4;//getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
-		TestDataResultTable resultTable = testDataResultService.getResultTableByid(resultTableId);
-		String resultFileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + " 结果与评价.doc";
-		generateResultTableToDoc(resultTable, resultFileName);
+		TestDataResultTable resultTable = testDataResultService.getResultTableById(resultTableId);
+		String filePath = strBuffer.toString();
+		generateResultTableToDoc(resultTable, filePath);
+		//System.out.println(filePath);
+		
+		setResponseForDownload(response, filePath);
 	}
 
-	private void generateProcessTableToDoc(TestDataProcessTable processTable, String fileName) {
-		documentGeneration.generateProcessTable(processTable, fileName);
+
+	@RequestMapping(value = "/downloadProcessTable")
+	public void downloadProcessTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		StringBuffer strBuffer = new StringBuffer();
+		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
+		strBuffer.append("\\WEB-INF\\tempDocs\\");
+		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
+		strBuffer.append(" 有毒物质 计算结果表.doc"); 
+		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
+		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
+		String filePath = strBuffer.toString();
+		generateProcessTableToDoc(processTable, filePath);
+		//System.out.println(filePath);
+		
+		setResponseForDownload(response, filePath);
 	}
-	private void generateResultTableToDoc(TestDataResultTable resultTable, String fileName) {
-		documentGeneration.generateResultTable(resultTable, fileName);
+	
+	private void setResponseForDownload(HttpServletResponse response,
+			String filePath) throws UnsupportedEncodingException, IOException {
+		File file = new File(filePath);
+		String fileNameSrc = file.getName();
+		String fileName = URLEncoder.encode(fileNameSrc, "UTF-8");
+		if (fileName.length() > 150)// 解决IE 6.0 bug
+			fileName = new String(fileNameSrc.getBytes("GBK"), "ISO-8859-1");
+		response.setHeader("Content-disposition", "attachment; filename=" + fileName);
+		response.setContentType("application/msword");
+
+		BufferedInputStream bis = null;
+		BufferedOutputStream bos = null;
+		try {
+			bis = new BufferedInputStream(new FileInputStream(filePath));
+			bos = new BufferedOutputStream(response.getOutputStream());
+
+			byte[] buff = new byte[2048];
+			int bytesRead;
+
+			while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+				bos.write(buff, 0, bytesRead);
+			}
+
+		} catch (final IOException e) {
+			System.out.println("IOException." + e);
+
+		} finally {
+			if (bis != null)
+				bis.close();
+			if (bos != null)
+				bos.close();
+		}
+	}
+	
+//	@RequestMapping(value = "/generateTables")
+//	public void generateTables(HttpServletRequest request) {
+//		//TODO REMOVE
+//		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
+//		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+//		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
+//		String processFileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + "有毒物质 计算结果表.doc";
+//		//generateProcessTableToDoc(processTable, processFileName);
+//		int resultTableId = 4;//getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
+//		TestDataResultTable resultTable = testDataResultService.getResultTableByid(resultTableId);
+//		String resultFileName = testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName() + " 结果与评价.doc";
+//		generateResultTableToDoc(resultTable, resultFileName);
+//	}
+
+	private void generateProcessTableToDoc(TestDataProcessTable processTable, String filePath) {
+		documentGeneration.generateProcessTable(processTable, filePath);
+	}
+	private void generateResultTableToDoc(TestDataResultTable resultTable, String filePath) {
+		documentGeneration.generateResultTable(resultTable, filePath);
 	}
 }

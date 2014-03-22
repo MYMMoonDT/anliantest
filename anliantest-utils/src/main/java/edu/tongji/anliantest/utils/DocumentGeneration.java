@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
 
@@ -20,7 +21,8 @@ public class DocumentGeneration {
 	private int ParticlesNotOtherwiseRegulatedId = 461;
 	private int[] PercentIdList = {439, 440, 441, 442, 443, 444};
 
-	public void generateResultTable(TestDataResultTable resultTable, String fileName) {
+	public void generateResultTable(TestDataResultTable resultTable, String filePath) {
+		//ComThread.InitMTA();
 		StudyJacob jacob = new StudyJacob();
 		jacob.createNewDocument();
 		setPage(jacob, 3.17, 2.54);
@@ -31,9 +33,10 @@ public class DocumentGeneration {
 		addResultDataToTable(resultTable, jacob);
 		
 		
-		jacob.save("C:\\"+fileName);
+		jacob.save(filePath);
 		jacob.closeDocument();
 		jacob.close();
+		//ComThread.Release();
 	}
 	
 	private void addResultDataToTable(TestDataResultTable resultTable,
@@ -192,7 +195,8 @@ public class DocumentGeneration {
 		return 3;
 	}
 	
-	public void generateProcessTable(TestDataProcessTable processTable, String fileName) {
+	public void generateProcessTable(TestDataProcessTable processTable, String filePath) {
+		//ComThread.InitMTA();
 		StudyJacob jacob = new StudyJacob();
 		jacob.createNewDocument();
 		setPage(jacob, 0.8, 1.27);
@@ -206,9 +210,10 @@ public class DocumentGeneration {
 		addProcessDataToTable(processTable, jacob);
 		jacob.breakHeaderFooterLink();
 		
-		jacob.save("C:\\"+fileName);
+		jacob.save(filePath);
 		jacob.closeDocument();
 		jacob.close();
+		//ComThread.Release();
 	}
 
 	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {

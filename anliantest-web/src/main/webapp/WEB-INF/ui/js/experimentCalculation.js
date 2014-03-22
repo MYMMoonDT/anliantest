@@ -23,22 +23,7 @@
 //
 //var testData = [];
 
-//$(function(){
-//	$("#next_btn").click(function(){
-//		$.post("addTestReportItem", {itemId: "1"}, function(){
-//			alert("done");
-//		});
-//		//getDataFromInput();
-//		//clearInput();
-//	});
-//});
-//
-//$(function(){
-//	$("#finish_btn").click(function(){
-//		calc();
-//		clearInput();
-//	});
-//});
+
 
 //function clearInput() {
 //	$("#position").val("");
@@ -131,13 +116,25 @@ function inList(target, list) {
 	}
 	return isIn;
 }
-$(function loadSelector() {
-	$("#substance").bind("change", setDetailVisibility);
+function loadSelector() {
+	$("#substance").change(setDetailVisibility);
 	$.post("loadSubstanceList", function(list) {
 		var selector = $("#substance");
 		list.forEach(function(substance){
 			selector.append("<option value='"+ substance.id +"'>"+ substance.name +"</option>");
 		});
 		setDetailVisibility();
+	});
+}
+
+$(function(){
+	loadSelector();
+	
+	$("#process_btn").click(function(){
+		window.location.href = "downloadProcessTable";
+	});
+	
+	$("#result_btn").click(function(){
+		window.location.href = "downloadResultTable";
 	});
 });
