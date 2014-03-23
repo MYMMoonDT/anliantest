@@ -5,8 +5,11 @@
     request.setAttribute("context",context);
 %>
 <link rel="stylesheet" href="${context}/ui/css/form.css">
+<link rel="stylesheet" href="${context}/ui/css/custom-theme/jquery-ui-1.9.2.custom.css">
 
 <script src="${context}/ui/js/experimentCalculation.js"></script>
+<script src="${context}/ui/js/jquery/jquery.fileDownload.js"></script>
+<script src="${context}/ui/js/jquery-ui-bootstrap/jquery-ui-1.9.2.custom.min.js"></script>
 
 <div class="panel panel-default">
 	<div class="panel-heading">实验数据输入</div>
@@ -268,4 +271,13 @@
 		<button id="process_btn" type="button" class="btn btn-primary">生成并下载计算结果表</button>
 		<button id="result_btn" type="button" class="btn btn-primary">生成并下载结果与评价表</button>
 	</div>
+
+	<div id="preparing-file-modal" title="Preparing report..."
+		style="display: none;">
+		We are preparing your report, please wait...
+	</div>
+
+	<div id="error-modal" title="Error" style="display: none;">There
+		was a problem generating your report, please try again.</div>
+
 </div>

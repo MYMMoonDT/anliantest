@@ -13,7 +13,7 @@ public class StudyJacob {
 	// 所有word文档集合
 	private Dispatch documents = null;
 	// 选定的范围或插入点
-	private static Dispatch selection = null;
+	private Dispatch selection = null;
 	// 设置是否保存后才退出的标志
 	private boolean saveOnExit = true;
 	/**
@@ -56,10 +56,10 @@ public class StudyJacob {
 	 * 打开word时同时要打开的文档，不指定时将新建一个空白文档
 	 */
 	// private File openDoc;
-	private static Dispatch shapes;
-	private static Dispatch shape;
-	private static Dispatch textRange;
-	private static Dispatch textframe;
+	private Dispatch shapes;
+	private Dispatch shape;
+	private Dispatch textRange;
+	private Dispatch textframe;
 	private Dispatch range;
 	private Dispatch paragraphs;
 	private Dispatch paragraph;
@@ -68,7 +68,7 @@ public class StudyJacob {
 	public StudyJacob() {
 		if (word == null) {
 			word = new ActiveXComponent("Word.Application");
-			word.setProperty("Visible", new Variant(false));
+			word.setProperty("Visible", new Variant(true));
 		}
 		if (documents == null) {
 			documents = word.getProperty("Documents").toDispatch();

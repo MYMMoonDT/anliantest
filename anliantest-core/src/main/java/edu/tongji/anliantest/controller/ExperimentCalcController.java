@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,11 +54,11 @@ public class ExperimentCalcController extends BaseController {
 	@Autowired
 	private TestDataResultService testDataResultService;
 	
-	DocumentGeneration documentGeneration;
+	//DocumentGeneration documentGeneration;
 	
 	public ExperimentCalcController() {
 		super();
-		documentGeneration = new DocumentGeneration();
+		//documentGeneration = new DocumentGeneration();
 	}
 
 	@RequestMapping(value = "/experimentCalculation")
@@ -490,7 +491,7 @@ public class ExperimentCalcController extends BaseController {
 
 	@RequestMapping(value = "/getHarmfulData1")
 	public void getHarmfulData1FromDoc() throws Exception {
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = documentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount());
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount());
 		for (HarmfulSubstanceNationalStandardTable item : list) {
 			harmfulSubstanceNationalStandardService.addItem(item);
 		}
@@ -498,7 +499,7 @@ public class ExperimentCalcController extends BaseController {
 	
 	@RequestMapping(value = "/getHarmfulData2")
 	public void getHarmfulData2FromDoc() throws Exception {
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = documentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount());
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount());
 		for (HarmfulSubstanceNationalStandardTable item : list) {
 			harmfulSubstanceNationalStandardService.addItem(item);
 		}
@@ -509,10 +510,10 @@ public class ExperimentCalcController extends BaseController {
 		StringBuffer strBuffer = new StringBuffer();
 		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
 		strBuffer.append("\\WEB-INF\\tempDocs\\");
-		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
 		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
 		strBuffer.append(" 结果与评价.doc"); 
-		int resultTableId = 4;//getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
+		int resultTableId = getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
 		TestDataResultTable resultTable = testDataResultService.getResultTableById(resultTableId);
 		String filePath = strBuffer.toString();
 		generateResultTableToDoc(resultTable, filePath);
@@ -527,10 +528,10 @@ public class ExperimentCalcController extends BaseController {
 		StringBuffer strBuffer = new StringBuffer();
 		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
 		strBuffer.append("\\WEB-INF\\tempDocs\\");
-		int reportTableId = 4;//getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
 		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
 		strBuffer.append(" 有毒物质 计算结果表.doc"); 
-		int processTableId = 4;//getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
+		int processTableId = getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
 		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
 		String filePath = strBuffer.toString();
 		generateProcessTableToDoc(processTable, filePath);
@@ -546,9 +547,17 @@ public class ExperimentCalcController extends BaseController {
 		String fileName = URLEncoder.encode(fileNameSrc, "UTF-8");
 		if (fileName.length() > 150)// 解决IE 6.0 bug
 			fileName = new String(fileNameSrc.getBytes("GBK"), "ISO-8859-1");
+		else
+			fileName = fileName.replace("+", "%20");
+//		System.out.println("fileNameSrc" + fileNameSrc);
+//		System.out.println("fileName" + fileName);
+		
 		response.setHeader("Content-disposition", "attachment; filename=" + fileName);
 		response.setContentType("application/msword");
-
+		Cookie cookie = new Cookie("fileDownload", "true");
+		cookie.setPath("/");
+		response.addCookie(cookie);
+		
 		BufferedInputStream bis = null;
 		BufferedOutputStream bos = null;
 		try {
@@ -588,9 +597,9 @@ public class ExperimentCalcController extends BaseController {
 //	}
 
 	private void generateProcessTableToDoc(TestDataProcessTable processTable, String filePath) {
-		documentGeneration.generateProcessTable(processTable, filePath);
+		DocumentGeneration.generateProcessTable(processTable, filePath);
 	}
 	private void generateResultTableToDoc(TestDataResultTable resultTable, String filePath) {
-		documentGeneration.generateResultTable(resultTable, filePath);
+		DocumentGeneration.generateResultTable(resultTable, filePath);
 	}
 }

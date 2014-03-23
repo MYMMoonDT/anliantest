@@ -18,11 +18,11 @@ import edu.tongji.anliantest.model.TestDataResultItem;
 import edu.tongji.anliantest.model.TestDataResultTable;
 
 public class DocumentGeneration {
-	private int ParticlesNotOtherwiseRegulatedId = 461;
-	private int[] PercentIdList = {439, 440, 441, 442, 443, 444};
+	private static int ParticlesNotOtherwiseRegulatedId = 461;
+	private static int[] PercentIdList = {439, 440, 441, 442, 443, 444};
 
-	public void generateResultTable(TestDataResultTable resultTable, String filePath) {
-		//ComThread.InitMTA();
+	public static void generateResultTable(TestDataResultTable resultTable, String filePath) {
+		//ComThread.InitSTA();
 		StudyJacob jacob = new StudyJacob();
 		jacob.createNewDocument();
 		setPage(jacob, 3.17, 2.54);
@@ -39,7 +39,7 @@ public class DocumentGeneration {
 		//ComThread.Release();
 	}
 	
-	private void addResultDataToTable(TestDataResultTable resultTable,
+	private static void addResultDataToTable(TestDataResultTable resultTable,
 			StudyJacob jacob) {
 		int tableCol = 14;
 		int tableRow = 1;
@@ -124,7 +124,7 @@ public class DocumentGeneration {
 		}
 	}
 
-	private String getRangeString(BigDecimal start, BigDecimal end, int scale) {
+	private static String getRangeString(BigDecimal start, BigDecimal end, int scale) {
 		StringBuffer temp = new StringBuffer();
 		if (start != null) {
 			temp.append(new ValueAndScale(start, scale).toString());
@@ -135,7 +135,7 @@ public class DocumentGeneration {
 		temp.append(new ValueAndScale(end, scale));
 		return temp.toString();
 	}
-	private int addResultTableHeadingRows(StudyJacob jacob) {		
+	private static int addResultTableHeadingRows(StudyJacob jacob) {		
 		jacob.addRow();
 		jacob.addRow();
 		jacob.setRowHeadingFormat(1);
@@ -195,8 +195,8 @@ public class DocumentGeneration {
 		return 3;
 	}
 	
-	public void generateProcessTable(TestDataProcessTable processTable, String filePath) {
-		//ComThread.InitMTA();
+	public static void generateProcessTable(TestDataProcessTable processTable, String filePath) {
+		//ComThread.InitSTA();
 		StudyJacob jacob = new StudyJacob();
 		jacob.createNewDocument();
 		setPage(jacob, 0.8, 1.27);
@@ -216,7 +216,7 @@ public class DocumentGeneration {
 		//ComThread.Release();
 	}
 
-	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
+	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
 			StudyJacob jacob = new StudyJacob();
 			jacob.openDocument("C:\\2.doc");
 	
@@ -280,7 +280,7 @@ public class DocumentGeneration {
 			return list;
 		}
 
-	public ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
+	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
 			StudyJacob jacob = new StudyJacob();
 			jacob.openDocument("C:\\2.doc");
 	
@@ -347,7 +347,7 @@ public class DocumentGeneration {
 			return list;
 		}
 
-	private void setPage(StudyJacob jacob, double verticalMargin, double horizontalMargin) {
+	private static void setPage(StudyJacob jacob, double verticalMargin, double horizontalMargin) {
 		jacob.setPageOrientation(1);
 		Dispatch pageSetup = jacob.getPageSetup();
 		Dispatch.put(pageSetup, "TopMargin", jacob.centimetersToPoints(verticalMargin));
@@ -389,7 +389,7 @@ public class DocumentGeneration {
 		jacob.switchToMainDoc();
 	}
 	
-	private int addProcessTableHeadingRows(StudyJacob jacob) {		
+	private static int addProcessTableHeadingRows(StudyJacob jacob) {		
 		jacob.addRow();
 		jacob.addRow();
 		jacob.setRowHeadingFormat(1);
@@ -502,7 +502,7 @@ public class DocumentGeneration {
 		jacob.insertText("\t\t8---时间加权平均容许浓度规定的8h\n");
 	}
 	
-	private void addProcessDataToTable(TestDataProcessTable processTable,
+	private static void addProcessDataToTable(TestDataProcessTable processTable,
 			StudyJacob jacob) {
 		int tableCol = 15;
 		int tableRow = 1;
@@ -614,22 +614,22 @@ public class DocumentGeneration {
 		jacob.moveDown(1);
 	}
 
-	private String getDetailedName(
+	private static String getDetailedName(
 			String detailedName, int substanceId) {
 		if (detailedName == null) return "";
 
-		if (substanceId == this.ParticlesNotOtherwiseRegulatedId) {
+		if (substanceId == ParticlesNotOtherwiseRegulatedId) {
 			return "（" + detailedName + "）";
 		}
-		for (int i = 0; i < this.PercentIdList.length; i++) {
-			if (this.PercentIdList[i] == substanceId) {
+		for (int i = 0; i < PercentIdList.length; i++) {
+			if (PercentIdList[i] == substanceId) {
 				return "（" + detailedName + "%）";
 			}
 		}
 		return "";
 	}
 
-	private boolean getValueAndScaleFromString(ValueAndScale vs, String s) {
+	private static boolean getValueAndScaleFromString(ValueAndScale vs, String s) {
 		if (s == null || s.equals("-")) {
 			return false;
 		} else {

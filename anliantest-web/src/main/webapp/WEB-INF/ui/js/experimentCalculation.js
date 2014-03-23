@@ -129,12 +129,31 @@ function loadSelector() {
 
 $(function(){
 	loadSelector();
-	
-	$("#process_btn").click(function(){
-		window.location.href = "downloadProcessTable";
+	$(document).on("click", "#process_btn", function () {	
+		$("#process_btn").prop("disabled", true);
+		$("#result_btn").prop("disabled", true);
+	    $.fileDownload("downloadProcessTable", {
+	        preparingMessageHtml: "生成中，请等待...",
+            successCallback: function(url) {
+        		$("#process_btn").prop("disabled", false);
+        		$("#result_btn").prop("disabled", false);
+            },
+	        failMessageHtml: "生成错误，请重试。",
+	        httpMethod: "POST",
+	    });
 	});
 	
 	$("#result_btn").click(function(){
-		window.location.href = "downloadResultTable";
+		$("#process_btn").prop("disabled", true);
+		$("#result_btn").prop("disabled", true);
+	    $.fileDownload("downloadResultTable", {
+	        preparingMessageHtml: "生成中，请等待...",
+            successCallback: function(url) {
+        		$("#process_btn").prop("disabled", false);
+        		$("#result_btn").prop("disabled", false);
+            },
+	        failMessageHtml: "生成错误，请重试。",
+	        httpMethod: "POST",
+	    });
 	});
 });
