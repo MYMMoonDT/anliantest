@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import edu.tongji.anliantest.dao.ContractReviewRecordItemDao;
 import edu.tongji.anliantest.dao.ContractReviewRecordTableDao;
+import edu.tongji.anliantest.model.ContractReviewRecordItem;
 import edu.tongji.anliantest.model.ContractReviewRecordTable;
 
 
@@ -24,6 +25,21 @@ public class ContractReviewRecordService {
 
 	public void addTable(ContractReviewRecordTable contractReviewRecordTable) {
 		contractReviewRecordTableDao.save(contractReviewRecordTable);
+	}
+
+
+	public long getItemCount() {
+		return contractReviewRecordItemDao.getItemCount();
+	}
+
+
+	public ContractReviewRecordTable getTableById(int tableId) {
+		return contractReviewRecordTableDao.get(tableId);
+	}
+
+
+	public void addItem(ContractReviewRecordItem contractReviewRecordItem) {
+		contractReviewRecordItemDao.save(contractReviewRecordItem);
 	}
 	
 	
