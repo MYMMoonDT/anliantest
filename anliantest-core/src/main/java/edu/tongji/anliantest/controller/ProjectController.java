@@ -5,13 +5,14 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import edu.tongji.anliantest.model.ContractReviewRecordTable;
 import edu.tongji.anliantest.model.EmployeeInfo;
 import edu.tongji.anliantest.model.ProjectInfo;
+import edu.tongji.anliantest.service.ContractReviewRecordService;
 import edu.tongji.anliantest.service.EmployeeService;
 import edu.tongji.anliantest.service.ProjectInfoService;
 
@@ -23,6 +24,9 @@ public class ProjectController extends BaseController {
 	private EmployeeService employeeService;
 	@Autowired
 	private ProjectInfoService projectInfoService;
+	@Autowired
+	private ContractReviewRecordService contractReviewRecordService;
+	
 	
 	@RequestMapping(value="/createProject")//创建项目
 	public ModelAndView createProject(HttpServletRequest request, ProjectInfo projectInfo){
@@ -41,12 +45,21 @@ public class ProjectController extends BaseController {
 		return mad;
 	}
 	
-	@RequestMapping(value="/addContractReviewRecord")//创建合同评审记录
-	public ModelAndView addContractReviewRecord(){
+	@RequestMapping(value="/createContractReviewRecordTable")//创建合同评审记录表
+	public ModelAndView createContractReviewRecordTable(ContractReviewRecordTable contractReviewRecordTable){
 		ModelAndView mad = new ModelAndView();
+		int contactReviewRecordTableId = (int)contractReviewRecordService.getTableCount();
+		contractReviewRecordTable.setTableId(contactReviewRecordTableId);
+		contractReviewRecordTable.setTableNum("ALJC/JL07-03");
 		
+		contractReviewRecordService.addTable(contractReviewRecordTable);
+		
+		mad.setViewName("forward:process/step1/contractReviewForm");//mark
 		return mad;
 	}
+	
+	
+	
 	
 	@RequestMapping(value = "/create")
 	public String createProjectPage(){
