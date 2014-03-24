@@ -21,6 +21,11 @@
 				  				<a href="${context}/experimentCalculation" class="btn btn-primary btn-create-testreport" role="button">创建检测报告</a>
 				  			</div>
 				  		</div>
+				  		<div class="row">
+				  			<div class="col-sm-12">
+				  				
+				  			</div>
+				  		</div>
 				  	</div>
 				  	<div class="tab-pane" id="deviceManage">
 				  	</div>
@@ -29,3 +34,8 @@
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+	$(function(){
+		
+	});
+</script>
