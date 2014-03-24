@@ -11,8 +11,8 @@
 <script src="${context}/ui/js/jquery/jquery.fileDownload.js"></script>
 <script src="${context}/ui/js/jquery-ui-bootstrap/jquery-ui-1.9.2.custom.min.js"></script>
 
-<div class="panel panel-default">
-	<div class="panel-heading">实验数据输入</div>
+<div class="panel panel-primary">
+	<div class="panel-heading">检测结果输入</div>
 	<div class="panel-body">
 		<form id="formid" action="${context}/addTestReportItemAndCalc" role="form" method="POST">
 			<div class="row">
@@ -266,7 +266,7 @@
 					</div>
 				</div>
 			</div>
-			<button type="submit" class="btn btn-default">继续</button>
+			<button type="submit" class="btn btn-primary">继续</button>
 		</form>
 		<button id="process_btn" type="button" class="btn btn-primary">生成并下载计算结果表</button>
 		<button id="result_btn" type="button" class="btn btn-primary">生成并下载结果与评价表</button>
