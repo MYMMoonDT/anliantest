@@ -14,10 +14,13 @@ import edu.tongji.anliantest.model.ContractReviewRecordTable;
 import edu.tongji.anliantest.model.DepartmentInfo;
 import edu.tongji.anliantest.model.EmployeeInfo;
 import edu.tongji.anliantest.model.ProjectInfo;
+import edu.tongji.anliantest.model.WorkTaskItem;
+import edu.tongji.anliantest.model.WorkTaskTable;
 import edu.tongji.anliantest.service.ContractReviewRecordService;
 import edu.tongji.anliantest.service.DepartmentInfoService;
 import edu.tongji.anliantest.service.EmployeeService;
 import edu.tongji.anliantest.service.ProjectInfoService;
+import edu.tongji.anliantest.service.WorkTaskService;
 
 @Controller
 @RequestMapping(value = "/project")
@@ -31,7 +34,8 @@ public class ProjectController extends BaseController {
 	private ContractReviewRecordService contractReviewRecordService;
 	@Autowired
 	private DepartmentInfoService departmentInfoService; 
-	
+	@Autowired
+	private WorkTaskService workTaskService;
 	
 	@RequestMapping(value="/createProject")//创建项目
 	public ModelAndView createProject(HttpServletRequest request, ProjectInfo projectInfo){
@@ -89,6 +93,40 @@ public class ProjectController extends BaseController {
 		return mad;
 	}
 	
+	@RequestMapping(value="/createWorkTaskTable")//创建工作任务表
+	public ModelAndView createWorkTaskTable(HttpServletRequest request, WorkTaskTable workTaskTable){
+		ModelAndView mad = new ModelAndView();
+		int workTaskTableId = (int) workTaskService.getTableCount();
+		workTaskTable.setTableId(workTaskTableId);
+		setIdIntoSession(request, "workTaskTableId", workTaskTableId);
+		workTaskTable.setTableNum("ALJC/JL32-01");
+		workTaskTable.setTaskTime(new Date());
+		ProjectInfo projectInfo = projectInfoService.getProjectByName((String)request.getAttribute("projectName"));
+		workTaskTable.setProjectInfo(projectInfo);
+		EmployeeInfo taskEmployee = employeeService.getEmployeeByEmployeeName((String)request.getAttribute("taskEmployee"));
+		workTaskTable.setEmployeeInfo(taskEmployee);
+		
+		workTaskService.addTable(workTaskTable);
+		mad.setViewName("forward:process/step1/workTaskList");/*MARK*/
+		return mad;
+	}
+	
+	@RequestMapping(value="/addWorkTaskItem")//增加工作任务表条目
+	public ModelAndView addWorkTaskItem(HttpServletRequest request, WorkTaskItem workTaskItem){
+		ModelAndView mad = new ModelAndView();
+		int workTaskItemId = (int) workTaskService.getItemCount();
+		workTaskItem.setItemId(workTaskItemId);
+		
+		WorkTaskTable workTaskTable = workTaskService.getTableById(getIdFromSession(request, "workTaskTableId"));
+		workTaskItem.setWorkTaskTable(workTaskTable);
+		
+		DepartmentInfo departmentInfo = departmentInfoService.getDepartmentByName((String)request.getAttribute("departmentName"));
+		workTaskItem.setDepartmentInfo(departmentInfo);
+		
+		workTaskService.addItem(workTaskItem);
+		mad.setViewName("");/*MARK*/
+		return mad;
+	}
 	
 	
 	protected int getIdFromSession(HttpServletRequest request, String name){

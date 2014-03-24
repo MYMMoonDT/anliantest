@@ -26,4 +26,9 @@ public class ProjectInfoService {
 	public ProjectInfo getProjectById(int projectId) {
 		return projectInfoDao.get(projectId);
 	}
+
+
+	public ProjectInfo getProjectByName(String projectName) {
+		return projectInfoDao.getProjectByName(projectName);
+	}
 }

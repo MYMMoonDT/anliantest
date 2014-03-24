@@ -3,13 +3,12 @@ package edu.tongji.anliantest.dao;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
-import edu.tongji.anliantest.model.ContractReviewRecordItem;
-
+import edu.tongji.anliantest.model.WorkTaskItem;
 
 @Repository
-public class ContractReviewRecordItemDao extends BaseDao<ContractReviewRecordItem>{
+public class WorkTaskItemDao extends BaseDao<WorkTaskItem>{
 
-	private final String GET_ITEM_COUNT = "select count(*) from ContractReviewRecordItem";
+	private final String GET_ITEM_COUNT = "select count(*) from WorkTaskItem";
 	
 	public long getItemCount() {
 		Query query = createQuery(GET_ITEM_COUNT);
