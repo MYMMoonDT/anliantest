@@ -1,12 +1,14 @@
 package edu.tongji.anliantest.utils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
 
@@ -16,11 +18,224 @@ import edu.tongji.anliantest.model.TestDataProcessItem;
 import edu.tongji.anliantest.model.TestDataProcessTable;
 import edu.tongji.anliantest.model.TestDataResultItem;
 import edu.tongji.anliantest.model.TestDataResultTable;
+import edu.tongji.anliantest.model.TestReportItemData;
+import edu.tongji.anliantest.model.TestReportTable;
 
 public class DocumentGeneration {
 	private static int ParticlesNotOtherwiseRegulatedId = 461;
 	private static int[] PercentIdList = {439, 440, 441, 442, 443, 444};
+	private static int[] ColsToCheck = {7, 2, 1};
+	
+//	public static void main(String argv[]) {
+//		String filePath = "C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\reportTableTest.doc";
+//		//getReportTableData(filePath);
+//	}
+	
+	public static void getReportTableData(String filePath, TestReportTable table, ArrayList<TestReportItemData> itemDataList) {
+//		TestReportTable table = new TestReportTable();
+//		ArrayList<TestReportItemData> itemDataList = new ArrayList<TestReportItemData>();
+		int cellRowIdx = -1;
+		StudyJacob jacob = new StudyJacob();
+		try {
+			jacob.openDocument(filePath);
+			
+			String temp;
+			jacob.switchToHeader();
+			Dispatch selection = jacob.getSelection();
+			Dispatch.call(selection, "WholeStory");
+			temp = Dispatch.get(selection, "Text").getString();
+			table.setTestReportNum(temp.substring(temp.indexOf('：')+1, temp.indexOf('\r')));
+			jacob.switchToMainDoc();
+			
+			jacob.getTable(1);
+			table.setSampleName(getValue(jacob.getCellString(1, 1)));
+			temp = getValue(jacob.getCellString(1, 2));
+			table.setSampleNum(Integer.valueOf(temp.substring(0, temp.length()-1)));
+			table.setTestUnitName(getValue(jacob.getCellString(2, 1)));
+			table.setSampleStatus(getValue(jacob.getCellString(2, 2)));
+			table.setTestUnitAddress(getValue(jacob.getCellString(3, 1)));
+			table.setTestProperty(getValue(jacob.getCellString(3, 2)));
+			table.setEntrustUnitName(getValue(jacob.getCellString(4, 1)));
+			
+			jacob.getTable(2);
+			Date[] dates = null;
+			dates = getDate(jacob.getCellString(jacob.getRowsCount(), 1));
+			table.setSampleTimeStart(dates[0]);
+			if (dates.length == 2) {
+				table.setSampleTimeEnd(dates[1]);
+			}
+			dates = getDate(jacob.getCellString(jacob.getRowsCount(), 2));
+			table.setReceiveTimeStart(dates[0]);
+			if (dates.length == 2) {
+				table.setReceiveTimeEnd(dates[1]);
+			}
+			dates = getDate(jacob.getCellString(jacob.getRowsCount(), 3));
+			table.setTestTimeStart(dates[0]);
+			if (dates.length == 2) {
+				table.setTestTimeEnd(dates[1]);
+			}
+			dates = getDate(jacob.getCellString(jacob.getRowsCount(), 4));
+			table.setReportTime(dates[0]);
 
+			Dispatch doc = jacob.getDocumnet();
+			Dispatch sentences = Dispatch.get(doc, "Sentences").getDispatch();
+			int senCnt = Dispatch.get(sentences, "Count").getInt();
+			temp = Dispatch.get(Dispatch.call(sentences, "Item", senCnt).getDispatch(), "Text").getString();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+			table.setTableTime(dateFormat.parse(temp.trim()));
+			
+			jacob.getTable(3);
+			dateFormat = new SimpleDateFormat("MM月dd号");
+			Date[] testTime = new Date[3];
+			String[][] testSampleNum = new String[3][4];
+			String[][] testResult = new String[3][4];
+			String[][] testTouchTime = new String[3][4];
+			Integer[][] testCollectTime = new Integer[3][4];
+			int tableRow = jacob.getRowsCount();
+			int i = -1, j = 0, prevRowIdx = -1 ;
+			int prevTestTime = 1, prevSubstance = 1, prevWorkshopJob = 2;
+			int[] prevRows = {prevTestTime, prevSubstance, prevWorkshopJob};
+			TestReportItemData itemData = new TestReportItemData();;
+			for (cellRowIdx = 2; cellRowIdx <= tableRow; cellRowIdx++) {
+				if (jacob.isCellStrExisted(cellRowIdx, 7)) {
+					//DONE use prev to judge if time is same
+					if (!isSameCells(jacob, cellRowIdx, prevRows, ColsToCheck)) {
+						i++;
+						j = 0;
+						prevRows[0] = cellRowIdx;
+						//prevTestTime = cellRowIdx;
+						if (jacob.isCellStrExisted(cellRowIdx, 2)) {
+							//DONE use prev to judge if time is same
+							if (!isSameCells(jacob, cellRowIdx, prevRows, ColsToCheck)) {
+								if (prevRowIdx != -1) {
+									itemData = new TestReportItemData();
+									i = 0;
+									j = 0;
+									testTime = new Date[3];
+									testSampleNum = new String[3][4];
+									testResult = new String[3][4];
+									testTouchTime = new String[3][4];
+									testCollectTime = new Integer[3][4];
+								}
+								prevRowIdx=1;
+								
+								String sub = jacob.getCellString(cellRowIdx, 2);
+								String[] r = splitSubName(sub);
+								itemData.setTestSubstance(r[0]);
+								itemData.setTestSubstanceDetailedName(r[1]);
+								itemData.setTestTime(testTime);
+								itemData.setTestSampleNum(testSampleNum);
+								itemData.setTestResult(testResult);
+								itemData.setTestTouchTime(testTouchTime);
+								itemData.setTestCollectTime(testCollectTime);
+								
+								itemDataList.add(itemData);
+								//prevSubstance = cellRowIdx;
+								prevRows[1] = cellRowIdx;
+								
+								if (jacob.isCellStrExisted(cellRowIdx, 1)) {
+									itemData.setTestWorkshopJob(jacob.getCellString(cellRowIdx, 1));
+									//prevWorkshopJob = cellRowIdx;
+									prevRows[2] = cellRowIdx;
+								} else {
+									itemData.setTestWorkshopJob(jacob.getCellString(prevRows[2], 1));
+								}
+							}
+						}
+						testTime[i] = dateFormat.parse(jacob.getCellString(cellRowIdx, 7));
+						// TODO Deal with different months / years
+						Calendar c = Calendar.getInstance();
+						c.setTimeInMillis(table.getSampleTimeStart().getTime());
+						int year = c.get(Calendar.YEAR);
+						c.setTime(testTime[i]);
+						c.set(Calendar.YEAR, year);
+						testTime[i] = c.getTime();
+					}
+				}
+					testSampleNum[i][j] = jacob.getCellString(cellRowIdx, 3);
+					testResult[i][j] = jacob.getCellString(cellRowIdx, 4);
+					testTouchTime[i][j] = jacob.getCellString(cellRowIdx, 5);
+					temp = jacob.getCellString(cellRowIdx, 6);
+					testCollectTime[i][j] = Integer.valueOf(temp.substring(0, temp.length() - 3));
+					j++;
+			}
+			
+			jacob.close();
+			jacob.closeDocument();
+		} catch (Exception e) {
+			e.printStackTrace();
+			// TODO Remove later
+			try {
+				System.out.println(cellRowIdx+": "+jacob.getCellString(cellRowIdx, 3));
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	private static String[] splitSubName(String sub) {
+		sub = sub.replace('(', '（');
+		sub = sub.replace(')', '）');
+		sub = sub.replace(" ", "");
+		// TODO Deal with other detailedName
+		String subDetail;
+		if (sub.contains("其他粉尘")) {
+			String[] strs = sub.split("[（\\(）\\)]");
+			sub = strs[0];
+			subDetail = strs[1];
+		} else {
+			subDetail = null;
+		}
+		String[] r = {sub, subDetail};
+		return r;
+	}
+	private static boolean isSameCells(StudyJacob jacob, int rowToCheck, int prevRows[], int[] cols) throws Exception {
+		for (int i = 0; i < cols.length; i++) {
+			if (!isSameCell(jacob, rowToCheck, prevRows[i], cols[i]))
+				return false;
+		}
+		return true;
+	}
+	
+	private static boolean isSameCell(StudyJacob jacob, int row1, int row2, int col) throws Exception {
+		if (!jacob.isCellStrExisted(row1, col)) return true;
+		if (jacob.isInOnePage(row1, col, row2, col)) return false;
+		String s1 = jacob.getCellString(row1, col);
+		String s2 = jacob.getCellString(row2, col);
+		if (!s1.equals(s2)) return false;
+		return true;
+	}
+	
+	private static Date[] getDate(String s) {
+		// TODO Deal with different months / years
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date[] dates = new Date[2];
+		try {
+			for (int i = 0; i < s.length(); i++) {
+				if (Character.isDigit(s.charAt(i))) {
+					int wavyIndex = s.indexOf('~');
+					if (wavyIndex != -1) {
+						dates[0] = dateFormat.parse(s.substring(i, wavyIndex));
+						dates[1] = dateFormat.parse(s.substring(i, s.lastIndexOf('-') + 1) + s.substring(wavyIndex + 1, s.length()));
+					} else {
+						dates[0] = dateFormat.parse(s.substring(i, s.length()));
+					}
+					break;
+				}
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dates;
+	}
+
+	private static String getValue(String nameAndValue) {
+		if (nameAndValue != null)
+			return nameAndValue.substring(nameAndValue.indexOf('：')+1, nameAndValue.length());
+		else 
+			return null;
+	}
+	
 	public static void generateResultTable(TestDataResultTable resultTable, String filePath) {
 		//ComThread.InitSTA();
 		StudyJacob jacob = new StudyJacob();
@@ -39,162 +254,6 @@ public class DocumentGeneration {
 		//ComThread.Release();
 	}
 	
-	private static void addResultDataToTable(TestDataResultTable resultTable,
-			StudyJacob jacob) {
-		int tableCol = 14;
-		int tableRow = 1;
-		Dispatch table = jacob.insertTable(tableCol, tableRow);
-		Dispatch borders = Dispatch.get(table, "Borders").toDispatch();
-		Dispatch.put(borders, "InsideLineStyle", new Variant(1));
-		Dispatch.put(borders, "OutsideLineStyle", new Variant(1));
-		
-		jacob.setTableAlignCenter();
-		
-		//Dispatch font = jacob.getFont();
-		//Dispatch.put(font, "Bold", new Variant(true));
-		tableRow = addResultTableHeadingRows(jacob);
-		//font = jacob.getFont();
-		//Dispatch.put(font, "Bold", new Variant(false));
-		
-		int cellRowIdx = tableRow, cellColIdx = 1;
-		int mergeRowBegin = cellRowIdx;
-		Iterator<TestDataResultItem> itemIt = resultTable.getTestDataResultItems().iterator();
-		while (itemIt.hasNext()) {
-			TestDataResultItem item = itemIt.next();
-			jacob.putTxtToCell(cellRowIdx, 1, item.getTestWorkshopJob());
-			HarmfulSubstanceNationalStandardTable substance = item.getHarmfulSubstanceNationalStandardTable();
-			jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
-			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
-			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeEnd(), item.getTestResultRangeScale()));
-			String type = item.getResultType().equals("=") ? "" : "<";
-			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(item.getCstel(), item.getCstelScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(item.getOm(), item.getOmScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(substance.getMac(), substance.getMacScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult().toString());
-			
-			if (itemIt.hasNext()) {
-				jacob.addRow();
-				tableRow++;
-				cellRowIdx++;
-			}
-		}
-		
-//		for (int row = mergeRowBegin + 1; row <= cellRowIdx; row++) {
-//			//for (int col = 1; col <= tableCol; col++) {
-//			int col = 1;
-//				String mergeStr;
-//				try {
-//					mergeStr = jacob.getCellString(mergeRowBegin, col);
-//
-//					if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
-//						jacob.deleteCellTxt(row, col);
-//						jacob.mergeCell(mergeRowBegin, col, row, col);
-//					} else {
-//						jacob.putTxtToCell(row, col, mergeStr);
-//						continue;
-//					}
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			//}
-//		}
-		String prevStr = "";
-		int prevRowIdx = 1;
-		for (cellRowIdx = 1; cellRowIdx <= tableRow; cellRowIdx++) {
-			String curStr;
-			try {
-				curStr = jacob.getCellString(cellRowIdx, cellColIdx);
-				if (curStr.equals(prevStr)
-						&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
-					jacob.deleteCellTxt(cellRowIdx, cellColIdx);
-					jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
-				} else {
-					prevRowIdx = cellRowIdx;
-					prevStr = curStr;
-				}
-			} catch (Exception e) {
-				continue;
-			}
-		}
-	}
-
-	private static String getRangeString(BigDecimal start, BigDecimal end, int scale) {
-		StringBuffer temp = new StringBuffer();
-		if (start != null) {
-			temp.append(new ValueAndScale(start, scale).toString());
-			temp.append("-");
-		} else {
-			temp.append("<");
-		}
-		temp.append(new ValueAndScale(end, scale));
-		return temp.toString();
-	}
-	private static int addResultTableHeadingRows(StudyJacob jacob) {		
-		jacob.addRow();
-		jacob.addRow();
-		jacob.setRowHeadingFormat(1);
-		jacob.setRowHeadingFormat(2);
-
-		jacob.setRowBold(1);
-		jacob.setRowBold(2);
-		
-		jacob.setColumnWidth(4.21, 1);
-		jacob.setColumnWidth(2.75, 2);
-		jacob.setColumnWidth(1.37, 3);
-		jacob.setColumnWidth(1.27, 4);
-		jacob.setColumnWidth(3.17, 5);
-		jacob.setColumnWidth(1.27, 6);
-		jacob.setColumnWidth(1.51, 7);
-		jacob.setColumnWidth(1.65, 8);
-		jacob.setColumnWidth(1.53, 9);
-		jacob.setColumnWidth(1.48, 10);
-		jacob.setColumnWidth(1.26, 11);
-		jacob.setColumnWidth(1.49, 12);
-		jacob.setColumnWidth(1.51, 13);
-		jacob.setColumnWidth(1.56, 14);
-		jacob.setRowsHeight(0.7);
-		jacob.setRowHeight(0.66, 1);
-		jacob.setRowHeight(0.66, 2);
-		
-		jacob.putTxtToCell(1, 1, "检测地点");
-		jacob.mergeCell(1, 1, 2, 1);
-		jacob.putTxtToCell(1, 2, "检测\n项目");
-		jacob.mergeCell(1, 2, 2, 2);
-		jacob.putTxtToCell(1, 3, "样品数（个）");
-		jacob.mergeCell(1, 3, 2, 3);
-		jacob.putTxtToCell(1, 4, "接触时间(h/d)");
-		jacob.mergeCell(1, 4, 2, 4);
-		jacob.putTxtToCell(1, 5, "检测结果\n（mg/m");
-		jacob.insertSuperText("3");
-		jacob.insertText("）");
-		jacob.mergeCell(1, 5, 1, 9);
-		jacob.putTxtToCell(1, 6, "职业接触限值（mg/m");
-		jacob.insertSuperText("3");
-		jacob.insertText("）");
-		jacob.mergeCell(1, 6, 1, 9);
-		jacob.putTxtToCell(1, 7, "评价\n结论");
-		jacob.mergeCell(1, 7, 2, 14);
-		jacob.putTxtToCell(2, 5, "范围");
-		jacob.putTxtToCell(2, 6, "C");
-		jacob.insertSubText("MAC");
-		jacob.putTxtToCell(2, 7, "C");
-		jacob.insertSubText("TWA");
-		jacob.putTxtToCell(2, 8, "C");
-		jacob.insertSubText("STEL");
-		jacob.putTxtToCell(2, 9, "超限倍数");
-		jacob.putTxtToCell(2, 10, "MAC");
-		jacob.putTxtToCell(2, 11, "PC-\nTWA");
-		jacob.putTxtToCell(2, 12, "PC-\nSTEL");
-		jacob.putTxtToCell(2, 13, "最大超限倍数");
-		return 3;
-	}
-	
 	public static void generateProcessTable(TestDataProcessTable processTable, String filePath) {
 		//ComThread.InitSTA();
 		StudyJacob jacob = new StudyJacob();
@@ -203,7 +262,7 @@ public class DocumentGeneration {
 		Dispatch font = jacob.getFont();
 		Dispatch.put(font, "Name", new Variant("宋体"));
 		Dispatch.put(font, "Name", new Variant("Times New Roman"));
-
+	
 		// TODO Add projectNum
 		setHeader(jacob, processTable.getTableNum(), "");
 		setNote(jacob);	
@@ -218,12 +277,11 @@ public class DocumentGeneration {
 
 	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
 			StudyJacob jacob = new StudyJacob();
-			jacob.openDocument("C:\\2.doc");
+			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\2.doc");
 	
 			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
 			int tableIndex = 1;
 			int prevIndex = 0;
-	//		int tableCol = jacob.getColumnsCount(tableIndex);
 			int tableRow = jacob.getRowsCount(tableIndex);
 			int substanceId = substanceIdBegin;
 			for (int row = 3; row <= tableRow - 1; row++) {
@@ -282,7 +340,7 @@ public class DocumentGeneration {
 
 	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
 			StudyJacob jacob = new StudyJacob();
-			jacob.openDocument("C:\\2.doc");
+			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\2.doc");
 	
 			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
 			int tableIndex = 2;
@@ -347,6 +405,165 @@ public class DocumentGeneration {
 			return list;
 		}
 
+	private static void addResultDataToTable(TestDataResultTable resultTable,
+			StudyJacob jacob) {
+		int tableCol = 14;
+		int tableRow = 1;
+		Dispatch table = jacob.insertTable(tableCol, tableRow);
+		Dispatch borders = Dispatch.get(table, "Borders").toDispatch();
+		Dispatch.put(borders, "InsideLineStyle", new Variant(1));
+		Dispatch.put(borders, "OutsideLineStyle", new Variant(1));
+		
+		jacob.setTableAlignCenter();
+		
+		//Dispatch font = jacob.getFont();
+		//Dispatch.put(font, "Bold", new Variant(true));
+		int headingRowCount = addResultTableHeadingRows(jacob);
+		tableRow = headingRowCount + 1;
+		//font = jacob.getFont();
+		//Dispatch.put(font, "Bold", new Variant(false));
+		
+		int cellRowIdx = tableRow, cellColIdx = 1;
+		//int mergeRowBegin = cellRowIdx;
+		Iterator<TestDataResultItem> itemIt = resultTable.getTestDataResultItems().iterator();
+		while (itemIt.hasNext()) {
+			TestDataResultItem item = itemIt.next();
+			jacob.putTxtToCell(cellRowIdx, 1, item.getTestWorkshopJob());
+			HarmfulSubstanceNationalStandardTable substance = item.getHarmfulSubstanceNationalStandardTable();
+			jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
+			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
+			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeEnd(), item.getTestResultRangeScale()));
+			String type = item.getResultType().equals("=") ? "" : "<";
+			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(item.getCstel(), item.getCstelScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(item.getOm(), item.getOmScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(substance.getMac(), substance.getMacScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult().toString());
+			
+			if (itemIt.hasNext()) {
+				jacob.addRow();
+				tableRow++;
+				cellRowIdx++;
+			}
+		}
+		
+//		for (int row = mergeRowBegin + 1; row <= cellRowIdx; row++) {
+//			//for (int col = 1; col <= tableCol; col++) {
+//			int col = 1;
+//				String mergeStr;
+//				try {
+//					mergeStr = jacob.getCellString(mergeRowBegin, col);
+//
+//					if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
+//						jacob.deleteCellTxt(row, col);
+//						jacob.mergeCell(mergeRowBegin, col, row, col);
+//					} else {
+//						jacob.putTxtToCell(row, col, mergeStr);
+//						continue;
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			//}
+//		}
+		String prevStr = "";
+		int prevRowIdx = 1;
+		for (cellRowIdx = headingRowCount; cellRowIdx <= tableRow; cellRowIdx++) {
+			String curStr;
+			try {
+				curStr = jacob.getCellString(cellRowIdx, cellColIdx);
+				if (curStr.equals(prevStr)
+						&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
+					jacob.deleteCellTxt(cellRowIdx, cellColIdx);
+					jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
+				} else {
+					prevRowIdx = cellRowIdx;
+					prevStr = curStr;
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+	}
+
+	private static String getRangeString(BigDecimal start, BigDecimal end, int scale) {
+		StringBuffer temp = new StringBuffer();
+		if (start != null) {
+			temp.append(new ValueAndScale(start, scale).toString());
+			temp.append("-");
+		} else {
+			temp.append("<");
+		}
+		temp.append(new ValueAndScale(end, scale));
+		return temp.toString();
+	}
+	
+	private static int addResultTableHeadingRows(StudyJacob jacob) {		
+		jacob.addRow();
+		jacob.addRow();
+		jacob.setRowHeadingFormat(1);
+		jacob.setRowHeadingFormat(2);
+
+		jacob.setRowBold(1);
+		jacob.setRowBold(2);
+		
+		jacob.setColumnWidth(4.21, 1);
+		jacob.setColumnWidth(2.75, 2);
+		jacob.setColumnWidth(1.37, 3);
+		jacob.setColumnWidth(1.27, 4);
+		jacob.setColumnWidth(3.17, 5);
+		jacob.setColumnWidth(1.27, 6);
+		jacob.setColumnWidth(1.51, 7);
+		jacob.setColumnWidth(1.65, 8);
+		jacob.setColumnWidth(1.53, 9);
+		jacob.setColumnWidth(1.48, 10);
+		jacob.setColumnWidth(1.26, 11);
+		jacob.setColumnWidth(1.49, 12);
+		jacob.setColumnWidth(1.51, 13);
+		jacob.setColumnWidth(1.56, 14);
+		//jacob.setRowsHeightRuleExactly();
+		jacob.setRowsHeight(0.7);
+		jacob.setRowHeight(0.66, 1);
+		jacob.setRowHeight(0.66, 2);
+		
+		jacob.putTxtToCell(1, 1, "检测地点");
+		jacob.mergeCell(1, 1, 2, 1);
+		jacob.putTxtToCell(1, 2, "检测\n项目");
+		jacob.mergeCell(1, 2, 2, 2);
+		jacob.putTxtToCell(1, 3, "样品数（个）");
+		jacob.mergeCell(1, 3, 2, 3);
+		jacob.putTxtToCell(1, 4, "接触时间(h/d)");
+		jacob.mergeCell(1, 4, 2, 4);
+		jacob.putTxtToCell(1, 5, "检测结果\n（mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("）");
+		jacob.mergeCell(1, 5, 1, 9);
+		jacob.putTxtToCell(1, 6, "职业接触限值（mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("）");
+		jacob.mergeCell(1, 6, 1, 9);
+		jacob.putTxtToCell(1, 7, "评价\n结论");
+		jacob.mergeCell(1, 7, 2, 14);
+		jacob.putTxtToCell(2, 5, "范围");
+		jacob.putTxtToCell(2, 6, "C");
+		jacob.insertSubText("MAC");
+		jacob.putTxtToCell(2, 7, "C");
+		jacob.insertSubText("TWA");
+		jacob.putTxtToCell(2, 8, "C");
+		jacob.insertSubText("STEL");
+		jacob.putTxtToCell(2, 9, "超限倍数");
+		jacob.putTxtToCell(2, 10, "MAC");
+		jacob.putTxtToCell(2, 11, "PC-\nTWA");
+		jacob.putTxtToCell(2, 12, "PC-\nSTEL");
+		jacob.putTxtToCell(2, 13, "最大超限倍数");
+		return 2;
+	}
+	
 	private static void setPage(StudyJacob jacob, double verticalMargin, double horizontalMargin) {
 		jacob.setPageOrientation(1);
 		Dispatch pageSetup = jacob.getPageSetup();
@@ -396,7 +613,7 @@ public class DocumentGeneration {
 		jacob.setRowHeadingFormat(2);
 		
 		jacob.setColumnWidth(2.04, 1);
-		jacob.setColumnWidth(2.15, 2);
+		jacob.setColumnWidth(2.65, 2);
 		jacob.setColumnWidth(3.4, 3);
 		jacob.setColumnWidth(3.43, 4);
 		jacob.setColumnWidth(2.09, 5);
@@ -410,6 +627,7 @@ public class DocumentGeneration {
 		jacob.setColumnWidth(1.4, 13);
 		jacob.setColumnWidth(1.34, 14);
 		jacob.setColumnWidth(1.2, 15);
+		jacob.setRowsHeightRuleExactly();
 		jacob.setRowsHeight(0.63);
 		jacob.setRowHeight(1.31, 1);
 		jacob.setRowHeight(1.05, 2);
@@ -448,7 +666,7 @@ public class DocumentGeneration {
 		jacob.putTxtToCell(2, 12, "PC-\nTWA");
 		jacob.putTxtToCell(2, 13, "PC-\nSTEL");
 		jacob.putTxtToCell(2, 14, "超限倍数");
-		return 3;
+		return 2;
 	}
 	
 	private static void setNote(StudyJacob jacob) {
@@ -502,6 +720,10 @@ public class DocumentGeneration {
 		jacob.insertText("\t\t8---时间加权平均容许浓度规定的8h\n");
 	}
 	
+//	private boolean needMerge() {
+//		
+//	}
+	
 	private static void addProcessDataToTable(TestDataProcessTable processTable,
 			StudyJacob jacob) {
 		int tableCol = 15;
@@ -513,13 +735,16 @@ public class DocumentGeneration {
 		
 		jacob.setTableAlignCenter();
 		
-		tableRow = addProcessTableHeadingRows(jacob);
+		int headingRowCount = addProcessTableHeadingRows(jacob);
+		tableRow = headingRowCount + 1;
 		ArrayList<Integer> colsNotToMerge = new ArrayList<Integer>();
 		colsNotToMerge.add(4);
 		colsNotToMerge.add(5);
 		colsNotToMerge.add(6);
 		
 		int cellRowIdx = tableRow, cellColIdx = 1;
+		int prevTestTime = 1, prevSubstance = 1, prevWorkshopJob = 1, newPrevRow = 1;
+		int[] prevRows = {prevTestTime, prevSubstance, prevWorkshopJob};
 		SimpleDateFormat dateFormat =  new SimpleDateFormat("MM月dd号");
 		Set<TestDataProcessGroup> groupSet = processTable.getTestDataProcessGroups();
 		Iterator<TestDataProcessGroup> groupIt = groupSet.iterator();
@@ -539,7 +764,7 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 14, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 15, group.getTestResult().toString());
-			int mergeRowBegin = cellRowIdx;
+			int mergeResultsRowBegin = cellRowIdx;
 			Set<TestDataProcessItem> itemSet = group.getTestDataProcessItems();
 			Iterator<TestDataProcessItem> itemIt = itemSet.iterator();
 			while (itemIt.hasNext()) {
@@ -552,65 +777,114 @@ public class DocumentGeneration {
 				tableRow++;
 				cellRowIdx++;
 			}
-			for (int row = mergeRowBegin + 1; row < cellRowIdx; row++) {
-				for (int col = 1; col <= tableCol; col++) {
-					if (colsNotToMerge.contains(col))
-						continue;
-					String mergeStr;
-					try {
-						mergeStr = jacob.getCellString(mergeRowBegin, col);
-
-						if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
-							jacob.deleteCellTxt(row, col);
-							jacob.mergeCell(mergeRowBegin, col, row, col);
-						} else {
-							jacob.putTxtToCell(row, col, mergeStr);
-							continue;
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
+			boolean crossPage = false;
+			for (int col = 1; col <= tableCol; col++) {
+				if (colsNotToMerge.contains(col))
+					continue;
+//					jacob.mergeCell(mergeResultsRowBegin, col, cellRowIdx-1, col);
+				
+				
+				int row;
+				for (row = mergeResultsRowBegin + 1; row < cellRowIdx; row++) {
+					if (jacob.isInOnePage(mergeResultsRowBegin, col, row, col)) {
+						jacob.deleteCellTxt(row, col);
+					} else {
+						crossPage = true;
+						newPrevRow = row;
+						break;
 					}
 				}
+				try {
+					String mergeStr;
+					mergeStr = jacob.getCellString(mergeResultsRowBegin, col);
+
+					//if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
+					if (row < cellRowIdx) {							
+						//if (row > mergeRowBegin)
+							jacob.mergeCell(mergeResultsRowBegin, col, row-1, col);
+						jacob.putTxtToCell(row, col, mergeStr);
+						//if (row < cellRowIdx-1)
+							jacob.mergeCell(row, col, cellRowIdx-1, col);
+					} else {
+						jacob.mergeCell(mergeResultsRowBegin, col, cellRowIdx-1, col);
+					}
+					//} else {
+					//	continue;
+					//}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				if (jacob.getCellString(prevRows[2], 2).equals(jacob.getCellString(mergeResultsRowBegin, 2))
+						&& jacob.isInOnePage(prevRows[2], 2, mergeResultsRowBegin, 2)) {
+					jacob.deleteCellTxt(mergeResultsRowBegin, 2);
+					jacob.mergeCell(mergeResultsRowBegin, 2, prevRows[2], 2);
+					if (jacob.getCellString(prevRows[1], 3).equals(jacob.getCellString(mergeResultsRowBegin, 3))
+							&& jacob.isInOnePage(prevRows[1], 3, mergeResultsRowBegin, 3)) {
+						jacob.deleteCellTxt(mergeResultsRowBegin, 3);
+						jacob.mergeCell(mergeResultsRowBegin, 3, prevRows[1], 3);
+						if (jacob.getCellString(prevRows[0], 1).equals(jacob.getCellString(mergeResultsRowBegin, 1))
+								&& jacob.isInOnePage(prevRows[0], 1, mergeResultsRowBegin, 1)) {
+							jacob.deleteCellTxt(mergeResultsRowBegin, 1);
+							jacob.mergeCell(mergeResultsRowBegin, 1, prevRows[0], 1);
+						} else {
+							prevRows[0] = mergeResultsRowBegin;
+						}
+					} else {
+						prevRows[0] = mergeResultsRowBegin;
+						prevRows[1] = mergeResultsRowBegin;
+					}
+				} else {
+					prevRows[0] = mergeResultsRowBegin;
+					prevRows[1] = mergeResultsRowBegin;
+					prevRows[2] = mergeResultsRowBegin;
+				}
+				if (crossPage) {
+					prevRows[0] = newPrevRow;
+					prevRows[1] = newPrevRow;
+					prevRows[2] = newPrevRow;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		tableRow--;
 		
-		colsNotToMerge.add(1);
-		colsNotToMerge.add(7);
-		colsNotToMerge.add(8);
-		colsNotToMerge.add(9);
-		colsNotToMerge.add(10);
-		colsNotToMerge.add(11);
-		colsNotToMerge.add(12);
-		colsNotToMerge.add(13);
-		colsNotToMerge.add(14);
-		colsNotToMerge.add(15);
-		String prevStr = "";
-		int prevRowIdx = 1;
-		for (cellColIdx = 1; cellColIdx <= tableCol; cellColIdx++) {
-			if (colsNotToMerge.contains(cellColIdx))
-				continue;
-			//cellColIdx = 2;
-			for (cellRowIdx = 1; cellRowIdx <= tableRow; cellRowIdx++) {
-				String curStr;
-				try {
-					curStr = jacob.getCellString(cellRowIdx, cellColIdx);
-					if (curStr.equals(prevStr)
-							&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
-						jacob.deleteCellTxt(cellRowIdx, cellColIdx);
-						jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
-					} else {
-						prevRowIdx = cellRowIdx;
-						prevStr = curStr;
-					}
-				} catch (Exception e) {
-					continue;
-				}
-			}
-		}
-//		for (int col = 1; col <= tableCol; col++) {
-//			jacob.deleteCell(tableRow+1, 1);
+//		colsNotToMerge.add(1);
+//		colsNotToMerge.add(7);
+//		colsNotToMerge.add(8);
+//		colsNotToMerge.add(9);
+//		colsNotToMerge.add(10);
+//		colsNotToMerge.add(11);
+//		colsNotToMerge.add(12);
+//		colsNotToMerge.add(13);
+//		colsNotToMerge.add(14);
+//		colsNotToMerge.add(15);
+//		String prevStr = "";
+//		int prevRowIdx = 1;
+//		for (cellColIdx = 1; cellColIdx <= tableCol; cellColIdx++) {
+//			if (colsNotToMerge.contains(cellColIdx))
+//				continue;
+//			//cellColIdx = 2;
+//			for (cellRowIdx = headingRowCount; cellRowIdx <= tableRow; cellRowIdx++) {
+//				String curStr;
+//				try {
+//					curStr = jacob.getCellString(cellRowIdx, cellColIdx);
+//					if (curStr.equals(prevStr)
+//							&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
+//						jacob.deleteCellTxt(cellRowIdx, cellColIdx);
+//						jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
+//					} else {
+//						prevRowIdx = cellRowIdx;
+//						prevStr = curStr;
+//					}
+//				} catch (Exception e) {
+//					continue;
+//				}
+//			}
 //		}
+
 		jacob.moveDown(1);
 	}
 

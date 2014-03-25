@@ -123,6 +123,10 @@ public class StudyJacob {
 		documents = null;
 	}
 
+	public Dispatch getDocumnet() {
+		return this.doc;
+	}
+	
 	public void switchToHeader() {
 		switchToView(1);
 	}
@@ -167,6 +171,15 @@ public class StudyJacob {
 		Dispatch headerFooter = Dispatch.get(selection, "HeaderFooter").toDispatch();
 		Dispatch.put(headerFooter, "LinkToPrevious", new Variant(false));
 		switchToMainDoc();
+	}
+	
+	public boolean isCellStrExisted(int cellRowIdx, int cellColIdx) {
+		try {
+			getCellString(cellRowIdx, cellColIdx);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 	/**
@@ -725,9 +738,9 @@ public class StudyJacob {
 		if (columnWidth < 0) {
 			columnWidth = 0;
 		}
-		if (columns == null) {
+		//if (columns == null) {
 			this.getColumns();
-		}
+		//}
 		this.getColumn(columnIndex);
 		// Auto 1 Percent 2 Points 3
 		Dispatch.put(column, "PreferredWidthType", new Variant(3));
@@ -1208,7 +1221,7 @@ public class StudyJacob {
 	 * @param rowIndex @return
 	 */
 	public Dispatch getRow(int rowIndex) {
-		if (rows == null)
+		//if (rows == null)
 			this.getRows();
 		row = Dispatch.invoke(rows, "item", Dispatch.Method,
 				new Object[] { new Integer(rowIndex) }, new int[1])
@@ -1217,7 +1230,7 @@ public class StudyJacob {
 	}
 
 	public int getRowsCount() {
-		if (rows == null)
+		//if (rows == null)
 			this.getRows();
 		return Dispatch.get(rows, "Count").getInt();
 	}
@@ -1241,7 +1254,7 @@ public class StudyJacob {
 	 * @return
 	 */
 	public Dispatch getColumn(int columnIndex) {
-		if (columns == null)
+		//if (columns == null)
 			this.getColumns();
 		return this.column = Dispatch.call(columns, "Item",
 				new Variant(columnIndex)).toDispatch();
@@ -1286,12 +1299,17 @@ public class StudyJacob {
 	 */
 	public void setRowsHeight(double rowHeight) {
 		if (rowHeight > 0) {
-			if (rows == null)
+			//if (rows == null)
 				this.getRows();
 			Dispatch.put(rows, "Height", centimetersToPoints(rowHeight));
 		}
 	}
 
+	public void setRowsHeightRuleExactly() {
+		this.getRows();
+		Dispatch.put(rows, "HeightRule", 2);
+	}
+	
 	/**
 	 * 设置指定表格的所有行的行高
 	 * 
@@ -1318,18 +1336,18 @@ public class StudyJacob {
 	 */
 	public void setRowHeight(double rowHeight, int rowIndex) {
 		if (rowHeight > 0) {
-			if (rows == null) {
+			//if (rows == null) {
 				this.getRows();	
-			}
+			//}
 			this.getRow(rowIndex);
 			Dispatch.put(row, "Height", centimetersToPoints(rowHeight));
 		}
 	}
 
 	public void setRowHeadingFormat(int rowIndex) {
-		if (rows == null) {
+		//if (rows == null) {
 			this.getRows();
-		}
+		//}
 		this.getRow(rowIndex);
 		Dispatch.put(row, "HeadingFormat", true);
 	}
@@ -1356,7 +1374,7 @@ public class StudyJacob {
 		if (columnWidth < 11) {
 			columnWidth = 120;
 		}
-		if (columns == null)
+		//if (columns == null)
 			this.getColumns();
 		Dispatch.put(columns, "Width", new Variant(columnWidth));
 	}
@@ -1495,6 +1513,8 @@ public class StudyJacob {
 	 */
 	public void mergeCell(int fstCellRowIndex, int fstCellColIndex,
 			int secCellRowIndex, int secCellColIndex) {
+		if (fstCellRowIndex == secCellRowIndex && fstCellColIndex == secCellColIndex)
+			return;
 		Dispatch fstCell = getCell(fstCellRowIndex, fstCellColIndex);
 		Dispatch secCell = getCell(secCellRowIndex, secCellColIndex);
 			Dispatch.call(fstCell, "Merge", secCell);
@@ -1502,9 +1522,11 @@ public class StudyJacob {
 	
 	public boolean isInOnePage(int fstCellRowIndex, int fstCellColIndex,
 			int secCellRowIndex, int secCellColIndex) {
-		getCell(fstCellRowIndex, fstCellColIndex);
+		Dispatch.call(getCell(fstCellRowIndex, fstCellColIndex), "Select");
+		Dispatch.call(selection, "MoveLeft");
 		int fstPage = Dispatch.call(selection, "Information", 3).getInt();
-		getCell(secCellRowIndex, secCellColIndex);
+		Dispatch.call(getCell(secCellRowIndex, secCellColIndex), "Select");
+		Dispatch.call(selection, "MoveLeft");
 		int secPage = Dispatch.call(selection, "Information", 3).getInt();
 		//System.out.println("1:"+fstPage+" 2:"+secPage);
 		if (fstPage == secPage) {

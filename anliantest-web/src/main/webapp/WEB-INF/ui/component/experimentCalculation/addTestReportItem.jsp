@@ -7,9 +7,9 @@
 <link rel="stylesheet" href="${context}/ui/css/form.css">
 <link rel="stylesheet" href="${context}/ui/css/custom-theme/jquery-ui-1.9.2.custom.css">
 
-<script src="${context}/ui/js/experimentCalculation.js"></script>
 <script src="${context}/ui/js/jquery/jquery.fileDownload.js"></script>
 <script src="${context}/ui/js/jquery-ui-bootstrap/jquery-ui-1.9.2.custom.min.js"></script>
+<script src="${context}/ui/js/experimentCalculation.js"></script>
 
 <div class="panel panel-default">
 	<div class="panel-heading">实验数据输入</div>

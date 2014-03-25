@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-20 17:07:37 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-25 16:37:44 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,9 +23,8 @@ public class TestReportItem implements java.io.Serializable {
 
 	private int itemId;
 	private TestReportTable testReportTable;
+	private HarmfulSubstanceNationalStandardTable harmfulSubstanceNationalStandardTable;
 	private String testWorkshopJob;
-	private String testSubstance;
-	private Integer testSubstanceId;
 	private String substanceDetailedName;
 	private Date testTime;
 	private Integer testSampleId;
@@ -44,18 +43,19 @@ public class TestReportItem implements java.io.Serializable {
 		this.itemId = itemId;
 	}
 
-	public TestReportItem(int itemId, TestReportTable testReportTable,
-			String testWorkshopJob, String testSubstance,
-			Integer testSubstanceId, String substanceDetailedName,
+	public TestReportItem(
+			int itemId,
+			TestReportTable testReportTable,
+			HarmfulSubstanceNationalStandardTable harmfulSubstanceNationalStandardTable,
+			String testWorkshopJob, String substanceDetailedName,
 			Date testTime, Integer testSampleId, String testSampleNum,
 			BigDecimal testResult, Integer testResultScale,
 			String testResultType, BigDecimal testTouchTime,
 			Integer testTouchTimeScale, Integer testCollectTime) {
 		this.itemId = itemId;
 		this.testReportTable = testReportTable;
+		this.harmfulSubstanceNationalStandardTable = harmfulSubstanceNationalStandardTable;
 		this.testWorkshopJob = testWorkshopJob;
-		this.testSubstance = testSubstance;
-		this.testSubstanceId = testSubstanceId;
 		this.substanceDetailedName = substanceDetailedName;
 		this.testTime = testTime;
 		this.testSampleId = testSampleId;
@@ -88,6 +88,17 @@ public class TestReportItem implements java.io.Serializable {
 		this.testReportTable = testReportTable;
 	}
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "test_substance_id")
+	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTable() {
+		return this.harmfulSubstanceNationalStandardTable;
+	}
+
+	public void setHarmfulSubstanceNationalStandardTable(
+			HarmfulSubstanceNationalStandardTable harmfulSubstanceNationalStandardTable) {
+		this.harmfulSubstanceNationalStandardTable = harmfulSubstanceNationalStandardTable;
+	}
+
 	@Column(name = "test_workshop_job", length = 100)
 	public String getTestWorkshopJob() {
 		return this.testWorkshopJob;
@@ -95,24 +106,6 @@ public class TestReportItem implements java.io.Serializable {
 
 	public void setTestWorkshopJob(String testWorkshopJob) {
 		this.testWorkshopJob = testWorkshopJob;
-	}
-
-	@Column(name = "test_substance", length = 45)
-	public String getTestSubstance() {
-		return this.testSubstance;
-	}
-
-	public void setTestSubstance(String testSubstance) {
-		this.testSubstance = testSubstance;
-	}
-
-	@Column(name = "test_substance_id")
-	public Integer getTestSubstanceId() {
-		return this.testSubstanceId;
-	}
-
-	public void setTestSubstanceId(Integer testSubstanceId) {
-		this.testSubstanceId = testSubstanceId;
 	}
 
 	@Column(name = "substance_detailed_name", length = 45)

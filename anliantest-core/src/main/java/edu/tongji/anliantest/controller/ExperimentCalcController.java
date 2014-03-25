@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -65,10 +66,65 @@ public class ExperimentCalcController extends BaseController {
 	public String experimentCalculationPage(){
 		return "experimentCalculation/createTestReportTable";
 	}
-	
+
 	@RequestMapping(value = "/addTestReportItem")
 	public String testReportItemPage(){
 		return "experimentCalculation/addTestReportItem";
+	}
+	
+	@RequestMapping(value = "/uploadTestReport")
+	public String uploadTestReport(){
+		return "experimentCalculation/uploadTestReport";
+	}
+	
+	@RequestMapping(value = "/createTestReportTableFromDoc")
+	public void createTestReportTableFromDoc(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			BufferedInputStream fileIn;
+			fileIn = new BufferedInputStream(request.getInputStream());
+			String fn = request.getParameter("fileName");
+			StringBuffer strBuffer = new StringBuffer();
+			strBuffer.append(request.getSession().getServletContext().getRealPath(""));
+			strBuffer.append("\\WEB-INF\\tempDocs\\");
+			strBuffer.append(fn);
+			String filePath = strBuffer.toString();//"C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\reportTableTest.doc";
+			
+			byte[] buf = new byte[1024];
+			File file = new File(filePath);
+
+			BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(file));
+
+			while (true) {
+				// 读取数据
+				int bytesIn = fileIn.read(buf, 0, 1024);
+
+				//System.out.println(bytesIn);
+
+				if (bytesIn == -1) {
+					break;
+				} else {
+					fileOut.write(buf, 0, bytesIn);
+				}
+			}
+
+			fileOut.flush();
+			fileOut.close();
+
+			System.out.println(file.getAbsolutePath());
+		
+			TestReportTable reportTable = new TestReportTable();
+			ArrayList<TestReportItemData> itemDataList = new ArrayList<TestReportItemData>();
+			DocumentGeneration.getReportTableData(filePath, reportTable, itemDataList);
+			createTestReportTable(request, reportTable);
+			for (TestReportItemData itemData : itemDataList) {
+				addTestReportItemAndCalc(request, itemData);
+			}
+
+			PrintWriter printWriter = response.getWriter();
+			printWriter.write("Success");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@RequestMapping(value = "/createTestReportTable")
@@ -146,9 +202,7 @@ public class ExperimentCalcController extends BaseController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("forward:addTestReportItem");
-		
 		mav.addObject("resultMsg", "success");
-		
 		return mav;
 	}
 
@@ -267,7 +321,7 @@ public class ExperimentCalcController extends BaseController {
 			TestDataProcessGroup group = new TestDataProcessGroup(groupId);
 			group.setTestDataProcessTable(processTable);
 			TestReportItem reportItem = reportItemList.get(offset);
-			HarmfulSubstanceNationalStandardTable standardTable = harmfulSubstanceNationalStandardService.getHarmfulSubstanceNationalStandardTableById(reportItem.getTestSubstanceId());
+			HarmfulSubstanceNationalStandardTable standardTable = reportItem.getHarmfulSubstanceNationalStandardTable();
 			group.setHarmfulSubstanceNationalStandardTable(standardTable);
 			group.setTestDataTime(reportItem.getTestTime());
 			group.setTestWorkshopJob(reportItem.getTestWorkshopJob());
@@ -323,9 +377,8 @@ public class ExperimentCalcController extends BaseController {
 			BigDecimal std_om = standardTable.getOm();
 			mac = cstel;
 			ctwa = new BigDecimal(ctwa.doubleValue()/8);
-			om = new BigDecimal(cstel.doubleValue()/pc_twa.doubleValue());			
-			
-
+			if (std_om != null)
+				om = new BigDecimal(cstel.doubleValue()/pc_twa.doubleValue());
 			
 			boolean passed = true;
 			if (std_mac != null) {
@@ -391,7 +444,7 @@ public class ExperimentCalcController extends BaseController {
 				prevDate = item.getTestTime();
 			}
 			count++;
-			testReportService.addItem(item);			
+						
 		}
 		dayCount.add(count);
 		return dayCount;
@@ -405,6 +458,18 @@ public class ExperimentCalcController extends BaseController {
 			return num.length() - index - 1;
 	}
 	
+//	private void splitTypeAndValue(String typeAndValue, String type, BigDecimal value) {
+//		if (Character.isDigit(typeAndValue.charAt(0))) {
+//			value = BigDecimal.valueOf(Double.valueOf(typeAndValue));
+//			if (type != null)
+//				type = "=";
+//		} else {
+//			value = BigDecimal.valueOf(Double.valueOf(typeAndValue.substring(1)));
+//			if (type != null)
+//				type = "<";
+//		}
+//	}
+	
 	private ArrayList<TestReportItem> getReportItemListFromInput(
 			HttpServletRequest request, TestReportItemData data, Range<BigDecimal> range) {
 		ArrayList<TestReportItem> reportItemList = new ArrayList<TestReportItem>();
@@ -412,15 +477,23 @@ public class ExperimentCalcController extends BaseController {
 		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
 		TestReportTable reportTable = testReportService.getTestReportTableByTableId(reportTableId);
 		int offset = 0;
-		range.setStart(BigDecimal.valueOf(Double.valueOf(data.getTestResult()[0][0])));
+		if (Character.isDigit(data.getTestResult()[0][0].charAt(0))) {
+			range.setStart(BigDecimal.valueOf(Double.valueOf(data.getTestResult()[0][0])));			
+		} else {
+			range.setStart(BigDecimal.valueOf(Double.valueOf(data.getTestResult()[0][0].substring(1))));
+		}
 		range.setEnd(range.getStart());
 		for (int i = 0; i < 3; i++) {
 			if (data.getTestTime()[i] != null) {
 				for (int j = 0; j < 4; j++) {
-					if (data.getTestResult()[i][j] != "") {
+					if (data.getTestResult()[i][j] != null && !data.getTestResult()[i][j].equals("")) {
 						TestReportItem temp = new TestReportItem();
 						temp.setItemId(reportItemIdBegin+offset);
-						temp.setTestTouchTime(BigDecimal.valueOf(Double.valueOf(data.getTestTouchTime()[i][j])));
+						try {
+							temp.setTestTouchTime(BigDecimal.valueOf(Double.valueOf(data.getTestTouchTime()[i][j])));
+						} catch(Exception e) {
+							System.out.println(data.getTestSampleNum()[i][j]);
+						}
 						String touchTime = data.getTestTouchTime()[i][j];
 						temp.setTestTouchTimeScale(getScaleFromNumStr(touchTime));
 						temp.setTestCollectTime(data.getTestCollectTime()[i][j]);
@@ -433,7 +506,7 @@ public class ExperimentCalcController extends BaseController {
 							temp.setTestResultType("=");
 						} else {
 							temp.setTestResult(BigDecimal.valueOf(Double.valueOf(testResult.substring(1))));
-							temp.setTestResultType(testResult.substring(0, 1));
+							temp.setTestResultType("<");
 							range.setStart(null);
 						}
 
@@ -443,13 +516,20 @@ public class ExperimentCalcController extends BaseController {
 						}
 						//+"-"+(offset+1<10?"0":"")+String.valueOf(offset+1)
 						temp.setTestSampleNum(data.getTestSampleNum()[i][j]);
-						temp.setTestSubstanceId(data.getTestSubstanceId());
-						temp.setTestSubstance(harmfulSubstanceNationalStandardService.getStandardNameById(data.getTestSubstanceId()));
+						if (data.getTestSampleId() != null) {
+							temp.setHarmfulSubstanceNationalStandardTable(harmfulSubstanceNationalStandardService.getSubstanceById(data.getTestSubstanceId()));
+						} else {
+							temp.setHarmfulSubstanceNationalStandardTable(harmfulSubstanceNationalStandardService.getSubstanceByName(data.getTestSubstance()));
+						}
+						//temp.setTestSubstance();
 						temp.setTestTime(data.getTestTime()[i]);
 						temp.setTestWorkshopJob(data.getTestWorkshopJob());
 						temp.setTestResultScale(getScaleFromNumStr(testResult));
-						temp.setSubstanceDetailedName(data.getTestSubstanceDetailedName().length() == 0 ? null : data.getTestSubstanceDetailedName());
+						if (data.getTestSubstanceDetailedName() != null && data.getTestSubstanceDetailedName().length() != 0) {
+							temp.setSubstanceDetailedName(data.getTestSubstanceDetailedName());
+						}
 						reportItemList.add(temp);
+						testReportService.addItem(temp);
 						offset++;
 					} else {
 						break;
