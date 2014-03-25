@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  font-family: 'Microsoft YaHei', Arial, 'Lucida Grande', Tahoma, sans-serif;
+  background-color: #eee;
+}
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body .h1,
+body .h2,
+body .h3,
+body .h4,
+body .h5,
+body .h6 {
+  font-family: 'Microsoft YaHei', Arial, 'Lucida Grande', Tahoma, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+body .panel .panel-heading {
+  font-size: 16px;
+}
+body label {
+  font-size: 15px;
+}
+body .container {
+  width: 1200px;
+}
+body .btn-create-testreport {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}

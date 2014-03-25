@@ -16,4 +16,19 @@ public class ProjectInfoService {
 	public void addProject(ProjectInfo projectInfo){
 		projectInfoDao.save(projectInfo);
 	}
+
+
+	public long getCount() {
+		return projectInfoDao.getCount();
+	}
+
+
+	public ProjectInfo getProjectById(int projectId) {
+		return projectInfoDao.get(projectId);
+	}
+
+
+	public ProjectInfo getProjectByName(String projectName) {
+		return projectInfoDao.getProjectByName(projectName);
+	}
 }

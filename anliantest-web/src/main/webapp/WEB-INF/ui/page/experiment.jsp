@@ -14,7 +14,7 @@
 
 <link rel="stylesheet" href="ui/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="ui/bootstrap/css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="ui/css/home.css">
+<link rel="stylesheet" href="ui/css/experiment.css">
 
 <script src="ui/js/jquery/jquery-1.10.2.min.js"></script>
 <script src="ui/bootstrap/js/bootstrap.min.js"></script>
@@ -34,7 +34,7 @@
 				</c:import>
 			</div>
 			<div class="col-md-9">
-				
+				<c:import url="../component/panel/experimentContainer.jsp"></c:import>
 			</div>
 		</div>
 		<div class="row">
