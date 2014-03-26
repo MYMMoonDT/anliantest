@@ -217,10 +217,10 @@ public class ExperimentCalcController extends BaseController {
 	class Range<T> {
 		private T start;
 		private T end;
+		private String startType;
+		private String endType;
 		
 		Range() {
-			start = null;
-			end = null;
 		}
 
 		public T getStart() {
@@ -238,17 +238,38 @@ public class ExperimentCalcController extends BaseController {
 		public void setEnd(T end) {
 			this.end = end;
 		}
+
+		public String getStartType() {
+			return startType;
+		}
+
+		public void setStartType(String startType) {
+			this.startType = startType;
+		}
+
+		public String getEndType() {
+			return endType;
+		}
+
+		public void setEndType(String endType) {
+			this.endType = endType;
+		}
 	}
 	private void calcResultData(HttpServletRequest request,
 			ArrayList<TestReportItem> reportItemList,
 			ArrayList<Integer> dayCount,
 			ArrayList<TestDataProcessGroup> groupList,  Range<BigDecimal> range) {
 		int sampleCount = reportItemList.size();
-		BigDecimal groupTouchTime = new BigDecimal(0);
-		for (int i= 0; i < dayCount.get(0); i++) {
-			groupTouchTime = groupTouchTime.add(reportItemList.get(i).getTestTouchTime());
+		BigDecimal maxGroupTouchTime = new BigDecimal(0);
+		int offset = 0;
+		for (Integer cnt : dayCount) {
+			BigDecimal groupTouchTime = new BigDecimal(0);
+			for (int i= offset; i < offset+cnt; i++) {
+				groupTouchTime = groupTouchTime.add(reportItemList.get(i).getTestTouchTime());
+			}
+			offset += cnt;
+			maxGroupTouchTime = maxGroupTouchTime.max(groupTouchTime);
 		}
-		
 		
 		int resultItemId = (int)testDataResultService.getItemCount();
 		TestDataResultItem resultItem = new TestDataResultItem(resultItemId);
@@ -257,14 +278,16 @@ public class ExperimentCalcController extends BaseController {
 		resultItem.setHarmfulSubstanceNationalStandardTable(groupList.get(0).getHarmfulSubstanceNationalStandardTable());
 		resultItem.setTestWorkshopJob(groupList.get(0).getTestWorkshopJob());
 		resultItem.setTestSampleCount(sampleCount);
-		resultItem.setTestTouchTime(groupTouchTime);
+		resultItem.setTestTouchTime(maxGroupTouchTime);
 		resultItem.setTestTouchTimeScale(reportItemList.get(0).getTestTouchTimeScale());
 		resultItem.setTestResultRangeScale(reportItemList.get(0).getTestResultScale());
 		resultItem.setSubstanceDetailedName(reportItemList.get(0).getSubstanceDetailedName());
-		if (range.getStart() != null) {
+		//if (range.getStart() != null) {
 			resultItem.setTestResultRangeStart(range.getStart());
-		}
+			resultItem.setTestResultRangeStartType(range.getStartType());
+		//}
 		resultItem.setTestResultRangeEnd(range.getEnd());
+		resultItem.setTestResultRangeEndType(range.getEndType());
 		BigDecimal mac = new BigDecimal(0);
 		BigDecimal ctwa = new BigDecimal(0);
 		BigDecimal cstel = new BigDecimal(0);
@@ -533,11 +556,14 @@ public class ExperimentCalcController extends BaseController {
 		TestReportTable reportTable = testReportService.getTestReportTableByTableId(reportTableId);
 		int offset = 0;
 		if (Character.isDigit(data.getTestResult()[0][0].charAt(0))) {
+			range.setStartType("=");
 			range.setStart(BigDecimal.valueOf(Double.valueOf(data.getTestResult()[0][0])));			
 		} else {
+			range.setStartType("<");
 			range.setStart(BigDecimal.valueOf(Double.valueOf(data.getTestResult()[0][0].substring(1))));
 		}
 		range.setEnd(range.getStart());
+		range.setEndType(range.getStartType());
 		for (int i = 0; i < 3; i++) {
 			if (data.getTestTime()[i] != null) {
 				for (int j = 0; j < 4; j++) {
@@ -562,13 +588,27 @@ public class ExperimentCalcController extends BaseController {
 						} else {
 							temp.setTestResult(BigDecimal.valueOf(Double.valueOf(testResult.substring(1))));
 							temp.setTestResultType("<");
-							range.setStart(null);
+							//range.setStart(null);
 						}
 
-						range.setEnd(range.getEnd().max(temp.getTestResult()));
-						if (range.getStart() != null) {
-							range.setStart(range.getStart().min(temp.getTestResult()));
+						if (range.getStart().compareTo(temp.getTestResult()) > 0) {
+							range.setStart(temp.getTestResult());
+							range.setStartType(temp.getTestResultType());
+						} else if (range.getStart().compareTo(temp.getTestResult()) == 0
+								&& range.getStartType().equals("=") && temp.getTestResultType().equals("<")) {
+							range.setStartType("<");
 						}
+						if (range.getEnd().compareTo(temp.getTestResult()) < 0) {
+							range.setEnd(temp.getTestResult());
+							range.setEndType(temp.getTestResultType());
+						} else if (range.getEnd().compareTo(temp.getTestResult()) == 0
+								&& range.getEndType().equals("<") && temp.getTestResultType().equals("=")) {
+							range.setEndType("=");
+						}
+						//range.setEnd(range.getEnd().max(temp.getTestResult()));
+						//if (range.getStart() != null) {
+						//	range.setStart(range.getStart().min(temp.getTestResult()));
+						//}
 						//+"-"+(offset+1<10?"0":"")+String.valueOf(offset+1)
 						temp.setTestSampleNum(data.getTestSampleNum()[i][j]);
 						if (data.getTestSampleId() != null) {

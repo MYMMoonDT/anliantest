@@ -433,7 +433,7 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
 			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
 			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeEnd(), item.getTestResultRangeScale()));
+			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeStartType(), item.getTestResultRangeEnd(), item.getTestResultRangeEndType(), item.getTestResultRangeScale()));
 			String type = item.getResultType();//.equals("=") ? "" : "<";
 			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
@@ -495,15 +495,13 @@ public class DocumentGeneration {
 		}
 	}
 
-	private static String getRangeString(BigDecimal start, BigDecimal end, int scale) {
+	private static String getRangeString(BigDecimal start, String startType, BigDecimal end, String endType, int scale) {
 		StringBuffer temp = new StringBuffer();
-		if (start != null) {
-			temp.append(new ValueAndScale(start, scale).toString());
+		temp.append(new ValueAndScale(start, scale).toTypeString(startType));
+		if (!startType.equals(endType) || !start.equals(end)) {
 			temp.append("-");
-		} else {
-			temp.append("<");
-		}
-		temp.append(new ValueAndScale(end, scale));
+			temp.append(new ValueAndScale(end, scale).toTypeString(endType));
+		}		
 		return temp.toString();
 	}
 	

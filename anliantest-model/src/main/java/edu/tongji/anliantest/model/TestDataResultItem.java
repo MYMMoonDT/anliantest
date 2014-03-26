@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-20 17:07:37 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-26 21:59:18 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import javax.persistence.Column;
@@ -39,6 +39,8 @@ public class TestDataResultItem implements java.io.Serializable {
 	private Integer testResultRangeScale;
 	private String resultType;
 	private Integer testTouchTimeScale;
+	private String testResultRangeStartType;
+	private String testResultRangeEndType;
 
 	public TestDataResultItem() {
 	}
@@ -57,7 +59,8 @@ public class TestDataResultItem implements java.io.Serializable {
 			Integer ctwaScale, Integer cstelScale, Integer omScale,
 			BigDecimal testResultRangeStart, BigDecimal testResultRangeEnd,
 			String testResult, Integer testResultRangeScale, String resultType,
-			Integer testTouchTimeScale) {
+			Integer testTouchTimeScale, String testResultRangeStartType,
+			String testResultRangeEndType) {
 		this.itemId = itemId;
 		this.harmfulSubstanceNationalStandardTable = harmfulSubstanceNationalStandardTable;
 		this.testDataResultTable = testDataResultTable;
@@ -79,6 +82,8 @@ public class TestDataResultItem implements java.io.Serializable {
 		this.testResultRangeScale = testResultRangeScale;
 		this.resultType = resultType;
 		this.testTouchTimeScale = testTouchTimeScale;
+		this.testResultRangeStartType = testResultRangeStartType;
+		this.testResultRangeEndType = testResultRangeEndType;
 	}
 
 	@Id
@@ -272,6 +277,24 @@ public class TestDataResultItem implements java.io.Serializable {
 
 	public void setTestTouchTimeScale(Integer testTouchTimeScale) {
 		this.testTouchTimeScale = testTouchTimeScale;
+	}
+
+	@Column(name = "test_result_range_start_type", length = 2)
+	public String getTestResultRangeStartType() {
+		return this.testResultRangeStartType;
+	}
+
+	public void setTestResultRangeStartType(String testResultRangeStartType) {
+		this.testResultRangeStartType = testResultRangeStartType;
+	}
+
+	@Column(name = "test_result_range_end_type", length = 2)
+	public String getTestResultRangeEndType() {
+		return this.testResultRangeEndType;
+	}
+
+	public void setTestResultRangeEndType(String testResultRangeEndType) {
+		this.testResultRangeEndType = testResultRangeEndType;
 	}
 
 }
