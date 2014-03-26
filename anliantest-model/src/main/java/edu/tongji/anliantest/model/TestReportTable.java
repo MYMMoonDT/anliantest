@@ -5,6 +5,7 @@ package edu.tongji.anliantest.model;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -290,6 +292,7 @@ public class TestReportTable implements java.io.Serializable {
 		this.tableTime = tableTime;
 	}
 
+	@OrderBy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testReportTable")
 	public Set<TestReportItem> getTestReportItems() {
 		return this.testReportItems;

@@ -4,6 +4,7 @@ package edu.tongji.anliantest.model;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 /**
@@ -70,6 +72,7 @@ public class TestDataResultTable implements java.io.Serializable {
 		this.tableName = tableName;
 	}
 
+	@OrderBy
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "testDataResultTable")
 	public Set<TestDataResultItem> getTestDataResultItems() {
 		return this.testDataResultItems;

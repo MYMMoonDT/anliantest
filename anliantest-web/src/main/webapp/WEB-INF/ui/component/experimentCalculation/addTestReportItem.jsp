@@ -98,8 +98,6 @@
 	<div id="error-modal" title="Error" style="display: none;">There
 		was a problem generating your report, please try again.</div>
 
-</div>
-
 <script id="addTestDateItem" type="text/x-jquery-tmpl">
 <div class="dayData">
 	<div class="row">
@@ -157,3 +155,4 @@
 	</div>
 </div>		
 </script>
+</div>

@@ -1,6 +1,6 @@
 package edu.tongji.anliantest.model;
 
-// Generated 2014-3-20 17:07:37 by Hibernate Tools 3.4.0.CR1
+// Generated 2014-3-24 17:35:33 by Hibernate Tools 3.4.0.CR1
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -33,6 +33,7 @@ public class HarmfulSubstanceNationalStandardTable implements
 	private Integer pcTwaScale;
 	private Integer pcStelScale;
 	private Integer omScale;
+	private Set<TestReportItem> testReportItems = new HashSet<TestReportItem>(0);
 	private Set<TestDataResultItem> testDataResultItems = new HashSet<TestDataResultItem>(
 			0);
 	private Set<SamplePlanItem> samplePlanItems = new HashSet<SamplePlanItem>(0);
@@ -51,7 +52,8 @@ public class HarmfulSubstanceNationalStandardTable implements
 			String chemicalAbstractNum, BigDecimal mac, BigDecimal pcTwa,
 			BigDecimal pcStel, BigDecimal om, String substanceComment,
 			Integer macScale, Integer pcTwaScale, Integer pcStelScale,
-			Integer omScale, Set<TestDataResultItem> testDataResultItems,
+			Integer omScale, Set<TestReportItem> testReportItems,
+			Set<TestDataResultItem> testDataResultItems,
 			Set<SamplePlanItem> samplePlanItems,
 			Set<TestDataProcessGroup> testDataProcessGroups) {
 		this.substanceId = substanceId;
@@ -67,6 +69,7 @@ public class HarmfulSubstanceNationalStandardTable implements
 		this.pcTwaScale = pcTwaScale;
 		this.pcStelScale = pcStelScale;
 		this.omScale = omScale;
+		this.testReportItems = testReportItems;
 		this.testDataResultItems = testDataResultItems;
 		this.samplePlanItems = samplePlanItems;
 		this.testDataProcessGroups = testDataProcessGroups;
@@ -188,6 +191,15 @@ public class HarmfulSubstanceNationalStandardTable implements
 
 	public void setOmScale(Integer omScale) {
 		this.omScale = omScale;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "harmfulSubstanceNationalStandardTable")
+	public Set<TestReportItem> getTestReportItems() {
+		return this.testReportItems;
+	}
+
+	public void setTestReportItems(Set<TestReportItem> testReportItems) {
+		this.testReportItems = testReportItems;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "harmfulSubstanceNationalStandardTable")

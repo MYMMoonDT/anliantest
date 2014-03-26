@@ -22,7 +22,7 @@ public class HarmfulSubstanceNationalStandardService {
 		return harmfulSubstanceNationalStandardTableDao.getStandardList();
 	}
 	
-	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTableById(int id) {
+	public HarmfulSubstanceNationalStandardTable getSubstanceById(int id) {
 		return harmfulSubstanceNationalStandardTableDao.get(id);
 	}
 	
@@ -32,5 +32,9 @@ public class HarmfulSubstanceNationalStandardService {
 	
 	public long getItemCount() {
 		return harmfulSubstanceNationalStandardTableDao.getItemCount();
+	}
+	
+	public HarmfulSubstanceNationalStandardTable getSubstanceByName(String name) {
+		return harmfulSubstanceNationalStandardTableDao.getHarmfulSubstanceNationalStandardTableByName(name);
 	}
 }
