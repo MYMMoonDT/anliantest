@@ -99,14 +99,14 @@ public class DocumentGeneration {
 			for (cellRowIdx = 2; cellRowIdx <= tableRow; cellRowIdx++) {
 				if (jacob.isCellStrExisted(cellRowIdx, 7)) {
 					//DONE use prev to judge if time is same
-					if (!isSameCells(jacob, cellRowIdx, prevRows, ColsToCheck)) {
+					if (!isSameCells(jacob, cellRowIdx, prevRows, ColsToCheck, 0)) {
 						i++;
 						j = 0;
 						prevRows[0] = cellRowIdx;
 						//prevTestTime = cellRowIdx;
 						if (jacob.isCellStrExisted(cellRowIdx, 2)) {
 							//DONE use prev to judge if time is same
-							if (!isSameCells(jacob, cellRowIdx, prevRows, ColsToCheck)) {
+							if (!isSameCells(jacob, cellRowIdx, prevRows, ColsToCheck, 1)) {
 								if (prevRowIdx != -1) {
 									itemData = new TestReportItemData();
 									i = 0;
@@ -189,8 +189,8 @@ public class DocumentGeneration {
 		String[] r = {sub, subDetail};
 		return r;
 	}
-	private static boolean isSameCells(StudyJacob jacob, int rowToCheck, int prevRows[], int[] cols) throws Exception {
-		for (int i = 0; i < cols.length; i++) {
+	private static boolean isSameCells(StudyJacob jacob, int rowToCheck, int prevRows[], int[] cols, int compareBegin) throws Exception {
+		for (int i = compareBegin; i < cols.length; i++) {
 			if (!isSameCell(jacob, rowToCheck, prevRows[i], cols[i]))
 				return false;
 		}
@@ -434,7 +434,7 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
 			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeEnd(), item.getTestResultRangeScale()));
-			String type = item.getResultType().equals("=") ? "" : "<";
+			String type = item.getResultType();//.equals("=") ? "" : "<";
 			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(item.getCstel(), item.getCstelScale()).toTypeString(type));
@@ -443,7 +443,11 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult().toString());
+			if (item.getTestResult().equals("不合格")) {
+				jacob.putBoldTxtToCell(cellRowIdx, 14, item.getTestResult());
+			} else {
+				jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult());
+			}
 			
 			if (itemIt.hasNext()) {
 				jacob.addRow();
@@ -754,7 +758,7 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 2, group.getTestWorkshopJob());
 			HarmfulSubstanceNationalStandardTable substance = group.getHarmfulSubstanceNationalStandardTable();
 			jacob.putTxtToCell(cellRowIdx, 3, substance.getSubstanceChineseName() + getDetailedName(group.getSubstanceDetailedName(), substance.getSubstanceId()));
-			String type = group.getResultType().equals("=") ? "" : "<";
+			String type = group.getResultType();//.equals("=") ? "" : "<";
 			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(group.getMac(), group.getMacScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(group.getCtwa(), group.getCtwaScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(group.getCstel(), group.getCstelScale()).toTypeString(type));
@@ -763,14 +767,18 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
 			jacob.putTxtToCell(cellRowIdx, 14, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 15, group.getTestResult().toString());
+			if (group.getTestResult().equals("不合格")) {
+				jacob.putBoldTxtToCell(cellRowIdx, 15, group.getTestResult());
+			} else {
+				jacob.putTxtToCell(cellRowIdx, 15, group.getTestResult());
+			}
 			int mergeResultsRowBegin = cellRowIdx;
 			Set<TestDataProcessItem> itemSet = group.getTestDataProcessItems();
 			Iterator<TestDataProcessItem> itemIt = itemSet.iterator();
 			while (itemIt.hasNext()) {
 				TestDataProcessItem item = itemIt.next();
 				jacob.putTxtToCell(cellRowIdx, 4, item.getTestSampleNum());
-				jacob.putTxtToCell(cellRowIdx, 5, new ValueAndScale(item.getTestResult(), item.getTestResultScale()).toString());
+				jacob.putTxtToCell(cellRowIdx, 5, new ValueAndScale(item.getTestResult(), item.getTestResultScale()).toTypeString(item.getTestResultType()));
 				jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
 				if (itemIt.hasNext() || groupIt.hasNext())
 					jacob.addRow();

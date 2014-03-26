@@ -40,6 +40,6 @@ public class ValueAndScale {
 	public String toTypeString(String type) {
 		if (value == null || scale == null)
 			return null;
-		return type + value.setScale(scale).toString();
+		return (type.equals("=") ? "" : "＜") + value.setScale(scale).toString();
 	}
 }

@@ -128,7 +128,7 @@ public class TestDataProcessTable implements java.io.Serializable {
 		this.tableNum = tableNum;
 	}
 
-	@OrderBy("groupId")
+	@OrderBy
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "testDataProcessTable")
 	public Set<TestDataProcessGroup> getTestDataProcessGroups() {
 		return this.testDataProcessGroups;

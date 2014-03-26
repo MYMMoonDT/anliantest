@@ -416,8 +416,22 @@ public class StudyJacob {
 		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
 				new Variant(cellColIdx)).toDispatch();
 		Dispatch.call(cell, "Select");
+		Dispatch.put(font, "Bold", new Variant(false));	
 		Dispatch.call(selection, "TypeText", txt);
 	}
+
+	public void putBoldTxtToCell(int cellRowIdx, int cellColIdx,
+			String txt) {
+		if (txt == null) txt = "-";
+		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
+				new Variant(cellColIdx)).toDispatch();
+		Dispatch.call(cell, "Select");
+		getFont();
+		Dispatch.put(font, "Bold", new Variant(true));
+		Dispatch.call(selection, "TypeText", txt);
+		Dispatch.put(font, "Bold", new Variant(false));	
+	}
+	
 	
 	public void deleteCellTxt(int cellRowIdx, int cellColIdx) {
 		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),

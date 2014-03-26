@@ -39,6 +39,7 @@ import edu.tongji.anliantest.service.TestDataProcessService;
 import edu.tongji.anliantest.service.TestDataResultService;
 import edu.tongji.anliantest.service.TestReportService;
 import edu.tongji.anliantest.utils.DocumentGeneration;
+import edu.tongji.anliantest.utils.ValueAndScale;
 
 @Controller
 public class ExperimentCalcController extends BaseController {
@@ -77,6 +78,51 @@ public class ExperimentCalcController extends BaseController {
 		return "experimentCalculation/uploadTestReport";
 	}
 	
+	@RequestMapping(value = "/createTestReportTable")
+	public ModelAndView createTestReportTable(HttpServletRequest request, TestReportTable reportTable) {
+		int reportTableId = (int)testReportService.getTableCount();
+		reportTable.setTableId(reportTableId);
+		setSessionTableId(request, REPORT_TABLE_ID_CONTEXT, reportTableId);
+		testReportService.addTable(reportTable);
+	
+		TestDataProcessTable processTable = new TestDataProcessTable();
+		int processTableId = (int)testDataProcessService.getTableCount();
+		processTable.setTableId(processTableId);
+		setSessionTableId(request, PROCESS_TABLE_ID_CONTEXT, processTableId);
+		processTable.setTableNum("ALJC/JL30-29");
+		testDataProcessService.addTable(processTable);
+		
+		TestDataResultTable resultTable = new TestDataResultTable();
+		int resultTableId = (int)testDataResultService.getTableCount();
+		resultTable.setTableId(resultTableId);
+		setSessionTableId(request, RESULT_TABLE_ID_CONTEXT, resultTableId);
+		testDataResultService.addTable(resultTable);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("forward:addTestReportItem");
+		return mav;
+	}
+
+	@RequestMapping(value = "/addTestReportItemAndCalc")
+	public ModelAndView addTestReportItemAndCalc(HttpServletRequest request, TestReportItemData data){
+		// convert TestReportItemData to ArrayList<TestReportItem>
+		Range<BigDecimal> range = new Range<BigDecimal>();
+		ArrayList<TestReportItem> reportItemList = getReportItemListFromInput(request, data, range);
+		
+		ArrayList<Integer> dayCount = getDayCountList(reportItemList);
+		
+		// calculate
+	
+		ArrayList<TestDataProcessGroup> groupList = calcProcessData(request, reportItemList, dayCount);
+	
+		calcResultData(request, reportItemList, dayCount, groupList, range);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("forward:addTestReportItem");
+		mav.addObject("resultMsg", "success");
+		return mav;
+	}
+
 	@RequestMapping(value = "/createTestReportTableFromDoc")
 	public void createTestReportTableFromDoc(HttpServletRequest request, HttpServletResponse response) {
 		try {
@@ -127,31 +173,40 @@ public class ExperimentCalcController extends BaseController {
 		}
 	}
 	
-	@RequestMapping(value = "/createTestReportTable")
-	public ModelAndView createTestReportTable(HttpServletRequest request, TestReportTable reportTable) {
-		int reportTableId = (int)testReportService.getTableCount();
-		reportTable.setTableId(reportTableId);
-		setSessionTableId(request, REPORT_TABLE_ID_CONTEXT, reportTableId);
-		testReportService.addTable(reportTable);
-
-		TestDataProcessTable processTable = new TestDataProcessTable();
-		int processTableId = (int)testDataProcessService.getTableCount();
-		processTable.setTableId(processTableId);
-		setSessionTableId(request, PROCESS_TABLE_ID_CONTEXT, processTableId);
-		processTable.setTableNum("ALJC/JL30-29");
-		testDataProcessService.addTable(processTable);
+	@RequestMapping(value = "/downloadProcessTable")
+	public void downloadProcessTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		StringBuffer strBuffer = new StringBuffer();
+		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
+		strBuffer.append("\\WEB-INF\\tempDocs\\");
+		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
+		strBuffer.append(" 有毒物质 计算结果表.doc"); 
+		int processTableId = getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
+		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
+		String filePath = strBuffer.toString();
+		generateProcessTableToDoc(processTable, filePath);
+		//System.out.println(filePath);
 		
-		TestDataResultTable resultTable = new TestDataResultTable();
-		int resultTableId = (int)testDataResultService.getTableCount();
-		resultTable.setTableId(resultTableId);
-		setSessionTableId(request, RESULT_TABLE_ID_CONTEXT, resultTableId);
-		testDataResultService.addTable(resultTable);
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("forward:addTestReportItem");
-		return mav;
+		setResponseForDownload(response, filePath);
 	}
-	
+
+	@RequestMapping(value = "/downloadResultTable")
+	public void downloadResultTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		StringBuffer strBuffer = new StringBuffer();
+		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
+		strBuffer.append("\\WEB-INF\\tempDocs\\");
+		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
+		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
+		strBuffer.append(" 结果与评价.doc"); 
+		int resultTableId = getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
+		TestDataResultTable resultTable = testDataResultService.getResultTableById(resultTableId);
+		String filePath = strBuffer.toString();
+		generateResultTableToDoc(resultTable, filePath);
+		//System.out.println(filePath);
+		
+		setResponseForDownload(response, filePath);
+	}
+
 	protected int getSessionTableId(HttpServletRequest request, String name){
 		return (Integer)request.getSession().getAttribute(name);
 	}
@@ -184,28 +239,6 @@ public class ExperimentCalcController extends BaseController {
 			this.end = end;
 		}
 	}
-	@RequestMapping(value = "/addTestReportItemAndCalc")
-	public ModelAndView addTestReportItemAndCalc(HttpServletRequest request, TestReportItemData data){
-		// convert TestReportItemData to ArrayList<TestReportItem>
-		Range<BigDecimal> range = new Range<BigDecimal>();
-		ArrayList<TestReportItem> reportItemList = getReportItemListFromInput(
-				request, data, range);
-		
-		ArrayList<Integer> dayCount = getDayCountList(reportItemList);
-		
-		// calculate
-
-		ArrayList<TestDataProcessGroup> groupList = calcProcessData(request,
-				reportItemList, dayCount);
-
-		calcResultData(request, reportItemList, dayCount, groupList, range);
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("forward:addTestReportItem");
-		mav.addObject("resultMsg", "success");
-		return mav;
-	}
-
 	private void calcResultData(HttpServletRequest request,
 			ArrayList<TestReportItem> reportItemList,
 			ArrayList<Integer> dayCount,
@@ -299,6 +332,7 @@ public class ExperimentCalcController extends BaseController {
 	}
 
 	private BigDecimal rounding(BigDecimal v, int scale) {
+		v = v.setScale(8, RoundingMode.HALF_UP);
 		BigDecimal zero = new BigDecimal(0);
 		BigDecimal u = null;
 		do {
@@ -360,7 +394,8 @@ public class ExperimentCalcController extends BaseController {
 				testDataProcessService.addItem(processTableItem);
 				BigDecimal calculatedResult = reportItem.getTestResult().multiply(BigDecimal.valueOf(reportItem.getTestCollectTime()/15));
 				if (hasLess && hasEqual) {
-					calculatedResult = new BigDecimal(calculatedResult.doubleValue()/2);
+					if (!processTableItem.getTestResultType().equals("="))
+						calculatedResult = new BigDecimal(calculatedResult.doubleValue()/2);
 					group.setResultType("=");
 				} else if (hasLess){
 					group.setResultType("<");
@@ -375,45 +410,65 @@ public class ExperimentCalcController extends BaseController {
 			BigDecimal pc_twa = standardTable.getPcTwa();
 			BigDecimal pc_stel = standardTable.getPcStel();
 			BigDecimal std_om = standardTable.getOm();
-			mac = cstel;
-			ctwa = new BigDecimal(ctwa.doubleValue()/8);
-			if (std_om != null)
+			if (hasLess && !hasEqual) {
+				ctwa = cstel = mac = reportItem.getTestResult();
+			} else {
+				mac = cstel;
+				ctwa = new BigDecimal(ctwa.doubleValue()/8);				
+			}
+			if (pc_twa != null)
 				om = new BigDecimal(cstel.doubleValue()/pc_twa.doubleValue());
 			
 			boolean passed = true;
 			if (std_mac != null) {
-				int macScale = standardTable.getMacScale()+1;
-				mac = rounding(mac, macScale);
+				if (hasLess && !hasEqual) {
+					group.setMacScale(reportItem.getTestResultScale());
+				} else {
+					int macScale = standardTable.getMacScale()+1;
+					mac = rounding(mac, macScale);
+					group.setMacScale(mac.scale());
+				}
 				group.setMac(mac);
-				group.setMacScale(mac.scale());
 				if (mac.compareTo(std_mac) > 0) {
 					passed = false;
 				}
 			}
 			if (pc_twa != null) {
-				int ctwaScale = standardTable.getPcTwaScale()+1;
-				ctwa = rounding(ctwa, ctwaScale);
+				if (hasLess && !hasEqual) {
+					group.setCtwaScale(reportItem.getTestResultScale());
+				} else {
+					int ctwaScale = standardTable.getPcTwaScale()+1;
+					ctwa = rounding(ctwa, ctwaScale);
+					group.setCtwaScale(ctwa.scale());
+				}
 				group.setCtwa(ctwa);
-				group.setCtwaScale(ctwa.scale());
 				if (ctwa.compareTo(pc_twa) > 0) {
 					passed = false;
 				}
 			}
 				
 			if (pc_stel != null) {
-				int cstelScale = standardTable.getPcStelScale()+1;
-				cstel = rounding(cstel, cstelScale);
+				if (hasLess && !hasEqual) {
+					group.setCstelScale(reportItem.getTestResultScale());
+				} else {
+					int cstelScale = standardTable.getPcStelScale()+1;
+					cstel = rounding(cstel, cstelScale);
+					group.setCstelScale(cstel.scale());
+				}
 				group.setCstel(cstel);
-				group.setCstelScale(cstel.scale());
 				if (cstel.compareTo(pc_stel) > 0) {
 					passed = false;
 				}
 			}
 			if (std_om != null) {
-				int omScale = standardTable.getOmScale()+1;
-				om = rounding(om, omScale);
+//				if (hasLess && !hasEqual) {
+//					group.setOmScale(reportItem.getTestResultScale());
+//				} else {
+					int omScale = standardTable.getOmScale()+1;
+					om = rounding(om, omScale);
+					group.setOmScale(om.scale());
+//				}
 				group.setOm(om);
-				group.setOmScale(om.scale());
 				if (om.compareTo(std_om) > 0) {
 					passed = false;
 				}
@@ -585,41 +640,6 @@ public class ExperimentCalcController extends BaseController {
 		}
 	}
 
-	@RequestMapping(value = "/downloadResultTable")
-	public void downloadResultTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		StringBuffer strBuffer = new StringBuffer();
-		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
-		strBuffer.append("\\WEB-INF\\tempDocs\\");
-		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
-		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
-		strBuffer.append(" 结果与评价.doc"); 
-		int resultTableId = getSessionTableId(request, RESULT_TABLE_ID_CONTEXT);
-		TestDataResultTable resultTable = testDataResultService.getResultTableById(resultTableId);
-		String filePath = strBuffer.toString();
-		generateResultTableToDoc(resultTable, filePath);
-		//System.out.println(filePath);
-		
-		setResponseForDownload(response, filePath);
-	}
-
-
-	@RequestMapping(value = "/downloadProcessTable")
-	public void downloadProcessTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		StringBuffer strBuffer = new StringBuffer();
-		strBuffer.append(request.getSession().getServletContext().getRealPath(""));
-		strBuffer.append("\\WEB-INF\\tempDocs\\");
-		int reportTableId = getSessionTableId(request, REPORT_TABLE_ID_CONTEXT);
-		strBuffer.append(testReportService.getTestReportTableByTableId(reportTableId).getTestUnitName());
-		strBuffer.append(" 有毒物质 计算结果表.doc"); 
-		int processTableId = getSessionTableId(request, PROCESS_TABLE_ID_CONTEXT);
-		TestDataProcessTable processTable = testDataProcessService.getProcessTableById(processTableId);
-		String filePath = strBuffer.toString();
-		generateProcessTableToDoc(processTable, filePath);
-		//System.out.println(filePath);
-		
-		setResponseForDownload(response, filePath);
-	}
-	
 	private void setResponseForDownload(HttpServletResponse response,
 			String filePath) throws UnsupportedEncodingException, IOException {
 		File file = new File(filePath);
