@@ -15,7 +15,7 @@ public class TestReportItemData {
 	private String[][] testTouchTime;
 	private Integer[][] testCollectTime;
 	private String testSubstanceDetailedName;
-	private HarmfulSubstanceNationalStandardTable harmfulSubstanceNationalStandardTable;
+//	private HarmfulSubstanceNationalStandardTable harmfulSubstanceNationalStandardTable;
 	
 	public TestReportItemData() {
 		this.testSampleNum = new String[3][4];

@@ -32,8 +32,10 @@ function uploadAndSubmit() {
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState == 4) {
 						if (xhr.status == 200) {
-							$("#process_btn").show();
-							$("#result_btn").show();
+							if (xhr.responseText == "Success") {
+								$("#process_btn").show();
+								$("#result_btn").show();
+							}
 						}
 					}
 				};
@@ -61,6 +63,11 @@ $(function(){
         		$("#upload_btn").prop("disabled", false);
             },
 	        failMessageHtml: "生成错误，请重试。",
+	        failCallback: function() {
+	        	$("#process_btn").prop("disabled", false);
+        		$("#result_btn").prop("disabled", false);
+        		$("#upload_btn").prop("disabled", false);
+	        },
 	        httpMethod: "POST",
 	    });
 	});
@@ -77,6 +84,11 @@ $(function(){
         		$("#upload_btn").prop("disabled", false);
             },
 	        failMessageHtml: "生成错误，请重试。",
+	        failCallback: function() {
+	        	$("#process_btn").prop("disabled", false);
+        		$("#result_btn").prop("disabled", false);
+        		$("#upload_btn").prop("disabled", false);
+	        },
 	        httpMethod: "POST",
 	    });
 	});

@@ -39,7 +39,6 @@ import edu.tongji.anliantest.service.TestDataProcessService;
 import edu.tongji.anliantest.service.TestDataResultService;
 import edu.tongji.anliantest.service.TestReportService;
 import edu.tongji.anliantest.utils.DocumentGeneration;
-import edu.tongji.anliantest.utils.ValueAndScale;
 
 @Controller
 public class ExperimentCalcController extends BaseController {
@@ -666,7 +665,7 @@ public class ExperimentCalcController extends BaseController {
 
 	@RequestMapping(value = "/getHarmfulData1")
 	public void getHarmfulData1FromDoc() throws Exception {
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount());
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData1((int)harmfulSubstanceNationalStandardService.getItemCount()+20);
 		for (HarmfulSubstanceNationalStandardTable item : list) {
 			harmfulSubstanceNationalStandardService.addItem(item);
 		}
@@ -674,7 +673,7 @@ public class ExperimentCalcController extends BaseController {
 	
 	@RequestMapping(value = "/getHarmfulData2")
 	public void getHarmfulData2FromDoc() throws Exception {
-		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount());
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = DocumentGeneration.getHarmfulData2((int)harmfulSubstanceNationalStandardService.getItemCount()+20);
 		for (HarmfulSubstanceNationalStandardTable item : list) {
 			harmfulSubstanceNationalStandardService.addItem(item);
 		}
