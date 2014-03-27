@@ -93,8 +93,8 @@
 //		});	
 //	});
 //};
-var ParticlesNotOtherwiseRegulatedId = 461;
-var PercentIdList = [439, 440, 441, 442, 443, 444];
+var ParticlesNotOtherwiseRegulatedId = 434;
+var PercentIdList = [417, 418, 419, 420, 421, 422];
 function setDetailVisibility() {
 	$("#detail").find("input").val("");
 	var id = $("#substance").val();

@@ -324,7 +324,7 @@ public class StudyJacob {
 	public String getCellString(int tableIndex, int cellRowIdx, int cellColIdx)
 			throws Exception {
 		getTable(tableIndex);
-		return getCellString(tableIndex, cellRowIdx, cellColIdx);
+		return getCellString(cellRowIdx, cellColIdx);
 		//Dispatch.call(cell, "Select");
 		//return Dispatch.get(selection, "Text").toString();
 	}

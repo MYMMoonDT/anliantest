@@ -19,11 +19,12 @@ import edu.tongji.anliantest.model.TestDataProcessTable;
 import edu.tongji.anliantest.model.TestDataResultItem;
 import edu.tongji.anliantest.model.TestDataResultTable;
 import edu.tongji.anliantest.model.TestReportItemData;
+import edu.tongji.anliantest.model.TestReportSiO2ItemData;
 import edu.tongji.anliantest.model.TestReportTable;
 
 public class DocumentGeneration {
-	private static int ParticlesNotOtherwiseRegulatedId = 461;
-	private static int[] PercentIdList = {439, 440, 441, 442, 443, 444};
+	private static int ParticlesNotOtherwiseRegulatedId = 434;
+//	private static int[] PercentIdList = {417, 418, 419, 420, 421, 422};
 	private static int[] ColsToCheck = {7, 2, 1};
 	
 //	public static void main(String argv[]) {
@@ -84,6 +85,19 @@ public class DocumentGeneration {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日");
 			table.setTableTime(dateFormat.parse(temp.trim()));
 			
+			jacob.getTable(4);
+			int tableRow = jacob.getRowsCount();
+			ArrayList<TestReportSiO2ItemData> sio2List = new ArrayList<TestReportSiO2ItemData>();
+			for (cellRowIdx = 2; cellRowIdx <= tableRow; cellRowIdx++) {
+				if (jacob.getCellString(cellRowIdx, 2).equals("游离二氧化硅")) {
+					TestReportSiO2ItemData item = new TestReportSiO2ItemData();
+					item.setTestWorkshopJob(jacob.getCellString(cellRowIdx, 1));
+					item.setTestSampleNum(jacob.getCellString(cellRowIdx, 3));
+					item.setTestResult(Double.valueOf(jacob.getCellString(cellRowIdx, 4)));
+					sio2List.add(item);
+				}
+			}
+			
 			jacob.getTable(3);
 			dateFormat = new SimpleDateFormat("MM月dd号");
 			Date[] testTime = new Date[3];
@@ -91,7 +105,7 @@ public class DocumentGeneration {
 			String[][] testResult = new String[3][4];
 			String[][] testTouchTime = new String[3][4];
 			Integer[][] testCollectTime = new Integer[3][4];
-			int tableRow = jacob.getRowsCount();
+			tableRow = jacob.getRowsCount();
 			int i = -1, j = 0, prevRowIdx = -1 ;
 			int prevTestTime = 1, prevSubstance = 1, prevWorkshopJob = 2;
 			int[] prevRows = {prevTestTime, prevSubstance, prevWorkshopJob};
@@ -119,19 +133,11 @@ public class DocumentGeneration {
 								}
 								prevRowIdx=1;
 								
-								String sub = jacob.getCellString(cellRowIdx, 2);
-								String[] r = splitSubName(sub);
-								itemData.setTestSubstance(r[0]);
-								itemData.setTestSubstanceDetailedName(r[1]);
 								itemData.setTestTime(testTime);
 								itemData.setTestSampleNum(testSampleNum);
 								itemData.setTestResult(testResult);
 								itemData.setTestTouchTime(testTouchTime);
 								itemData.setTestCollectTime(testCollectTime);
-								
-								itemDataList.add(itemData);
-								//prevSubstance = cellRowIdx;
-								prevRows[1] = cellRowIdx;
 								
 								if (jacob.isCellStrExisted(cellRowIdx, 1)) {
 									itemData.setTestWorkshopJob(jacob.getCellString(cellRowIdx, 1));
@@ -140,6 +146,38 @@ public class DocumentGeneration {
 								} else {
 									itemData.setTestWorkshopJob(jacob.getCellString(prevRows[2], 1));
 								}
+								String sub = jacob.getCellString(cellRowIdx, 2);
+								String[] r = splitSubName(sub);
+								if (r[0].equals("矽尘（总尘）")) {
+									double percent = sio2List.get(sio2List.indexOf(new TestReportSiO2ItemData(itemData.getTestWorkshopJob()))).getTestResult();
+									if (percent > 10 && percent <= 50) {
+										itemData.setTestSubstance("矽尘（总尘）（10%≤游离SiO2含量≤50%）");
+									} else if (percent > 50 && percent <=80) {
+										itemData.setTestSubstance("矽尘（总尘）（50%＜游离SiO2含量≤80%）");
+									} else if (percent > 80) {
+										itemData.setTestSubstance("矽尘（总尘）（游离SiO2含量＞80%）");
+									} else {
+										System.out.println("矽尘（总尘）w% < 10%");
+									}
+								} else if (r[0].equals("矽尘（呼尘）")) {
+									double percent = sio2List.get(sio2List.indexOf(new TestReportSiO2ItemData(itemData.getTestWorkshopJob()))).getTestResult();
+									if (percent > 10 && percent <= 50) {
+										itemData.setTestSubstance("矽尘（呼尘）（10%≤游离SiO2含量≤50%）");
+									} else if (percent > 50 && percent <=80) {
+										itemData.setTestSubstance("矽尘（呼尘）（50%＜游离SiO2含量≤80%）");
+									} else if (percent > 80) {
+										itemData.setTestSubstance("矽尘（呼尘）（游离SiO2含量＞80%）");
+									} else {
+										System.out.println("矽尘（呼尘）w% < 10%");
+									}
+								} else {
+									itemData.setTestSubstance(r[0]);
+									itemData.setTestSubstanceDetailedName(r[1]);
+								}
+								
+								itemDataList.add(itemData);
+								//prevSubstance = cellRowIdx;
+								prevRows[1] = cellRowIdx;
 							}
 						}
 						testTime[i] = dateFormat.parse(jacob.getCellString(cellRowIdx, 7));
@@ -160,8 +198,6 @@ public class DocumentGeneration {
 					j++;
 			}
 			
-			jacob.close();
-			jacob.closeDocument();
 		} catch (Exception e) {
 			e.printStackTrace();
 			// TODO Remove later
@@ -171,6 +207,8 @@ public class DocumentGeneration {
 				e1.printStackTrace();
 			}
 		}
+		jacob.close();
+		jacob.closeDocument();
 	}
 
 	private static String[] splitSubName(String sub) {
@@ -277,7 +315,7 @@ public class DocumentGeneration {
 
 	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
 			StudyJacob jacob = new StudyJacob();
-			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\2.doc");
+			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\GBZ.doc");
 	
 			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
 			int tableIndex = 1;
@@ -340,7 +378,7 @@ public class DocumentGeneration {
 
 	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
 			StudyJacob jacob = new StudyJacob();
-			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\2.doc");
+			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\GBZ.doc");
 	
 			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
 			int tableIndex = 2;
@@ -377,27 +415,35 @@ public class DocumentGeneration {
 				}
 				item.setSubstanceComment(comment);
 	
-				String name = jacob.getCellString(tableIndex, row, 2);
-				item.setSubstanceChineseName(name+"（总尘）");
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 5))) {
-					item.setPcTwa(vs.getValue());
-					item.setPcTwaScale(vs.getScale());
+				item.setSubstanceChineseName(jacob.getCellString(tableIndex, row, 2));
+				if (!jacob.getCellString(tableIndex, row, 5).equals("-")) {
+					getValueAndScaleFromString(vs, jacob.getCellString(tableIndex, row, 5));
+				} else {
+					getValueAndScaleFromString(vs, jacob.getCellString(tableIndex, row, 6));
 				}
-				list.add(item);
-	//			harmfulSubstanceNationalStandardService.addItem(item);
-	
-				item.setSubstanceId(substanceId++);
-				item.setSubstanceChineseName(name+"（呼尘）");
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 6))) {
-					item.setPcTwa(vs.getValue());
-					item.setPcTwaScale(vs.getScale());
-				}
+				item.setPcTwa(vs.getValue());
+				item.setPcTwaScale(vs.getScale());
+				
+//				String name = jacob.getCellString(tableIndex, row, 2);
+//				item.setSubstanceChineseName(name+"（总尘）");
+//				if (getValueAndScaleFromString(vs,
+//						jacob.getCellString(tableIndex, row, 5))) {
+//					item.setPcTwa(vs.getValue());
+//					item.setPcTwaScale(vs.getScale());
+//				}
+//				list.add(item);
+//	
+//				item.setSubstanceId(substanceId++);
+//				item.setSubstanceChineseName(name+"（呼尘）");
+//				if (getValueAndScaleFromString(vs,
+//						jacob.getCellString(tableIndex, row, 6))) {
+//					item.setPcTwa(vs.getValue());
+//					item.setPcTwaScale(vs.getScale());
+//				}
 				
 				list.add(item);
-	//			harmfulSubstanceNationalStandardService.addItem(item);
 			}
+			
 			System.out.println("row:" + tableRow);
 	
 			jacob.close();
@@ -430,10 +476,15 @@ public class DocumentGeneration {
 			TestDataResultItem item = itemIt.next();
 			jacob.putTxtToCell(cellRowIdx, 1, item.getTestWorkshopJob());
 			HarmfulSubstanceNationalStandardTable substance = item.getHarmfulSubstanceNationalStandardTable();
-			jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
+			if (substance.getSubstanceChineseName().contains("矽尘")) {
+				String temp = substance.getSubstanceChineseName();
+				jacob.putTxtToCell(cellRowIdx, 2, temp.substring(0, temp.lastIndexOf('（')));
+			} else {
+				jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
+			}
 			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
 			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeEnd(), item.getTestResultRangeScale()));
+			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeStartType(), item.getTestResultRangeEnd(), item.getTestResultRangeEndType(), item.getTestResultRangeScale()));
 			String type = item.getResultType();//.equals("=") ? "" : "<";
 			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
@@ -495,15 +546,13 @@ public class DocumentGeneration {
 		}
 	}
 
-	private static String getRangeString(BigDecimal start, BigDecimal end, int scale) {
+	private static String getRangeString(BigDecimal start, String startType, BigDecimal end, String endType, int scale) {
 		StringBuffer temp = new StringBuffer();
-		if (start != null) {
-			temp.append(new ValueAndScale(start, scale).toString());
+		temp.append(new ValueAndScale(start, scale).toTypeString(startType));
+		if (!startType.equals(endType) || !start.equals(end)) {
 			temp.append("-");
-		} else {
-			temp.append("<");
-		}
-		temp.append(new ValueAndScale(end, scale));
+			temp.append(new ValueAndScale(end, scale).toTypeString(endType));
+		}		
 		return temp.toString();
 	}
 	
@@ -746,7 +795,7 @@ public class DocumentGeneration {
 		colsNotToMerge.add(5);
 		colsNotToMerge.add(6);
 		
-		int cellRowIdx = tableRow, cellColIdx = 1;
+		int cellRowIdx = tableRow;//, cellColIdx = 1;
 		int prevTestTime = 1, prevSubstance = 1, prevWorkshopJob = 1, newPrevRow = 1;
 		int[] prevRows = {prevTestTime, prevSubstance, prevWorkshopJob};
 		SimpleDateFormat dateFormat =  new SimpleDateFormat("MM月dd号");
@@ -757,7 +806,12 @@ public class DocumentGeneration {
 			jacob.putTxtToCell(cellRowIdx, 1, dateFormat.format(group.getTestDataTime()));
 			jacob.putTxtToCell(cellRowIdx, 2, group.getTestWorkshopJob());
 			HarmfulSubstanceNationalStandardTable substance = group.getHarmfulSubstanceNationalStandardTable();
-			jacob.putTxtToCell(cellRowIdx, 3, substance.getSubstanceChineseName() + getDetailedName(group.getSubstanceDetailedName(), substance.getSubstanceId()));
+			if (substance.getSubstanceChineseName().contains("矽尘")) {
+				String temp = substance.getSubstanceChineseName();
+				jacob.putTxtToCell(cellRowIdx, 3, temp.substring(0, temp.lastIndexOf('（')));
+			} else {
+				jacob.putTxtToCell(cellRowIdx, 3, substance.getSubstanceChineseName() + getDetailedName(group.getSubstanceDetailedName(), substance.getSubstanceId()));
+			}
 			String type = group.getResultType();//.equals("=") ? "" : "<";
 			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(group.getMac(), group.getMacScale()).toTypeString(type));
 			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(group.getCtwa(), group.getCtwaScale()).toTypeString(type));
@@ -903,11 +957,11 @@ public class DocumentGeneration {
 		if (substanceId == ParticlesNotOtherwiseRegulatedId) {
 			return "（" + detailedName + "）";
 		}
-		for (int i = 0; i < PercentIdList.length; i++) {
-			if (PercentIdList[i] == substanceId) {
-				return "（" + detailedName + "%）";
-			}
-		}
+//		for (int i = 0; i < PercentIdList.length; i++) {
+//			if (PercentIdList[i] == substanceId) {
+//				return "（" + detailedName + "%）";
+//			}
+//		}
 		return "";
 	}
 
