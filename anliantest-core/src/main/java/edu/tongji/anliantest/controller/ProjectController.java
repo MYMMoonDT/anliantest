@@ -1,6 +1,8 @@
 package edu.tongji.anliantest.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -38,7 +40,7 @@ public class ProjectController extends BaseController {
 	private WorkTaskService workTaskService;
 	
 	@RequestMapping(value="/createProject")//创建项目
-	public ModelAndView createProject(HttpServletRequest request, ProjectInfo projectInfo){
+	public ModelAndView createProject(HttpServletRequest request, ProjectInfo projectInfo, String businessEmployeeName){
 		ModelAndView mad = new ModelAndView();
 		
 		EmployeeInfo businessEmployee = employeeService.getEmployeeByEmployeeName((String) request.getAttribute("businessEmployee"));
@@ -138,8 +140,18 @@ public class ProjectController extends BaseController {
 	}
 	
 	@RequestMapping(value = "/create")
-	public String createProjectPage(){
-		return "projectCreate";
+	public ModelAndView createProjectPage(){
+		ModelAndView mad = new ModelAndView();
+		List<EmployeeInfo> employeeList = employeeService.getAllEmployees();
+		System.out.println(employeeList.isEmpty());
+		List<String> employeeNames = new ArrayList<String>();
+		for(EmployeeInfo e:employeeList){
+			employeeNames.add(e.getEmployeeName());
+			System.out.println("e.getEmployeeName()"+e.getEmployeeName());
+		}
+		mad.addObject("employeeList", employeeNames);
+		mad.setViewName("projectCreate");
+		return mad;
 	}
 	
 	@RequestMapping(value = "/edit")
