@@ -1,5 +1,7 @@
 package edu.tongji.anliantest.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,5 +20,9 @@ public class EmployeeService {
 	
 	public EmployeeInfo getEmployeeByEmployeeName(String employeeName){
 		return employeeeDao.getEmployeeByEmployeeName(employeeName);
+	}
+
+	public List<EmployeeInfo> getAllEmployees() {
+		return employeeeDao.loadAll();
 	}
 }

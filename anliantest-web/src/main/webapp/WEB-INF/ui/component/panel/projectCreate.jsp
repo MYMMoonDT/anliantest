@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>      
 
 
 <div class="panel panel-default">
@@ -105,12 +105,10 @@
 					<div class="form-group">
 					    <label for="businessLeader" class="col-sm-4 control-label">业务负责人</label>
 					    <div class="col-sm-8">
-					    	<select class="form-control" id="businessLeader" name="businessEmployee">
-					    		<option>XXX</option>
-					    		<option>XXX</option>
-					    		<option>XXX</option>
-					    		<option>XXX</option>
-					    	</select>
+					    	<!-- <select class="form-control" id="businessLeader" name=""> -->
+					    		
+					    	<!-- </select> -->
+					    	<form:select path="employeeList" items="${employeeList}"></form:select>
 					    </div>
 					</div>
 				</div>
