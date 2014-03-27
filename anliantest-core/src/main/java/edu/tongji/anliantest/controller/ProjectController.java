@@ -214,6 +214,10 @@ public class ProjectController extends BaseController {
 	public String processStep1TechServiceContractConstrProjDiseaseCtrlEffect(){
 		return "form/step1/project_step1_techServiceContractConstrProjDiseaseCtrlEffect";
 	}
+	@RequestMapping(value = "process/step2/workTaskList")
+	public String processStep2WorkTaskList(){
+		return "form/step2/project_step2_workTaskList";
+	}
 	
 	@RequestMapping(value = "/process/step3/customerInfoRegister")
 	public String processStep3CustomerInfoRegisterPage(){
