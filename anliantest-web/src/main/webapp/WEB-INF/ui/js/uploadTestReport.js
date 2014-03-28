@@ -1,4 +1,6 @@
 function uploadAndSubmit() {
+	$("#upload_btn").prop("disabled", true);
+	
 	if (typeof XMLHttpRequest.prototype.sendAsBinary == 'undefined') {
 		XMLHttpRequest.prototype.sendAsBinary = function(datastr) {
 			var ui8a = new Uint8Array(datastr.length);
@@ -9,9 +11,10 @@ function uploadAndSubmit() {
 		};
 	}
 
-	var form = document.forms["demoForm"];
+	var form = document.forms["uploadForm"];
 
 	if (form["file"].files.length > 0) {
+		var $preparingDialog = null;
 		// 寻找表单域中的 <input type="file" ... /> 标签
 		var file = form["file"].files[0];
 		// try sending 
@@ -27,14 +30,18 @@ function uploadAndSubmit() {
 				xhr.open(/* method */"POST",
 				/* target url */"createTestReportTableFromDoc?fileName=" + file.name
 				/*, async, default to true */);
-				xhr.overrideMimeType("application/octet-stream");
+				xhr.overrideMimeType("application/octet-stream; charset=utf-8");
 				xhr.sendAsBinary(reader.result);
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState == 4) {
 						if (xhr.status == 200) {
+							$preparingDialog.dialog("close");
+							$("#upload_btn").prop("disabled", false);
 							if (xhr.responseText == "Success") {
 								$("#process_btn").show();
 								$("#result_btn").show();
+							} else {
+								$("<div>").html(xhr.responseText.replace("\n", "<p>")+"</p><p>上传错误，请重试。</p>").dialog({ modal: true });
 							}
 						}
 					}
@@ -43,6 +50,7 @@ function uploadAndSubmit() {
 		};
 
 		reader.readAsBinaryString(file);
+		$preparingDialog = $("<div>").html("上传中，请稍候...").dialog({ modal: true });
 	} else {
 		alert("请选择文件");
 	}

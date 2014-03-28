@@ -23,14 +23,14 @@ public class HarmfulSubstanceNationalStandardTableDao extends BaseDao<HarmfulSub
 		return (Long)query.uniqueResult();
 	}
 	
-	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTableByName(String name) {
+	public HarmfulSubstanceNationalStandardTable getHarmfulSubstanceNationalStandardTableByName(String name) throws Exception {
 		List<HarmfulSubstanceNationalStandardTable> list = (List<HarmfulSubstanceNationalStandardTable>)find(GET_SUBSTANCE_BY_NAME, name);
 		try {
 			// TODO check substanceChineseName 
 			return list.get(0);
 		} catch(Exception e) {
-			System.out.println(name);
-			return null;
+			System.err.println("检测项目 “"+name+"” 未找到。");
+			throw new Exception("<p>检测项目 “"+name+"” 未找到。</p>");
 		}
 	}
 }

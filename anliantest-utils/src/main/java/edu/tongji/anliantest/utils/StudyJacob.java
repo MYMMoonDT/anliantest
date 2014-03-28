@@ -64,6 +64,12 @@ public class StudyJacob {
 	private Dispatch paragraphs;
 	private Dispatch paragraph;
 
+	public int pageNum;
+	public int tableNum;
+	public int rowNum;
+	public int colNum;
+	public int rowNumInCurPage;
+	
 	// constructor
 	public StudyJacob() {
 		if (word == null) {
@@ -329,8 +335,24 @@ public class StudyJacob {
 		//return Dispatch.get(selection, "Text").toString();
 	}
 	
+	public int getCellPageNum(int cellRowIdx, int cellColIdx) {
+		Dispatch.call(getCell(cellRowIdx, cellColIdx), "Select");
+		Dispatch.call(selection, "MoveLeft");
+		return Dispatch.call(selection, "Information", 3).getInt();
+	}
+	
 	public String getCellString(int cellRowIdx, int cellColIdx)
 			throws Exception {
+		if (cellColIdx == 3) {
+			int curPageNum = getCellPageNum(cellRowIdx, cellColIdx);
+			if (curPageNum != this.pageNum) {
+				this.rowNumInCurPage = 0;
+			}
+				this.rowNumInCurPage++;
+			this.pageNum = curPageNum;
+		}
+		this.colNum = cellColIdx;
+		this.rowNum = cellRowIdx;
 		Dispatch cell = Dispatch.call(table, "Cell", new Variant(cellRowIdx),
 				new Variant(cellColIdx)).toDispatch();
 		Dispatch cellRange = Dispatch.get(cell, "Range").toDispatch();
@@ -341,7 +363,7 @@ public class StudyJacob {
 		} else {
 			String temp = Dispatch.get(cellRange, "Text").getString();
 			temp = temp.substring(0, temp.length()-2);
-			if (temp.length() == 0) temp = null;
+			if (temp.length() == 0) throw new Exception("值为空");//temp = null;
 			return temp;
 		}
 	}
@@ -712,8 +734,11 @@ public class StudyJacob {
 	 */
 	public Dispatch getTable(int tableIndex) {
 		Dispatch tables = Dispatch.get(doc, "Tables").toDispatch();
-		this.table = Dispatch.call(tables, "Item", new Variant(tableIndex))
-				.toDispatch();
+		this.table = Dispatch.call(tables, "Item", new Variant(tableIndex)).toDispatch();
+		this.tableNum = tableIndex;
+		this.colNum = 0;
+		this.rowNum = 0;
+		this.rowNumInCurPage = 0;
 		return this.table;
 	}
 

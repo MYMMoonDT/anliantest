@@ -14,7 +14,7 @@
 <div class="panel panel-default">
 	<div class="panel-heading">上传检测报告</div>
 	<div class="panel-body">
-		<form name="demoForm" id="demoForm" method="post"
+		<form name="demoForm" id="uploadForm" method="post"
 			enctype="multipart/form-data" action="javascript: uploadAndSubmit();">
 			<div class="form-group">
 <!-- 				<label>File input</label> -->

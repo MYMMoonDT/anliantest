@@ -10,11 +10,15 @@
 	</parent>
 	<artifactId>anliantest-utils</artifactId>
 	<name>anliantest-utils</name>
-
 	<dependencies>
 		<dependency>
 			<groupId>edu.tongji.anliantest</groupId>
 			<artifactId>anliantest-model</artifactId>
+			<version>${anliantest.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.tongji.anliantest</groupId>
+			<artifactId>anliantest-persist</artifactId>
 			<version>${anliantest.version}</version>
 		</dependency>
 		<dependency>

@@ -27,14 +27,16 @@ public class DocumentGeneration {
 //	private static int[] PercentIdList = {417, 418, 419, 420, 421, 422};
 	private static int[] ColsToCheck = {7, 2, 1};
 	
-//	public static void main(String argv[]) {
-//		String filePath = "C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\reportTableTest.doc";
-//		//getReportTableData(filePath);
-//	}
-	
-	public static void getReportTableData(String filePath, TestReportTable table, ArrayList<TestReportItemData> itemDataList) {
-//		TestReportTable table = new TestReportTable();
-//		ArrayList<TestReportItemData> itemDataList = new ArrayList<TestReportItemData>();
+	/**
+	 * 读取filePath处的doc文件，将检测报告的基本信息存入table中，将实验记录以检测项目为单位存入itemDataList中。
+	 * 
+	 * @param filePath
+	 * @param table
+	 * @param itemDataList
+	 * @param harmfulSubstanceNationalStandardService 
+	 * @throws Exception 
+	 */
+	public static void getReportTableData(String filePath, TestReportTable table, ArrayList<TestReportItemData> itemDataList) throws Exception {
 		int cellRowIdx = -1;
 		StudyJacob jacob = new StudyJacob();
 		try {
@@ -157,7 +159,8 @@ public class DocumentGeneration {
 									} else if (percent > 80) {
 										itemData.setTestSubstance("矽尘（总尘）（游离SiO2含量＞80%）");
 									} else {
-										System.out.println("矽尘（总尘）w% < 10%");
+										System.err.println("矽尘（总尘）w% < 10%");
+										throw new Exception("矽尘（总尘）w% < 10%");
 									}
 								} else if (r[0].equals("矽尘（呼尘）")) {
 									double percent = sio2List.get(sio2List.indexOf(new TestReportSiO2ItemData(itemData.getTestWorkshopJob()))).getTestResult();
@@ -168,7 +171,8 @@ public class DocumentGeneration {
 									} else if (percent > 80) {
 										itemData.setTestSubstance("矽尘（呼尘）（游离SiO2含量＞80%）");
 									} else {
-										System.out.println("矽尘（呼尘）w% < 10%");
+										System.err.println("矽尘（呼尘）w% < 10%");
+										throw new Exception("矽尘（总尘）w% < 10%");
 									}
 								} else {
 									itemData.setTestSubstance(r[0]);
@@ -181,7 +185,7 @@ public class DocumentGeneration {
 							}
 						}
 						testTime[i] = dateFormat.parse(jacob.getCellString(cellRowIdx, 7));
-						// TODO Deal with different months / years
+						// TODO Deal with different years
 						Calendar c = Calendar.getInstance();
 						c.setTimeInMillis(table.getSampleTimeStart().getTime());
 						int year = c.get(Calendar.YEAR);
@@ -200,100 +204,54 @@ public class DocumentGeneration {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			// TODO Remove later
-			try {
-				System.out.println(cellRowIdx+": "+jacob.getCellString(cellRowIdx, 3));
-			} catch (Exception e1) {
-				e1.printStackTrace();
+			StringBuffer message = new StringBuffer();
+			//if (jacob.isCellStrExisted(cellRowIdx, 3)) {
+			//	message = "表格"+cellRowIdx+"行，样品编号："+jacob.getCellString(cellRowIdx, 3)+"处";
+			//} else {
+			//	message = "表格"+cellRowIdx+"行处";
+			//}
+			message.append("表");
+			message.append(jacob.tableNum);
+			message.append(" 第");
+			message.append(jacob.pageNum);
+			message.append("页 第");
+			if (jacob.tableNum < 3) 
+				message.append(jacob.rowNum);
+			else {
+				if (jacob.colNum == ColsToCheck[0]
+						|| jacob.colNum == ColsToCheck[1]
+						|| jacob.colNum == ColsToCheck[2])
+					jacob.rowNumInCurPage++;
+				message.append(jacob.rowNumInCurPage);
 			}
+			message.append("行 第");
+			message.append(jacob.colNum);
+			message.append("列处\n");
+			//message.append(jacob.getCellString(cellRowIdx, 3));
+			if (IndexOutOfBoundsException.class.isInstance(e))
+				message.append("没有找到对应游离二氧化硅含量");
+			else if (e.getMessage() != null) {
+				message.append(e.getMessage());
+			}
+			System.err.println(message);
+			throw new Exception(message.toString());
+		} finally {
+			jacob.closeDocument();
+			jacob.close();
 		}
-		jacob.close();
-		jacob.closeDocument();
 	}
 
-	private static String[] splitSubName(String sub) {
-		sub = sub.replace('(', '（');
-		sub = sub.replace(')', '）');
-		sub = sub.replace(" ", "");
-		// TODO Deal with other detailedName
-		String subDetail;
-		if (sub.contains("其他粉尘")) {
-			String[] strs = sub.split("[（\\(）\\)]");
-			sub = strs[0];
-			subDetail = strs[1];
-		} else {
-			subDetail = null;
-		}
-		String[] r = {sub, subDetail};
-		return r;
-	}
-	private static boolean isSameCells(StudyJacob jacob, int rowToCheck, int prevRows[], int[] cols, int compareBegin) throws Exception {
-		for (int i = compareBegin; i < cols.length; i++) {
-			if (!isSameCell(jacob, rowToCheck, prevRows[i], cols[i]))
-				return false;
-		}
-		return true;
-	}
+//	private void handleException(Exception e) {
+//		
+//	}
 	
-	private static boolean isSameCell(StudyJacob jacob, int row1, int row2, int col) throws Exception {
-		if (!jacob.isCellStrExisted(row1, col)) return true;
-		if (jacob.isInOnePage(row1, col, row2, col)) return false;
-		String s1 = jacob.getCellString(row1, col);
-		String s2 = jacob.getCellString(row2, col);
-		if (!s1.equals(s2)) return false;
-		return true;
-	}
-	
-	private static Date[] getDate(String s) {
-		// TODO Deal with different months / years
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Date[] dates = new Date[2];
-		try {
-			for (int i = 0; i < s.length(); i++) {
-				if (Character.isDigit(s.charAt(i))) {
-					int wavyIndex = s.indexOf('~');
-					if (wavyIndex != -1) {
-						dates[0] = dateFormat.parse(s.substring(i, wavyIndex));
-						dates[1] = dateFormat.parse(s.substring(i, s.lastIndexOf('-') + 1) + s.substring(wavyIndex + 1, s.length()));
-					} else {
-						dates[0] = dateFormat.parse(s.substring(i, s.length()));
-					}
-					break;
-				}
-			}
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		return dates;
-	}
-
-	private static String getValue(String nameAndValue) {
-		if (nameAndValue != null)
-			return nameAndValue.substring(nameAndValue.indexOf('：')+1, nameAndValue.length());
-		else 
-			return null;
-	}
-	
-	public static void generateResultTable(TestDataResultTable resultTable, String filePath) {
-		//ComThread.InitSTA();
-		StudyJacob jacob = new StudyJacob();
-		jacob.createNewDocument();
-		setPage(jacob, 3.17, 2.54);
-		Dispatch font = jacob.getFont();
-		Dispatch.put(font, "Name", new Variant("仿宋"));
-		Dispatch.put(font, "Name", new Variant("Times New Roman"));
-		
-		addResultDataToTable(resultTable, jacob);
-		
-		
-		jacob.save(filePath);
-		jacob.closeDocument();
-		jacob.close();
-		//ComThread.Release();
-	}
-	
+	/**
+	 * 由processTable中的数据在filePath处生成“有毒物质 计算结果表.doc”。
+	 * 
+	 * @param processTable
+	 * @param filePath
+	 */
 	public static void generateProcessTable(TestDataProcessTable processTable, String filePath) {
-		//ComThread.InitSTA();
 		StudyJacob jacob = new StudyJacob();
 		jacob.createNewDocument();
 		setPage(jacob, 0.8, 1.27);
@@ -310,313 +268,170 @@ public class DocumentGeneration {
 		jacob.save(filePath);
 		jacob.closeDocument();
 		jacob.close();
-		//ComThread.Release();
 	}
 
-	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(int substanceIdBegin) throws Exception {
-			StudyJacob jacob = new StudyJacob();
-			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\GBZ.doc");
+	/**
+	 * 由resultTable中的数据在filePath处生成“结果与评价.doc”。
+	 * 
+	 * @param resultTable
+	 * @param filePath
+	 */
+	public static void generateResultTable(TestDataResultTable resultTable, String filePath) {
+		StudyJacob jacob = new StudyJacob();
+		jacob.createNewDocument();
+		setPage(jacob, 3.17, 2.54);
+		Dispatch font = jacob.getFont();
+		Dispatch.put(font, "Name", new Variant("仿宋"));
+		Dispatch.put(font, "Name", new Variant("Times New Roman"));
+		
+		addResultDataToTable(resultTable, jacob);
+		
+		jacob.save(filePath);
+		jacob.closeDocument();
+		jacob.close();
+	}
 	
-			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
-			int tableIndex = 1;
-			int prevIndex = 0;
-			int tableRow = jacob.getRowsCount(tableIndex);
-			int substanceId = substanceIdBegin;
-			for (int row = 3; row <= tableRow - 1; row++) {
-				try {
-					String s = jacob.getCellString(tableIndex, row, 1);
-					if (s == null)
-						continue;
-					prevIndex = Integer.valueOf(s);
-					System.out.println("[" + row + "," + 1 + "] (" + s + ")");
-				} catch (Exception e) {
-					System.out.println("[" + row + "," + 1 + "] (" + prevIndex
-							+ ")");
-				}
-	
-				HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
-				item.setSubstanceEnglishName(jacob
-						.getCellString(tableIndex, row, 2));
-				item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 3));
-				item.setSubstanceChineseName(jacob
-						.getCellString(tableIndex, row, 4));
-				ValueAndScale vs = new ValueAndScale();
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 5))) {
-					item.setMac(vs.getValue());
-					item.setMacScale(vs.getScale());
-				}
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 6))) {
-					item.setPcTwa(vs.getValue());
-					item.setPcTwaScale(vs.getScale());
-				}
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 7))) {
-					item.setPcStel(vs.getValue());
-					item.setPcStelScale(vs.getScale());
-				}
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 8))) {
-					item.setOm(vs.getValue());
-					item.setOmScale(vs.getScale());
-				}
-				String comment = jacob.getCellString(tableIndex, row, 9);
-				if (comment != null && comment.equals("-")) {
-					comment = null;
-				}
-				item.setSubstanceComment(comment);
-				list.add(item);
-	//			harmfulSubstanceNationalStandardService.addItem(item);
-			}
-			System.out.println("row:" + tableRow);
-	
-			jacob.close();
-			jacob.closeDocument();
-			return list;
-		}
+	/**
+	 * [仅导入使用] 导入GBZ表1
+	 * 
+	 * @param filePath
+	 * @param substanceIdBegin
+	 * @return
+	 * @throws Exception
+	 */
+	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData1(String filePath, int substanceIdBegin) throws Exception {
+		StudyJacob jacob = new StudyJacob();
+		jacob.openDocument(filePath);
 
-	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(int substanceIdBegin) throws Exception {
-			StudyJacob jacob = new StudyJacob();
-			jacob.openDocument("C:\\Users\\SausageHC\\eclipse_workspace\\.metadata\\.plugins\\org.eclipse.wst.server.core\\tmp0\\wtpwebapps\\anliantest-web\\WEB-INF\\tempDocs\\GBZ.doc");
-	
-			ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
-			int tableIndex = 2;
-			int prevIndex = 0;
-	//		int tableCol = jacob.getColumnsCount(tableIndex);
-			int tableRow = jacob.getRowsCount(tableIndex);
-			int substanceId = substanceIdBegin;
-			for (int row = 3; row <= tableRow - 1; row++) {
-				try {
-					String s = jacob.getCellString(tableIndex, row, 1);
-					if (s == null)
-						continue;
-					prevIndex = Integer.valueOf(s);
-					System.out.println("[" + row + "," + 1 + "] (" + s + ")");
-				} catch (Exception e) {
-					System.out.println("[" + row + "," + 1 + "] (" + prevIndex
-							+ ")");
-				}
-	
-				HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
-				item.setSubstanceEnglishName(jacob
-						.getCellString(tableIndex, row, 3));
-				item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 4));
-				ValueAndScale vs = new ValueAndScale();
-	
-				if (getValueAndScaleFromString(vs,
-						jacob.getCellString(tableIndex, row, 7))) {
-					item.setOm(vs.getValue());
-					item.setOmScale(vs.getScale());
-				}
-				String comment = jacob.getCellString(tableIndex, row, 8);
-				if (comment != null && comment.equals("-")) {
-					comment = null;
-				}
-				item.setSubstanceComment(comment);
-	
-				item.setSubstanceChineseName(jacob.getCellString(tableIndex, row, 2));
-				if (!jacob.getCellString(tableIndex, row, 5).equals("-")) {
-					getValueAndScaleFromString(vs, jacob.getCellString(tableIndex, row, 5));
-				} else {
-					getValueAndScaleFromString(vs, jacob.getCellString(tableIndex, row, 6));
-				}
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
+		int tableIndex = 1;
+		int prevIndex = 0;
+		int tableRow = jacob.getRowsCount(tableIndex);
+		int substanceId = substanceIdBegin;
+		for (int row = 3; row <= tableRow - 1; row++) {
+			try {
+				String s = jacob.getCellString(tableIndex, row, 1);
+				if (s == null)
+					continue;
+				prevIndex = Integer.valueOf(s);
+				System.out.println("[" + row + "," + 1 + "] (" + s + ")");
+			} catch (Exception e) {
+				System.out.println("[" + row + "," + 1 + "] (" + prevIndex
+						+ ")");
+			}
+
+			HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
+			item.setSubstanceEnglishName(jacob
+					.getCellString(tableIndex, row, 2));
+			item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 3));
+			item.setSubstanceChineseName(jacob
+					.getCellString(tableIndex, row, 4));
+			ValueAndScale vs = new ValueAndScale();
+			if (getValueAndScaleFromString(vs,
+					jacob.getCellString(tableIndex, row, 5))) {
+				item.setMac(vs.getValue());
+				item.setMacScale(vs.getScale());
+			}
+			if (getValueAndScaleFromString(vs,
+					jacob.getCellString(tableIndex, row, 6))) {
 				item.setPcTwa(vs.getValue());
 				item.setPcTwaScale(vs.getScale());
-				
-//				String name = jacob.getCellString(tableIndex, row, 2);
-//				item.setSubstanceChineseName(name+"（总尘）");
-//				if (getValueAndScaleFromString(vs,
-//						jacob.getCellString(tableIndex, row, 5))) {
-//					item.setPcTwa(vs.getValue());
-//					item.setPcTwaScale(vs.getScale());
-//				}
-//				list.add(item);
-//	
-//				item.setSubstanceId(substanceId++);
-//				item.setSubstanceChineseName(name+"（呼尘）");
-//				if (getValueAndScaleFromString(vs,
-//						jacob.getCellString(tableIndex, row, 6))) {
-//					item.setPcTwa(vs.getValue());
-//					item.setPcTwaScale(vs.getScale());
-//				}
-				
-				list.add(item);
 			}
-			
-			System.out.println("row:" + tableRow);
-	
-			jacob.close();
-			jacob.closeDocument();
-			return list;
+			if (getValueAndScaleFromString(vs,
+					jacob.getCellString(tableIndex, row, 7))) {
+				item.setPcStel(vs.getValue());
+				item.setPcStelScale(vs.getScale());
+			}
+			if (getValueAndScaleFromString(vs,
+					jacob.getCellString(tableIndex, row, 8))) {
+				item.setOm(vs.getValue());
+				item.setOmScale(vs.getScale());
+			}
+			String comment = jacob.getCellString(tableIndex, row, 9);
+			if (comment != null && comment.equals("-")) {
+				comment = null;
+			}
+			item.setSubstanceComment(comment);
+			list.add(item);
 		}
+		System.out.println("row:" + tableRow);
 
-	private static void addResultDataToTable(TestDataResultTable resultTable,
-			StudyJacob jacob) {
-		int tableCol = 14;
-		int tableRow = 1;
-		Dispatch table = jacob.insertTable(tableCol, tableRow);
-		Dispatch borders = Dispatch.get(table, "Borders").toDispatch();
-		Dispatch.put(borders, "InsideLineStyle", new Variant(1));
-		Dispatch.put(borders, "OutsideLineStyle", new Variant(1));
-		
-		jacob.setTableAlignCenter();
-		
-		//Dispatch font = jacob.getFont();
-		//Dispatch.put(font, "Bold", new Variant(true));
-		int headingRowCount = addResultTableHeadingRows(jacob);
-		tableRow = headingRowCount + 1;
-		//font = jacob.getFont();
-		//Dispatch.put(font, "Bold", new Variant(false));
-		
-		int cellRowIdx = tableRow, cellColIdx = 1;
-		//int mergeRowBegin = cellRowIdx;
-		Iterator<TestDataResultItem> itemIt = resultTable.getTestDataResultItems().iterator();
-		while (itemIt.hasNext()) {
-			TestDataResultItem item = itemIt.next();
-			jacob.putTxtToCell(cellRowIdx, 1, item.getTestWorkshopJob());
-			HarmfulSubstanceNationalStandardTable substance = item.getHarmfulSubstanceNationalStandardTable();
-			if (substance.getSubstanceChineseName().contains("矽尘")) {
-				String temp = substance.getSubstanceChineseName();
-				jacob.putTxtToCell(cellRowIdx, 2, temp.substring(0, temp.lastIndexOf('（')));
-			} else {
-				jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
-			}
-			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
-			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeStartType(), item.getTestResultRangeEnd(), item.getTestResultRangeEndType(), item.getTestResultRangeScale()));
-			String type = item.getResultType();//.equals("=") ? "" : "<";
-			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(item.getCstel(), item.getCstelScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(item.getOm(), item.getOmScale()).toTypeString(type));
-			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(substance.getMac(), substance.getMacScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
-			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
-			if (item.getTestResult().equals("不合格")) {
-				jacob.putBoldTxtToCell(cellRowIdx, 14, item.getTestResult());
-			} else {
-				jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult());
-			}
-			
-			if (itemIt.hasNext()) {
-				jacob.addRow();
-				tableRow++;
-				cellRowIdx++;
-			}
-		}
-		
-//		for (int row = mergeRowBegin + 1; row <= cellRowIdx; row++) {
-//			//for (int col = 1; col <= tableCol; col++) {
-//			int col = 1;
-//				String mergeStr;
-//				try {
-//					mergeStr = jacob.getCellString(mergeRowBegin, col);
-//
-//					if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
-//						jacob.deleteCellTxt(row, col);
-//						jacob.mergeCell(mergeRowBegin, col, row, col);
-//					} else {
-//						jacob.putTxtToCell(row, col, mergeStr);
-//						continue;
-//					}
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			//}
-//		}
-		String prevStr = "";
-		int prevRowIdx = 1;
-		for (cellRowIdx = headingRowCount; cellRowIdx <= tableRow; cellRowIdx++) {
-			String curStr;
+		jacob.closeDocument();
+		jacob.close();
+		return list;
+	}
+
+	/**
+	 * [仅导入使用] 导入GBZ表2
+	 * 
+	 * @param filePath
+	 * @param substanceIdBegin
+	 * @return
+	 * @throws Exception
+	 */
+	public static ArrayList<HarmfulSubstanceNationalStandardTable> getHarmfulData2(String filePath, int substanceIdBegin) throws Exception {
+		StudyJacob jacob = new StudyJacob();
+		jacob.openDocument(filePath);
+
+		ArrayList<HarmfulSubstanceNationalStandardTable> list = new ArrayList<HarmfulSubstanceNationalStandardTable>();
+		int tableIndex = 2;
+		int prevIndex = 0;
+		int tableRow = jacob.getRowsCount(tableIndex);
+		int substanceId = substanceIdBegin;
+		for (int row = 3; row <= tableRow - 1; row++) {
 			try {
-				curStr = jacob.getCellString(cellRowIdx, cellColIdx);
-				if (curStr.equals(prevStr)
-						&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
-					jacob.deleteCellTxt(cellRowIdx, cellColIdx);
-					jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
-				} else {
-					prevRowIdx = cellRowIdx;
-					prevStr = curStr;
-				}
+				String s = jacob.getCellString(tableIndex, row, 1);
+				if (s == null)
+					continue;
+				prevIndex = Integer.valueOf(s);
+				System.out.println("[" + row + "," + 1 + "] (" + s + ")");
 			} catch (Exception e) {
-				continue;
+				System.out.println("[" + row + "," + 1 + "] (" + prevIndex
+						+ ")");
 			}
+
+			HarmfulSubstanceNationalStandardTable item = new HarmfulSubstanceNationalStandardTable(substanceId++);
+			item.setSubstanceEnglishName(jacob
+					.getCellString(tableIndex, row, 3));
+			item.setChemicalAbstractNum(jacob.getCellString(tableIndex, row, 4));
+			ValueAndScale vs = new ValueAndScale();
+
+			if (getValueAndScaleFromString(vs,
+					jacob.getCellString(tableIndex, row, 7))) {
+				item.setOm(vs.getValue());
+				item.setOmScale(vs.getScale());
+			}
+			String comment = jacob.getCellString(tableIndex, row, 8);
+			if (comment != null && comment.equals("-")) {
+				comment = null;
+			}
+			item.setSubstanceComment(comment);
+
+			item.setSubstanceChineseName(jacob.getCellString(tableIndex, row, 2));
+			if (!jacob.getCellString(tableIndex, row, 5).equals("-")) {
+				getValueAndScaleFromString(vs, jacob.getCellString(tableIndex, row, 5));
+			} else {
+				getValueAndScaleFromString(vs, jacob.getCellString(tableIndex, row, 6));
+			}
+			item.setPcTwa(vs.getValue());
+			item.setPcTwaScale(vs.getScale());
+							
+			list.add(item);
 		}
+		
+		System.out.println("row:" + tableRow);
+
+		jacob.closeDocument();
+		jacob.close();
+		return list;
 	}
 
-	private static String getRangeString(BigDecimal start, String startType, BigDecimal end, String endType, int scale) {
-		StringBuffer temp = new StringBuffer();
-		temp.append(new ValueAndScale(start, scale).toTypeString(startType));
-		if (!startType.equals(endType) || !start.equals(end)) {
-			temp.append("-");
-			temp.append(new ValueAndScale(end, scale).toTypeString(endType));
-		}		
-		return temp.toString();
-	}
-	
-	private static int addResultTableHeadingRows(StudyJacob jacob) {		
-		jacob.addRow();
-		jacob.addRow();
-		jacob.setRowHeadingFormat(1);
-		jacob.setRowHeadingFormat(2);
-
-		jacob.setRowBold(1);
-		jacob.setRowBold(2);
-		
-		jacob.setColumnWidth(4.21, 1);
-		jacob.setColumnWidth(2.75, 2);
-		jacob.setColumnWidth(1.37, 3);
-		jacob.setColumnWidth(1.27, 4);
-		jacob.setColumnWidth(3.17, 5);
-		jacob.setColumnWidth(1.27, 6);
-		jacob.setColumnWidth(1.51, 7);
-		jacob.setColumnWidth(1.65, 8);
-		jacob.setColumnWidth(1.53, 9);
-		jacob.setColumnWidth(1.48, 10);
-		jacob.setColumnWidth(1.26, 11);
-		jacob.setColumnWidth(1.49, 12);
-		jacob.setColumnWidth(1.51, 13);
-		jacob.setColumnWidth(1.56, 14);
-		//jacob.setRowsHeightRuleExactly();
-		jacob.setRowsHeight(0.7);
-		jacob.setRowHeight(0.66, 1);
-		jacob.setRowHeight(0.66, 2);
-		
-		jacob.putTxtToCell(1, 1, "检测地点");
-		jacob.mergeCell(1, 1, 2, 1);
-		jacob.putTxtToCell(1, 2, "检测\n项目");
-		jacob.mergeCell(1, 2, 2, 2);
-		jacob.putTxtToCell(1, 3, "样品数（个）");
-		jacob.mergeCell(1, 3, 2, 3);
-		jacob.putTxtToCell(1, 4, "接触时间(h/d)");
-		jacob.mergeCell(1, 4, 2, 4);
-		jacob.putTxtToCell(1, 5, "检测结果\n（mg/m");
-		jacob.insertSuperText("3");
-		jacob.insertText("）");
-		jacob.mergeCell(1, 5, 1, 9);
-		jacob.putTxtToCell(1, 6, "职业接触限值（mg/m");
-		jacob.insertSuperText("3");
-		jacob.insertText("）");
-		jacob.mergeCell(1, 6, 1, 9);
-		jacob.putTxtToCell(1, 7, "评价\n结论");
-		jacob.mergeCell(1, 7, 2, 14);
-		jacob.putTxtToCell(2, 5, "范围");
-		jacob.putTxtToCell(2, 6, "C");
-		jacob.insertSubText("MAC");
-		jacob.putTxtToCell(2, 7, "C");
-		jacob.insertSubText("TWA");
-		jacob.putTxtToCell(2, 8, "C");
-		jacob.insertSubText("STEL");
-		jacob.putTxtToCell(2, 9, "超限倍数");
-		jacob.putTxtToCell(2, 10, "MAC");
-		jacob.putTxtToCell(2, 11, "PC-\nTWA");
-		jacob.putTxtToCell(2, 12, "PC-\nSTEL");
-		jacob.putTxtToCell(2, 13, "最大超限倍数");
-		return 2;
-	}
-	
+	/**
+	 * 设置纸张方向和页边距。
+	 * @param jacob
+	 * @param verticalMargin
+	 * @param horizontalMargin
+	 */
 	private static void setPage(StudyJacob jacob, double verticalMargin, double horizontalMargin) {
 		jacob.setPageOrientation(1);
 		Dispatch pageSetup = jacob.getPageSetup();
@@ -626,12 +441,18 @@ public class DocumentGeneration {
 		Dispatch.put(pageSetup, "RightMargin", jacob.centimetersToPoints(horizontalMargin));
 	}
 
+	/**
+	 * 写入process table的页眉
+	 * @param jacob
+	 * @param tableNum
+	 * @param projectNum
+	 */
 	private static void setHeader(StudyJacob jacob, String tableNum, String projectNum) {
 		jacob.switchToHeader();
 		Dispatch selection = jacob.getSelection();
 		
 		Dispatch.call(selection, "ClearFormatting");
-
+	
 		Dispatch font = jacob.getFont();
 		Dispatch.put(font, "Name", new Variant("宋体"));
 		Dispatch.put(font, "Name", new Variant("Times New Roman"));
@@ -658,7 +479,67 @@ public class DocumentGeneration {
 		jacob.insertText("项目类型： 检评  预评  控评√");
 		jacob.switchToMainDoc();
 	}
-	
+
+	/**
+	 * 写入process table标注。
+	 * @param jacob
+	 */
+	private static void setNote(StudyJacob jacob) {
+		jacob.insertBoldText("注：");
+		jacob.insertText("有毒物质C");
+		jacob.insertSubText("STEL");
+		jacob.insertText("的选取和C");
+		jacob.insertSubText("TWA");
+		jacob.insertText("的计算：\n");
+		jacob.insertText("\t采用定点、短时间采样方法的采样，在某工作岗位选取有代表性的、工人可能接触有毒物质浓度最高的几个时段进行短时间采样。几个时段中有毒物质浓度的最高值即是该岗位工人接触的C");
+		jacob.insertSubText("STEL");
+		jacob.insertText("，用几个时段中有毒物质的浓度分别乘以所代表的相应接触时间，再除以8小时即是该岗位工人接触的C");
+		jacob.insertSubText("TWA");
+		jacob.insertText("的计算公式：\n");
+		jacob.insertText("\t\t\t\tC");
+		jacob.insertSubText("TWA");
+		jacob.insertText("=(C");
+		jacob.insertSubText("1");
+		jacob.insertText("T");
+		jacob.insertSubText("1");
+		jacob.insertText("+ C");
+		jacob.insertSubText("2");
+		jacob.insertText("T");
+		jacob.insertSubText("2");
+		jacob.insertText("+…C");
+		jacob.insertSubText("n");
+		jacob.insertText("T");
+		jacob.insertSubText("n");
+		jacob.insertText(")/8\n");
+		jacob.insertText("\t\tC");
+		jacob.insertSubText("TWA");
+		jacob.insertText("---空气中有害物质8h时间加权平均浓度，mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("\n");
+		jacob.insertText("\t\tC");
+		jacob.insertSubText("1");
+		jacob.insertText("、C");
+		jacob.insertSubText("2");
+		jacob.insertText("、C");
+		jacob.insertSubText("n");
+		jacob.insertText("---空气中有害物质浓度，mg/ m");
+		jacob.insertSuperText("3");
+		jacob.insertText("\n");
+		jacob.insertText("\t\tT");
+		jacob.insertSubText("1");
+		jacob.insertText("、T");
+		jacob.insertSubText("2");
+		jacob.insertText("、T");
+		jacob.insertSubText("n");
+		jacob.insertText("---劳动者在相应的有害物质浓度下的工作时间，h\n");
+		jacob.insertText("\t\t8---时间加权平均容许浓度规定的8h\n");
+	}
+
+	/**
+	 * 写入process table标题行并设置重复标题行。
+	 * @param jacob
+	 * @return 标题行占用行数
+	 */
 	private static int addProcessTableHeadingRows(StudyJacob jacob) {		
 		jacob.addRow();
 		jacob.addRow();
@@ -722,63 +603,13 @@ public class DocumentGeneration {
 		return 2;
 	}
 	
-	private static void setNote(StudyJacob jacob) {
-		jacob.insertBoldText("注：");
-		jacob.insertText("有毒物质C");
-		jacob.insertSubText("STEL");
-		jacob.insertText("的选取和C");
-		jacob.insertSubText("TWA");
-		jacob.insertText("的计算：\n");
-		jacob.insertText("\t采用定点、短时间采样方法的采样，在某工作岗位选取有代表性的、工人可能接触有毒物质浓度最高的几个时段进行短时间采样。几个时段中有毒物质浓度的最高值即是该岗位工人接触的C");
-		jacob.insertSubText("STEL");
-		jacob.insertText("，用几个时段中有毒物质的浓度分别乘以所代表的相应接触时间，再除以8小时即是该岗位工人接触的C");
-		jacob.insertSubText("TWA");
-		jacob.insertText("的计算公式：\n");
-		jacob.insertText("\t\t\t\tC");
-		jacob.insertSubText("TWA");
-		jacob.insertText("=(C");
-		jacob.insertSubText("1");
-		jacob.insertText("T");
-		jacob.insertSubText("1");
-		jacob.insertText("+ C");
-		jacob.insertSubText("2");
-		jacob.insertText("T");
-		jacob.insertSubText("2");
-		jacob.insertText("+…C");
-		jacob.insertSubText("n");
-		jacob.insertText("T");
-		jacob.insertSubText("n");
-		jacob.insertText(")/8\n");
-		jacob.insertText("\t\tC");
-		jacob.insertSubText("TWA");
-		jacob.insertText("---空气中有害物质8h时间加权平均浓度，mg/m");
-		jacob.insertSuperText("3");
-		jacob.insertText("\n");
-		jacob.insertText("\t\tC");
-		jacob.insertSubText("1");
-		jacob.insertText("、C");
-		jacob.insertSubText("2");
-		jacob.insertText("、C");
-		jacob.insertSubText("n");
-		jacob.insertText("---空气中有害物质浓度，mg/ m");
-		jacob.insertSuperText("3");
-		jacob.insertText("\n");
-		jacob.insertText("\t\tT");
-		jacob.insertSubText("1");
-		jacob.insertText("、T");
-		jacob.insertSubText("2");
-		jacob.insertText("、T");
-		jacob.insertSubText("n");
-		jacob.insertText("---劳动者在相应的有害物质浓度下的工作时间，h\n");
-		jacob.insertText("\t\t8---时间加权平均容许浓度规定的8h\n");
-	}
-	
-//	private boolean needMerge() {
-//		
-//	}
-	
-	private static void addProcessDataToTable(TestDataProcessTable processTable,
-			StudyJacob jacob) {
+	/**
+	 * 将processTable中的数据写入文档的表中。
+	 * 
+	 * @param processTable
+	 * @param jacob
+	 */
+	private static void addProcessDataToTable(TestDataProcessTable processTable, StudyJacob jacob) {
 		int tableCol = 15;
 		int tableRow = 1;
 		Dispatch table = jacob.insertTable(tableCol, tableRow);
@@ -950,21 +781,335 @@ public class DocumentGeneration {
 		jacob.moveDown(1);
 	}
 
-	private static String getDetailedName(
-			String detailedName, int substanceId) {
+	/**
+	 * 写入result table标题行并设置重复标题行。
+	 * 
+	 * @param jacob
+	 * @return 标题行占用行数
+	 */
+	private static int addResultTableHeadingRows(StudyJacob jacob) {		
+		jacob.addRow();
+		jacob.addRow();
+		jacob.setRowHeadingFormat(1);
+		jacob.setRowHeadingFormat(2);
+	
+		jacob.setRowBold(1);
+		jacob.setRowBold(2);
+		
+		jacob.setColumnWidth(4.21, 1);
+		jacob.setColumnWidth(2.75, 2);
+		jacob.setColumnWidth(1.37, 3);
+		jacob.setColumnWidth(1.27, 4);
+		jacob.setColumnWidth(3.17, 5);
+		jacob.setColumnWidth(1.27, 6);
+		jacob.setColumnWidth(1.51, 7);
+		jacob.setColumnWidth(1.65, 8);
+		jacob.setColumnWidth(1.53, 9);
+		jacob.setColumnWidth(1.48, 10);
+		jacob.setColumnWidth(1.26, 11);
+		jacob.setColumnWidth(1.49, 12);
+		jacob.setColumnWidth(1.51, 13);
+		jacob.setColumnWidth(1.56, 14);
+		//jacob.setRowsHeightRuleExactly();
+		jacob.setRowsHeight(0.7);
+		jacob.setRowHeight(0.66, 1);
+		jacob.setRowHeight(0.66, 2);
+		
+		jacob.putTxtToCell(1, 1, "检测地点");
+		jacob.mergeCell(1, 1, 2, 1);
+		jacob.putTxtToCell(1, 2, "检测\n项目");
+		jacob.mergeCell(1, 2, 2, 2);
+		jacob.putTxtToCell(1, 3, "样品数（个）");
+		jacob.mergeCell(1, 3, 2, 3);
+		jacob.putTxtToCell(1, 4, "接触时间(h/d)");
+		jacob.mergeCell(1, 4, 2, 4);
+		jacob.putTxtToCell(1, 5, "检测结果\n（mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("）");
+		jacob.mergeCell(1, 5, 1, 9);
+		jacob.putTxtToCell(1, 6, "职业接触限值（mg/m");
+		jacob.insertSuperText("3");
+		jacob.insertText("）");
+		jacob.mergeCell(1, 6, 1, 9);
+		jacob.putTxtToCell(1, 7, "评价\n结论");
+		jacob.mergeCell(1, 7, 2, 14);
+		jacob.putTxtToCell(2, 5, "范围");
+		jacob.putTxtToCell(2, 6, "C");
+		jacob.insertSubText("MAC");
+		jacob.putTxtToCell(2, 7, "C");
+		jacob.insertSubText("TWA");
+		jacob.putTxtToCell(2, 8, "C");
+		jacob.insertSubText("STEL");
+		jacob.putTxtToCell(2, 9, "超限倍数");
+		jacob.putTxtToCell(2, 10, "MAC");
+		jacob.putTxtToCell(2, 11, "PC-\nTWA");
+		jacob.putTxtToCell(2, 12, "PC-\nSTEL");
+		jacob.putTxtToCell(2, 13, "最大超限倍数");
+		return 2;
+	}
+
+	/**
+	 * 将resultTable中的数据写入文档的表中。
+	 * 
+	 * @param resultTable
+	 * @param jacob
+	 */
+	private static void addResultDataToTable(TestDataResultTable resultTable, StudyJacob jacob) {
+		int tableCol = 14;
+		int tableRow = 1;
+		Dispatch table = jacob.insertTable(tableCol, tableRow);
+		Dispatch borders = Dispatch.get(table, "Borders").toDispatch();
+		Dispatch.put(borders, "InsideLineStyle", new Variant(1));
+		Dispatch.put(borders, "OutsideLineStyle", new Variant(1));
+		
+		jacob.setTableAlignCenter();
+		
+		//Dispatch font = jacob.getFont();
+		//Dispatch.put(font, "Bold", new Variant(true));
+		int headingRowCount = addResultTableHeadingRows(jacob);
+		tableRow = headingRowCount + 1;
+		//font = jacob.getFont();
+		//Dispatch.put(font, "Bold", new Variant(false));
+		
+		int cellRowIdx = tableRow, cellColIdx = 1;
+		//int mergeRowBegin = cellRowIdx;
+		Iterator<TestDataResultItem> itemIt = resultTable.getTestDataResultItems().iterator();
+		while (itemIt.hasNext()) {
+			TestDataResultItem item = itemIt.next();
+			jacob.putTxtToCell(cellRowIdx, 1, item.getTestWorkshopJob());
+			HarmfulSubstanceNationalStandardTable substance = item.getHarmfulSubstanceNationalStandardTable();
+			if (substance.getSubstanceChineseName().contains("矽尘")) {
+				String temp = substance.getSubstanceChineseName();
+				jacob.putTxtToCell(cellRowIdx, 2, temp.substring(0, temp.lastIndexOf('（')));
+			} else {
+				jacob.putTxtToCell(cellRowIdx, 2, substance.getSubstanceChineseName() + getDetailedName(item.getSubstanceDetailedName(), substance.getSubstanceId()));
+			}
+			jacob.putTxtToCell(cellRowIdx, 3, item.getTestSampleCount().toString());
+			jacob.putTxtToCell(cellRowIdx, 4, new ValueAndScale(item.getTestTouchTime(), item.getTestTouchTimeScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 5, getRangeString(item.getTestResultRangeStart(), item.getTestResultRangeStartType(), item.getTestResultRangeEnd(), item.getTestResultRangeEndType(), item.getTestResultRangeScale()));
+			String type = item.getResultType();//.equals("=") ? "" : "<";
+			jacob.putTxtToCell(cellRowIdx, 6, new ValueAndScale(item.getMac(), item.getMacScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 7, new ValueAndScale(item.getCtwa(), item.getCtwaScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 8, new ValueAndScale(item.getCstel(), item.getCstelScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 9, new ValueAndScale(item.getOm(), item.getOmScale()).toTypeString(type));
+			jacob.putTxtToCell(cellRowIdx, 10, new ValueAndScale(substance.getMac(), substance.getMacScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 11, new ValueAndScale(substance.getPcTwa(), substance.getPcTwaScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 12, new ValueAndScale(substance.getPcStel(), substance.getPcStelScale()).toString());
+			jacob.putTxtToCell(cellRowIdx, 13, new ValueAndScale(substance.getOm(), substance.getOmScale()).toString());
+			if (item.getTestResult().equals("不合格")) {
+				jacob.putBoldTxtToCell(cellRowIdx, 14, item.getTestResult());
+			} else {
+				jacob.putTxtToCell(cellRowIdx, 14, item.getTestResult());
+			}
+			
+			if (itemIt.hasNext()) {
+				jacob.addRow();
+				tableRow++;
+				cellRowIdx++;
+			}
+		}
+		
+//		for (int row = mergeRowBegin + 1; row <= cellRowIdx; row++) {
+//			//for (int col = 1; col <= tableCol; col++) {
+//			int col = 1;
+//				String mergeStr;
+//				try {
+//					mergeStr = jacob.getCellString(mergeRowBegin, col);
+//
+//					if (jacob.isInOnePage(mergeRowBegin, col, row, col)) {
+//						jacob.deleteCellTxt(row, col);
+//						jacob.mergeCell(mergeRowBegin, col, row, col);
+//					} else {
+//						jacob.putTxtToCell(row, col, mergeStr);
+//						continue;
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			//}
+//		}
+		String prevStr = "";
+		int prevRowIdx = 1;
+		for (cellRowIdx = headingRowCount; cellRowIdx <= tableRow; cellRowIdx++) {
+			String curStr;
+			try {
+				curStr = jacob.getCellString(cellRowIdx, cellColIdx);
+				if (curStr.equals(prevStr)
+						&& jacob.isInOnePage(prevRowIdx, cellColIdx, cellRowIdx, cellColIdx)) {
+					jacob.deleteCellTxt(cellRowIdx, cellColIdx);
+					jacob.mergeCell(prevRowIdx, cellColIdx, cellRowIdx,	cellColIdx);						
+				} else {
+					prevRowIdx = cellRowIdx;
+					prevStr = curStr;
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+	}
+
+	/**
+	 * 将substabce name 与 detailed name 分开。
+	 * @param sub
+	 * @return substabce name 与 detailed name组成的数组
+	 */
+	private static String[] splitSubName(String sub) {
+		sub = sub.replace('(', '（');
+		sub = sub.replace(')', '）');
+		sub = sub.replace(" ", "");
+		// DONE Deal with other detailedName
+		String subDetail;
+		if (sub.contains("其他粉尘")) {
+			String[] strs = sub.split("[（\\(）\\)]");
+			sub = strs[0];
+			subDetail = strs[1];
+		} else {
+			subDetail = null;
+		}
+		String[] r = {sub, subDetail};
+		return r;
+	}
+
+	/**
+	 * 判断是否是同一个项目的单元格，主要目的是判断跨页拆分单元格导致的拆分复制情况。
+	 * 
+	 * @param jacob
+	 * @param rowToCheck
+	 * @param prevRows
+	 * @param cols
+	 * @param compareBegin
+	 * @return
+	 * @throws Exception
+	 */
+	private static boolean isSameCells(StudyJacob jacob, int rowToCheck, int prevRows[], int[] cols, int compareBegin) throws Exception {
+		for (int i = compareBegin; i < cols.length; i++) {
+			if (!isSameCell(jacob, rowToCheck, prevRows[i], cols[i]))
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * [仅为isSameCells调用，不能直接使用]判断是否是同一个项目的单元格，仅以名称是否相同作为最后判断的依据，
+	 * 没有考虑下一项目恰好与其相同的情况，所以需要使用isSameCells来判断。
+	 * 
+	 * @param jacob
+	 * @param row1
+	 * @param row2
+	 * @param col
+	 * @return
+	 * @throws Exception
+	 */
+	private static boolean isSameCell(StudyJacob jacob, int row1, int row2, int col) throws Exception {
+		if (!jacob.isCellStrExisted(row1, col)) return true;
+		if (jacob.isInOnePage(row1, col, row2, col)) return false;
+		String s1 = jacob.getCellString(row1, col);
+		String s2 = jacob.getCellString(row2, col);
+		if (!s1.equals(s2)) return false;
+		return true;
+	}
+
+	/**
+	 * 将带有'~'的时间段字符串解析为Date[]。
+	 * 
+	 * @param s
+	 * @return 起始结束时间组成的数组
+	 */
+	private static Date[] getDate(String s) {
+		// DONE Deal with different months / years
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date[] dates = new Date[2];
+		try {
+			for (int i = 0; i < s.length(); i++) {
+				if (Character.isDigit(s.charAt(i))) {
+					int wavyIndex = s.indexOf('~');
+					if (wavyIndex != -1) {
+						dates[0] = dateFormat.parse(s.substring(i, wavyIndex));
+						String temp = s.substring(wavyIndex + 1, s.length());
+						if (temp.indexOf('-') == temp.lastIndexOf('-')) {
+							if (temp.indexOf('-') == -1) {
+								dates[1] = dateFormat.parse(s.substring(i, s.lastIndexOf('-') + 1) + temp);
+							} else {
+								dates[1] = dateFormat.parse(s.substring(i, s.indexOf('-') + 1) + temp);
+							}
+						} else {
+							dates[1] = dateFormat.parse(temp);
+						}
+					} else {
+						dates[0] = dateFormat.parse(s.substring(i, s.length()));
+					}
+					break;
+				}
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dates;
+	}
+
+	/**
+	 * 得到带有'：'名值对的值。
+	 * 
+	 * @param nameAndValue
+	 * @return
+	 */
+	private static String getValue(String nameAndValue) {
+		if (nameAndValue != null)
+			return nameAndValue.substring(nameAndValue.indexOf('：')+1, nameAndValue.length());
+		else 
+			return null;
+	}
+
+	/**
+	 * 生成范围字符串。
+	 * 
+	 * @param start
+	 * @param startType
+	 * @param end
+	 * @param endType
+	 * @param scale
+	 * @return
+	 */
+	private static String getRangeString(BigDecimal start, String startType, BigDecimal end, String endType, int scale) {
+		StringBuffer temp = new StringBuffer();
+		temp.append(new ValueAndScale(start, scale).toTypeString(startType));
+		if (!startType.equals(endType) || !start.equals(end)) {
+			temp.append("-");
+			temp.append(new ValueAndScale(end, scale).toTypeString(endType));
+		}		
+		return temp.toString();
+	}
+
+	/**
+	 * 将 detailed name根据制定规则处理。
+	 * 
+	 * @param detailedName
+	 * @param substanceId
+	 * @return
+	 */
+	private static String getDetailedName(String detailedName, int substanceId) {
 		if (detailedName == null) return "";
 
+		// 其他粉尘
 		if (substanceId == ParticlesNotOtherwiseRegulatedId) {
 			return "（" + detailedName + "）";
 		}
-//		for (int i = 0; i < PercentIdList.length; i++) {
-//			if (PercentIdList[i] == substanceId) {
-//				return "（" + detailedName + "%）";
+		// 矽尘
+//			for (int i = 0; i < PercentIdList.length; i++) {
+//				if (PercentIdList[i] == substanceId) {
+//					return "（" + detailedName + "%）";
+//				}
 //			}
-//		}
 		return "";
 	}
 
+	/**
+	 * 解析字符串得到数值以及小数位。
+	 * 
+	 * @param vs
+	 * @param s
+	 * @return 是否成功解析数值
+	 */
 	private static boolean getValueAndScaleFromString(ValueAndScale vs, String s) {
 		if (s == null || s.equals("-")) {
 			return false;

@@ -102,7 +102,7 @@ function setDetailVisibility() {
 		$("#detail label").text("粉尘名称");
 		$("#detail").show();
 	} else if (inList(id, PercentIdList)){
-		$("#detail label").text("游离SiO2含量");
+		$("#detail label").text("游离二氧化硅含量");
 		$("#detail").show();
 	} else {
 		$("#detail").hide();
