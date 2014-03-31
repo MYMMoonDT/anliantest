@@ -1,7 +1,6 @@
 package edu.tongji.anliantest.utils;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,8 +83,8 @@ public class DocumentGeneration {
 			Dispatch sentences = Dispatch.get(doc, "Sentences").getDispatch();
 			int senCnt = Dispatch.get(sentences, "Count").getInt();
 			temp = Dispatch.get(Dispatch.call(sentences, "Item", senCnt).getDispatch(), "Text").getString();
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日");
-			table.setTableTime(dateFormat.parse(temp.trim()));
+			//SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+			table.setTableTime(string2Date(temp));
 			
 			jacob.getTable(4);
 			int tableRow = jacob.getRowsCount();
@@ -101,7 +100,7 @@ public class DocumentGeneration {
 			}
 			
 			jacob.getTable(3);
-			dateFormat = new SimpleDateFormat("MM月dd号");
+			//dateFormat = new SimpleDateFormat("MM月dd号");
 			Date[] testTime = new Date[3];
 			String[][] testSampleNum = new String[3][4];
 			String[][] testResult = new String[3][4];
@@ -184,14 +183,17 @@ public class DocumentGeneration {
 								prevRows[1] = cellRowIdx;
 							}
 						}
-						testTime[i] = dateFormat.parse(jacob.getCellString(cellRowIdx, 7));
-						// TODO Deal with different years
+						// DONE Deal with different years
+						testTime[i] = string2Date(jacob.getCellString(cellRowIdx, 7));
+						
 						Calendar c = Calendar.getInstance();
 						c.setTimeInMillis(table.getSampleTimeStart().getTime());
 						int year = c.get(Calendar.YEAR);
 						c.setTime(testTime[i]);
-						c.set(Calendar.YEAR, year);
-						testTime[i] = c.getTime();
+						if (c.get(Calendar.YEAR) == 1970) {
+							c.set(Calendar.YEAR, year);
+							testTime[i] = c.getTime();
+						}
 					}
 				}
 					testSampleNum[i][j] = jacob.getCellString(cellRowIdx, 3);
@@ -1014,36 +1016,37 @@ public class DocumentGeneration {
 	 * 
 	 * @param s
 	 * @return 起始结束时间组成的数组
+	 * @throws Exception 
 	 */
-	private static Date[] getDate(String s) {
+	private static Date[] getDate(String s) throws Exception {
 		// DONE Deal with different months / years
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		//SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date[] dates = new Date[2];
-		try {
+//		try {
 			for (int i = 0; i < s.length(); i++) {
 				if (Character.isDigit(s.charAt(i))) {
 					int wavyIndex = s.indexOf('~');
 					if (wavyIndex != -1) {
-						dates[0] = dateFormat.parse(s.substring(i, wavyIndex));
+						dates[0] = string2Date(s.substring(i, wavyIndex));
 						String temp = s.substring(wavyIndex + 1, s.length());
 						if (temp.indexOf('-') == temp.lastIndexOf('-')) {
 							if (temp.indexOf('-') == -1) {
-								dates[1] = dateFormat.parse(s.substring(i, s.lastIndexOf('-') + 1) + temp);
+								dates[1] = string2Date(s.substring(i, s.lastIndexOf('-') + 1) + temp);
 							} else {
-								dates[1] = dateFormat.parse(s.substring(i, s.indexOf('-') + 1) + temp);
+								dates[1] = string2Date(s.substring(i, s.indexOf('-') + 1) + temp);
 							}
 						} else {
-							dates[1] = dateFormat.parse(temp);
+							dates[1] = string2Date(temp);
 						}
 					} else {
-						dates[0] = dateFormat.parse(s.substring(i, s.length()));
+						dates[0] = string2Date(s.substring(i, s.length()));
 					}
 					break;
 				}
 			}
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		return dates;
 	}
 
@@ -1123,5 +1126,36 @@ public class DocumentGeneration {
 			}
 			return true;
 		}
+	}
+	
+	private static Date string2Date(String s) throws Exception {
+		s = s.trim();
+		String formatStr = null;
+		if (s.contains("月")) {
+			if (s.contains("年")) {
+				if (s.contains("日")) {
+					formatStr = "yyyy年MM月dd日";
+				} else if (s.contains("号")) {
+					formatStr = "yyyy年MM月dd号";
+				} else {
+					throw new Exception("未支持的日期格式");
+				}
+			} else if (s.contains("日")) {
+				formatStr = "MM月dd日";
+			} else if (s.contains("号")) {
+				formatStr = "MM月dd号";
+			} else {
+				throw new Exception("未支持的日期格式");
+			}
+		} else if (s.contains("-")) {
+			if (s.indexOf('-') != s.lastIndexOf('-')) {
+				formatStr = "yyyy-MM-dd";
+			} else {
+				formatStr = "MM-dd";
+			}
+		} else {
+			throw new Exception("未支持的日期格式");
+		}
+		return new SimpleDateFormat(formatStr).parse(s);
 	}
 }
