@@ -21,7 +21,7 @@
 				<input type="file" name="file" />
 			</div>
 			<p>
-				<input id="upload_btn" type="submit" class="btn btn-default" value="上传"/>
+				<input id="upload_btn" type="submit" class="btn btn-primary" value="上传"/>
 			</p>
 		</form>
 <!-- 		<div> -->
