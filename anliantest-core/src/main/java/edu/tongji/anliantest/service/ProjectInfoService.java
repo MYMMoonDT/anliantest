@@ -33,5 +33,10 @@ public class ProjectInfoService {
 	}
 
 
+	public void update(ProjectInfo projectInfo) {
+		projectInfoDao.update(projectInfo);
+	}
+
+
 	
 }

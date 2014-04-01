@@ -29,6 +29,11 @@ import edu.tongji.anliantest.service.WorkTaskService;
 @RequestMapping(value = "/project")
 public class ProjectController extends BaseController {
 
+	
+	protected static final String PROJECT_ID_CONTEXT = "projectId";
+	protected static final String CONTRACTREVIEWRECORD_ID_CONTEXT="contractReviewRecordTableId";
+	protected static final String WORKTASKTABLE_ID_CONTEXT="workTaskTableId";
+	
 	@Autowired
 	private EmployeeService employeeService;
 	@Autowired
@@ -51,15 +56,18 @@ public class ProjectController extends BaseController {
 		projectInfo.setProjectCreateTime(new Date());//创建日期
 		projectInfoService.addProject(projectInfo);//持久化
 
-		System.out.println((String) request.getParameter("businessEmployee"));
-		System.out.println((String) request.getParameter("projectEmployee"));
-		employeeService.update(businessEmployee);
-		employeeService.update(projectEmployee);
+//		System.out.println((String) request.getParameter("businessEmployee"));
+//		System.out.println((String) request.getParameter("projectEmployee"));
+		employeeService.update(businessEmployee);//更新外键
+		employeeService.update(projectEmployee);//更新外键
 
 		mad.addObject("projectInfo",projectInfo);
 		int projectId = projectInfo.getProjectId();/*MARK*/
 		//		System.out.println("projectId: "+projectId);
-		setIdIntoSession(request, "projectId", projectId);
+		setIdIntoSession(request, PROJECT_ID_CONTEXT, projectId);
+		
+		
+		
 		mad.setViewName("forward:process/step1/contractReviewForm");
 
 		return mad;
@@ -68,29 +76,37 @@ public class ProjectController extends BaseController {
 	@RequestMapping(value="/createContractReviewRecordTable")//创建合同评审记录表
 	public ModelAndView createContractReviewRecordTable(HttpServletRequest request, ContractReviewRecordTable contractReviewRecordTable){
 		ModelAndView mad = new ModelAndView();
-		int contractReviewRecordTableId = (int)contractReviewRecordService.getTableCount();
+		
+		int contractReviewRecordTableId = contractReviewRecordService.getNextTableId();//TODO:ID
 		contractReviewRecordTable.setTableId(contractReviewRecordTableId);
-		setIdIntoSession(request, "contractReviewRecordTableId", contractReviewRecordTableId);
+		
+		setIdIntoSession(request, CONTRACTREVIEWRECORD_ID_CONTEXT, contractReviewRecordTableId);
 		contractReviewRecordTable.setTableNum("ALJC/JL07-03");
-		contractReviewRecordTable.setTableTime(new Date());
-		ProjectInfo projectInfo = projectInfoService.getProjectById(getIdFromSession(request, "projectId"));
+//		contractReviewRecordTable.setTableTime(new Date());
+		
+		ProjectInfo projectInfo = projectInfoService.getProjectById(getIdFromSession(request, PROJECT_ID_CONTEXT));
 		contractReviewRecordTable.setProjectInfo(projectInfo);
-		EmployeeInfo technicalEmployee = employeeService.getEmployeeByEmployeeName((String)request.getParameter("technicalEmployee"));
+		projectInfoService.update(projectInfo);//更新外键
+		
+		EmployeeInfo technicalEmployee = getSessionEmployee(request);
 		contractReviewRecordTable.setEmployeeInfo(technicalEmployee);
+		employeeService.update(technicalEmployee);//更新外键
 
 		contractReviewRecordService.addTable(contractReviewRecordTable);
 
 		//mad.addObject("mode", "addItem");//设置为添加条目的模式
-		mad.setViewName("forward:process/step1/contractReviewForm");/*MARK*/
+		mad.setViewName("process/step1/contractReviewForm");/*MARK*/
 		return mad;
 	}
 
 	@RequestMapping(value="/addContractReviewRecordItem")//增加合同评审记录表条目
 	public ModelAndView addContractReviewRecordItem(HttpServletRequest request, ContractReviewRecordItem contractReviewRecordItem){
 		ModelAndView mad = new ModelAndView();
-		int contractReviewRecordItemId = (int) contractReviewRecordService.getItemCount();
+		
+		int contractReviewRecordItemId = (int) contractReviewRecordService.getItemCount();//TODO:ID
 		contractReviewRecordItem.setItemId(contractReviewRecordItemId);
-		ContractReviewRecordTable contractReviewRecordTable = contractReviewRecordService.getTableById(getIdFromSession(request, "contractReviewRecordTableId"));
+		
+		ContractReviewRecordTable contractReviewRecordTable = contractReviewRecordService.getTableById(getIdFromSession(request, CONTRACTREVIEWRECORD_ID_CONTEXT));
 		contractReviewRecordItem.setContractReviewRecordTable(contractReviewRecordTable);
 		DepartmentInfo departmentInfo = departmentInfoService.getDepartmentByName((String)request.getParameter("departmentName"));
 		contractReviewRecordItem.setDepartmentInfo(departmentInfo);
@@ -105,9 +121,11 @@ public class ProjectController extends BaseController {
 	@RequestMapping(value="/createWorkTaskTable")//创建工作任务表
 	public ModelAndView createWorkTaskTable(HttpServletRequest request, WorkTaskTable workTaskTable){
 		ModelAndView mad = new ModelAndView();
-		int workTaskTableId = (int) workTaskService.getTableCount();
+		
+		int workTaskTableId = (int) workTaskService.getTableCount();//TODO:ID
 		workTaskTable.setTableId(workTaskTableId);
-		setIdIntoSession(request, "workTaskTableId", workTaskTableId);
+		
+		setIdIntoSession(request, WORKTASKTABLE_ID_CONTEXT, workTaskTableId);
 		workTaskTable.setTableNum("ALJC/JL32-01");
 		workTaskTable.setTaskTime(new Date());
 		ProjectInfo projectInfo = projectInfoService.getProjectByName((String)request.getParameter("projectName"));
@@ -123,10 +141,11 @@ public class ProjectController extends BaseController {
 	@RequestMapping(value="/addWorkTaskItem")//增加工作任务表条目
 	public ModelAndView addWorkTaskItem(HttpServletRequest request, WorkTaskItem workTaskItem){
 		ModelAndView mad = new ModelAndView();
-		int workTaskItemId = (int) workTaskService.getItemCount();
+		
+		int workTaskItemId = (int) workTaskService.getItemCount();//TODO:ID
 		workTaskItem.setItemId(workTaskItemId);
 
-		WorkTaskTable workTaskTable = workTaskService.getTableById(getIdFromSession(request, "workTaskTableId"));
+		WorkTaskTable workTaskTable = workTaskService.getTableById(getIdFromSession(request, WORKTASKTABLE_ID_CONTEXT));
 		workTaskItem.setWorkTaskTable(workTaskTable);
 
 		DepartmentInfo departmentInfo = departmentInfoService.getDepartmentByName((String)request.getParameter("departmentName"));
