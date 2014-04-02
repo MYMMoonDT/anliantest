@@ -142,7 +142,7 @@ public class ExperimentCalcController extends BaseController {
 			ArrayList<TestReportItemData> itemDataList = new ArrayList<TestReportItemData>();
 			String error = "";
 			try {
-				DocumentGeneration.getReportTableData(filePath, reportTable, itemDataList);
+				DocumentGeneration.getReportData(filePath, reportTable, itemDataList);
 				error = "表基本信息";
 				createTestReportTable(request, reportTable);
 				TestReportItemData itemData = null;

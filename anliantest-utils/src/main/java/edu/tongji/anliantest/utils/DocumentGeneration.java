@@ -35,7 +35,7 @@ public class DocumentGeneration {
 	 * @param harmfulSubstanceNationalStandardService 
 	 * @throws Exception 
 	 */
-	public static void getReportTableData(String filePath, TestReportTable table, ArrayList<TestReportItemData> itemDataList) throws Exception {
+	public static void getReportData(String filePath, TestReportTable table, ArrayList<TestReportItemData> itemDataList) throws Exception {
 		int cellRowIdx = -1;
 		StudyJacob jacob = new StudyJacob();
 		try {
@@ -1011,6 +1011,37 @@ public class DocumentGeneration {
 		return true;
 	}
 
+	private static Date string2Date(String s) throws Exception {
+		s = s.trim();
+		String formatStr = null;
+		if (s.contains("月")) {
+			if (s.contains("年")) {
+				if (s.contains("日")) {
+					formatStr = "yyyy年MM月dd日";
+				} else if (s.contains("号")) {
+					formatStr = "yyyy年MM月dd号";
+				} else {
+					throw new Exception("未支持的日期格式");
+				}
+			} else if (s.contains("日")) {
+				formatStr = "MM月dd日";
+			} else if (s.contains("号")) {
+				formatStr = "MM月dd号";
+			} else {
+				throw new Exception("未支持的日期格式");
+			}
+		} else if (s.contains("-")) {
+			if (s.indexOf('-') != s.lastIndexOf('-')) {
+				formatStr = "yyyy-MM-dd";
+			} else {
+				formatStr = "MM-dd";
+			}
+		} else {
+			throw new Exception("未支持的日期格式");
+		}
+		return new SimpleDateFormat(formatStr).parse(s);
+	}
+
 	/**
 	 * 将带有'~'的时间段字符串解析为Date[]。
 	 * 
@@ -1126,36 +1157,5 @@ public class DocumentGeneration {
 			}
 			return true;
 		}
-	}
-	
-	private static Date string2Date(String s) throws Exception {
-		s = s.trim();
-		String formatStr = null;
-		if (s.contains("月")) {
-			if (s.contains("年")) {
-				if (s.contains("日")) {
-					formatStr = "yyyy年MM月dd日";
-				} else if (s.contains("号")) {
-					formatStr = "yyyy年MM月dd号";
-				} else {
-					throw new Exception("未支持的日期格式");
-				}
-			} else if (s.contains("日")) {
-				formatStr = "MM月dd日";
-			} else if (s.contains("号")) {
-				formatStr = "MM月dd号";
-			} else {
-				throw new Exception("未支持的日期格式");
-			}
-		} else if (s.contains("-")) {
-			if (s.indexOf('-') != s.lastIndexOf('-')) {
-				formatStr = "yyyy-MM-dd";
-			} else {
-				formatStr = "MM-dd";
-			}
-		} else {
-			throw new Exception("未支持的日期格式");
-		}
-		return new SimpleDateFormat(formatStr).parse(s);
 	}
 }
