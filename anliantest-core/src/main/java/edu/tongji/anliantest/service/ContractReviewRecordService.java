@@ -41,6 +41,14 @@ public class ContractReviewRecordService {
 	public void addItem(ContractReviewRecordItem contractReviewRecordItem) {
 		contractReviewRecordItemDao.save(contractReviewRecordItem);
 	}
+
+
+	public int getNextTableId() {
+		return contractReviewRecordTableDao.getNextId();
+	}
+
+
+	
 	
 	
 }

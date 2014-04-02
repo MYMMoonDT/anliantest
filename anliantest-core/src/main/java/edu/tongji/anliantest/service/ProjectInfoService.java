@@ -31,4 +31,12 @@ public class ProjectInfoService {
 	public ProjectInfo getProjectByName(String projectName) {
 		return projectInfoDao.getProjectByName(projectName);
 	}
+
+
+	public void update(ProjectInfo projectInfo) {
+		projectInfoDao.update(projectInfo);
+	}
+
+
+	
 }

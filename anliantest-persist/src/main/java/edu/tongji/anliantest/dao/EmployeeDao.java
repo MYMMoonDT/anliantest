@@ -23,6 +23,7 @@ public class EmployeeDao extends BaseDao<EmployeeInfo>{
 	public EmployeeInfo getEmployeeByEmployeeName(String employeeName){
 		List<EmployeeInfo> employees = (List<EmployeeInfo>)getHibernateTemplate().find(GET_EMPLOYEE_BY_EMPLOYEENAME, employeeName);
 		if(employees.size() == 0){
+			System.out.println("no employee");
 			return null;
 		}else{
 			return employees.get(0);

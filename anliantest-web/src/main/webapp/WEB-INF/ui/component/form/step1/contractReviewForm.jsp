@@ -13,14 +13,14 @@
 <div class="panel panel-default">
 	<div class="panel-heading">合同评审表</div>
 	<div class="panel-body">
-		<form>
+		<form action="${context}/project/createContractReviewRecordTable">
 
 			<div class="row">
 				<div class="col-sm-10 form-group">
-					<label>项目名称</label> <input type="text" class="form-control">
+					<label>项目名称</label> <input type="text" class="form-control" name="projectName" value="${projectInfo.projectName}">
 				</div>
 				<div class="col-sm-2 form-group">
-					<label>编号</label> <input type="text" class="form-control">
+					<label>编号</label> <input type="text" class="form-control" name="tableNum" value="ALJC/JL07-03">
 				</div>
 			</div>
 			<div class="row">
@@ -82,14 +82,27 @@
 					</table>
 					<div class="row">
 					<div class="col-sm-4 form-group">
-						<label>技术负责人签字：</label> <input type="text" class="form-inline">
+						<label>技术负责人签字：</label> 
+						<select name="tableStatus" class="form-inline">
+							<option value="UN">不通过</option>
+							<option value="signed">通过</option>
+						</select>
 					</div>
 					<div class="col-sm-4 form-group">
 						
 					</div>
 					<div class="col-sm-4 form-group">
-						<label>日期：</label> <input type="date" class="form-inline">
+						<label>日期：</label> <input type="date" name="tableTime"class="form-inline">
 					</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="pull-right">
+						<button type="submit" class="btn btn-primary">创建</button>
+						<button type="reset" class="btn btn-default">重置</button>
 					</div>
 				</div>
 			</div>

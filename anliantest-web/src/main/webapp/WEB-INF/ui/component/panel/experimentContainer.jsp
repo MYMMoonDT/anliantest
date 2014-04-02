@@ -18,7 +18,7 @@
 				  	<div class="tab-pane active" id="dataProcess">
 				  		<div class="row">
 				  			<div class="col-sm-12">
-				  				<a href="${context}/experimentCalculation" class="btn btn-primary btn-create-testreport" role="button">创建检测报告</a>
+				  				<a href="${context}/uploadTestReport" class="btn btn-primary btn-create-testreport" role="button">上传检测报告</a>
 				  			</div>
 				  		</div>
 				  		<div class="row">

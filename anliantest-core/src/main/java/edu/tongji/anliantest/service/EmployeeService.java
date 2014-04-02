@@ -25,4 +25,8 @@ public class EmployeeService {
 	public List<EmployeeInfo> getAllEmployees() {
 		return employeeeDao.loadAll();
 	}
+
+	public void update(EmployeeInfo employeeInfo) {
+		employeeeDao.update(employeeInfo);
+	}
 }
