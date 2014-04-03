@@ -202,5 +202,23 @@ public class BaseDao<T>{
     public  Session getSession() {
         return SessionFactoryUtils.getSession(hibernateTemplate.getSessionFactory(),true);
     }
+    
+   
+    
+    public int getMaxId(String GET_MAX_ID){//获取Id最大值
+    	Query query = createQuery(GET_MAX_ID);
+    	Object result = query.uniqueResult();
+    	
+    	if(result == null)
+    		return 0;
+    	else
+    		return Integer.parseInt(result.toString());
+    }
+    
+    
+    
+    public int getNextId(String GET_MAX_ID){//获取下一个Id
+    	return getMaxId(GET_MAX_ID)+1;
+    }
 	
 }

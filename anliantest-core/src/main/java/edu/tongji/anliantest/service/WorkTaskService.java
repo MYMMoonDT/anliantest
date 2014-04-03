@@ -40,4 +40,14 @@ public class WorkTaskService {
 	public void addItem(WorkTaskItem workTaskItem) {
 		workTaskItemDao.save(workTaskItem);
 	}
+
+
+	public int getNextTableId() {
+		return workTaskTableDao.getNextId();
+	}
+
+
+	public int getNextItemId() {
+		return workTaskItemDao.getNextId();
+	}
 }

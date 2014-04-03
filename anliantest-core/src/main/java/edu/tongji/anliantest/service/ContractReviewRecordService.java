@@ -48,6 +48,11 @@ public class ContractReviewRecordService {
 	}
 
 
+	public int getNextItemId() {
+		return contractReviewRecordItemDao.getNextId();
+	}
+
+
 	
 	
 	

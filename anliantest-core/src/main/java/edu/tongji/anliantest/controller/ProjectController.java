@@ -95,7 +95,7 @@ public class ProjectController extends BaseController {
 		contractReviewRecordService.addTable(contractReviewRecordTable);
 
 		//mad.addObject("mode", "addItem");//设置为添加条目的模式
-		mad.setViewName("process/step1/contractReviewForm");/*MARK*/
+		mad.setViewName("redirect:process/step1/contractReviewForm");/*MARK*/
 		return mad;
 	}
 
@@ -103,7 +103,7 @@ public class ProjectController extends BaseController {
 	public ModelAndView addContractReviewRecordItem(HttpServletRequest request, ContractReviewRecordItem contractReviewRecordItem){
 		ModelAndView mad = new ModelAndView();
 		
-		int contractReviewRecordItemId = (int) contractReviewRecordService.getItemCount();//TODO:ID
+		int contractReviewRecordItemId = (int) contractReviewRecordService.getNextItemId();//TODO:ID
 		contractReviewRecordItem.setItemId(contractReviewRecordItemId);
 		
 		ContractReviewRecordTable contractReviewRecordTable = contractReviewRecordService.getTableById(getIdFromSession(request, CONTRACTREVIEWRECORD_ID_CONTEXT));
@@ -122,7 +122,7 @@ public class ProjectController extends BaseController {
 	public ModelAndView createWorkTaskTable(HttpServletRequest request, WorkTaskTable workTaskTable){
 		ModelAndView mad = new ModelAndView();
 		
-		int workTaskTableId = (int) workTaskService.getTableCount();//TODO:ID
+		int workTaskTableId = (int) workTaskService.getNextTableId();//TODO:ID
 		workTaskTable.setTableId(workTaskTableId);
 		
 		setIdIntoSession(request, WORKTASKTABLE_ID_CONTEXT, workTaskTableId);
@@ -142,7 +142,7 @@ public class ProjectController extends BaseController {
 	public ModelAndView addWorkTaskItem(HttpServletRequest request, WorkTaskItem workTaskItem){
 		ModelAndView mad = new ModelAndView();
 		
-		int workTaskItemId = (int) workTaskService.getItemCount();//TODO:ID
+		int workTaskItemId = (int) workTaskService.getNextItemId();//TODO:ID
 		workTaskItem.setItemId(workTaskItemId);
 
 		WorkTaskTable workTaskTable = workTaskService.getTableById(getIdFromSession(request, WORKTASKTABLE_ID_CONTEXT));

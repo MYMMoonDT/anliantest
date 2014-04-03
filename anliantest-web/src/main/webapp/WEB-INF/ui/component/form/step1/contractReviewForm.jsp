@@ -13,7 +13,7 @@
 <div class="panel panel-default">
 	<div class="panel-heading">合同评审表</div>
 	<div class="panel-body">
-		<form action="${context}/project/createContractReviewRecordTable">
+		<form action="${context}/project/createContractReviewRecordTable" method="post">
 
 			<div class="row">
 				<div class="col-sm-10 form-group">
@@ -84,7 +84,7 @@
 					<div class="col-sm-4 form-group">
 						<label>技术负责人签字：</label> 
 						<select name="tableStatus" class="form-inline">
-							<option value="UN">不通过</option>
+							<option value="unsigned">不通过</option>
 							<option value="signed">通过</option>
 						</select>
 					</div>

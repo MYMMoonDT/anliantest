@@ -16,17 +16,22 @@ public class ContractReviewRecordTableDao extends BaseDao<ContractReviewRecordTa
 		return (Long)query.uniqueResult();
 	}
 
-	public Long getMaxTableId() {
-		Query query = createQuery(GET_MAX_ID);
-		Object result = query.uniqueResult();
-		if(result == null)
-			return (long) 0;
-		else
-			return (Long) result;
-	}
+//	public int getMaxTableId(){
+//		Query query = createQuery(GET_MAX_ID);
+//		Object result = query.uniqueResult();
+//		System.out.println(result);
+//		if(result == null)
+//			return 0;
+//		else
+//			return Integer.parseInt(result.toString());
+//	}
+//	
+//	public int getNextId() {
+//		return getMaxTableId()+1;
+//	}
 	
 	public int getNextId(){
-		return Integer.parseInt(getMaxTableId().toString())+1;
+		return super.getNextId(GET_MAX_ID);
 	}
 
 }
