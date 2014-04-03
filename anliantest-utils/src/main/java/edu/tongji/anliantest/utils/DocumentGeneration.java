@@ -52,7 +52,7 @@ public class DocumentGeneration {
 			jacob.getTable(1);
 			table.setSampleName(getValue(jacob.getCellString(1, 1)));
 			temp = getValue(jacob.getCellString(1, 2));
-			table.setSampleNum(Integer.valueOf(temp.substring(0, temp.length()-1)));
+			table.setSampleNum(Integer.valueOf(getNumString(temp)));
 			table.setTestUnitName(getValue(jacob.getCellString(2, 1)));
 			table.setSampleStatus(getValue(jacob.getCellString(2, 2)));
 			table.setTestUnitAddress(getValue(jacob.getCellString(3, 1)));
@@ -200,7 +200,7 @@ public class DocumentGeneration {
 					testResult[i][j] = jacob.getCellString(cellRowIdx, 4);
 					testTouchTime[i][j] = jacob.getCellString(cellRowIdx, 5);
 					temp = jacob.getCellString(cellRowIdx, 6);
-					testCollectTime[i][j] = Integer.valueOf(temp.substring(0, temp.length() - 3));
+					testCollectTime[i][j] = Integer.valueOf(getNumString(temp));
 					j++;
 			}
 			
@@ -1157,5 +1157,16 @@ public class DocumentGeneration {
 			}
 			return true;
 		}
+	}
+	
+	/**
+	 * 解析字符串得到数字部分
+	 * @param s
+	 * @return
+	 */
+	private static String getNumString(String s) {
+		int i;
+		for (i = 0; i < s.length() && (Character.isDigit(s.charAt(i)) || s.charAt(i) == '.'); i++);
+		return s.substring(0, i);
 	}
 }
