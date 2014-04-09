@@ -51,6 +51,27 @@ public class ContractReviewRecordService {
 	public int getNextItemId() {
 		return contractReviewRecordItemDao.getNextId();
 	}
+	
+	public String getContentPJB(){//评价部评审内容
+		return contractReviewRecordItemDao.getContentPJB();
+	}
+	public String getContentJCB(){//检测部评审内容
+		return contractReviewRecordItemDao.getContentJCB();
+	}
+	public String getContentXZB(){//行政部评审内容
+		return contractReviewRecordItemDao.getContentXZB();
+	}
+	public String getContentZKB(){//质控部评审内容
+		return contractReviewRecordItemDao.getContentZKB();
+	}
+	public String getContentZJL(){//总经理评审内容
+		return contractReviewRecordItemDao.getContentZJL();
+	}
+
+
+	public void updateTable(ContractReviewRecordTable contractReviewRecordTable) {
+		contractReviewRecordTableDao.update(contractReviewRecordTable);
+	}
 
 
 	

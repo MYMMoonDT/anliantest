@@ -16,4 +16,8 @@ public class DepartmentInfoService {
 	public DepartmentInfo getDepartmentByName(String departmentName) {
 		return departmentInfoDao.getDepartmentByName(departmentName);
 	}
+
+	public void update(DepartmentInfo departmentInfo) {
+		departmentInfoDao.update(departmentInfo);
+	}
 }

@@ -1,5 +1,7 @@
 package edu.tongji.anliantest.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,11 +31,11 @@ import edu.tongji.anliantest.service.WorkTaskService;
 @RequestMapping(value = "/project")
 public class ProjectController extends BaseController {
 
-	
+
 	protected static final String PROJECT_ID_CONTEXT = "projectId";
 	protected static final String CONTRACTREVIEWRECORD_ID_CONTEXT="contractReviewRecordTableId";
 	protected static final String WORKTASKTABLE_ID_CONTEXT="workTaskTableId";
-	
+
 	@Autowired
 	private EmployeeService employeeService;
 	@Autowired
@@ -56,8 +58,8 @@ public class ProjectController extends BaseController {
 		projectInfo.setProjectCreateTime(new Date());//创建日期
 		projectInfoService.addProject(projectInfo);//持久化
 
-//		System.out.println((String) request.getParameter("businessEmployee"));
-//		System.out.println((String) request.getParameter("projectEmployee"));
+		//		System.out.println((String) request.getParameter("businessEmployee"));
+		//		System.out.println((String) request.getParameter("projectEmployee"));
 		employeeService.update(businessEmployee);//更新外键
 		employeeService.update(projectEmployee);//更新外键
 
@@ -65,47 +67,90 @@ public class ProjectController extends BaseController {
 		int projectId = projectInfo.getProjectId();/*MARK*/
 		//		System.out.println("projectId: "+projectId);
 		setIdIntoSession(request, PROJECT_ID_CONTEXT, projectId);
-		
-		
-		
+
+		//各部门的评审内容
+		mad.addObject("PJB", contractReviewRecordService.getContentPJB());//评价部
+		mad.addObject("JCB", contractReviewRecordService.getContentJCB());//检测部
+		mad.addObject("XZB", contractReviewRecordService.getContentXZB());//行政部
+		mad.addObject("ZKB", contractReviewRecordService.getContentZKB());//质控部
+		mad.addObject("ZJL", contractReviewRecordService.getContentZJL());//总经理
+
+
 		mad.setViewName("forward:process/step1/contractReviewForm");
 
 		return mad;
 	}
 
 	@RequestMapping(value="/createContractReviewRecordTable")//创建合同评审记录表
-	public ModelAndView createContractReviewRecordTable(HttpServletRequest request, ContractReviewRecordTable contractReviewRecordTable){
+	public ModelAndView createContractReviewRecordTable(HttpServletRequest request, ContractReviewRecordTable contractReviewRecordTable) throws ParseException{
 		ModelAndView mad = new ModelAndView();
-		
-		int contractReviewRecordTableId = contractReviewRecordService.getNextTableId();//TODO:ID
+
+		int contractReviewRecordTableId = contractReviewRecordService.getNextTableId();//ID
 		contractReviewRecordTable.setTableId(contractReviewRecordTableId);
-		
+
 		setIdIntoSession(request, CONTRACTREVIEWRECORD_ID_CONTEXT, contractReviewRecordTableId);
 		contractReviewRecordTable.setTableNum("ALJC/JL07-03");
-//		contractReviewRecordTable.setTableTime(new Date());
-		
+		//		contractReviewRecordTable.setTableTime(new Date());
+
 		ProjectInfo projectInfo = projectInfoService.getProjectById(getIdFromSession(request, PROJECT_ID_CONTEXT));
 		contractReviewRecordTable.setProjectInfo(projectInfo);
 		projectInfoService.update(projectInfo);//更新外键
-		
+
 		EmployeeInfo technicalEmployee = getSessionEmployee(request);
 		contractReviewRecordTable.setEmployeeInfo(technicalEmployee);
 		employeeService.update(technicalEmployee);//更新外键
 
 		contractReviewRecordService.addTable(contractReviewRecordTable);
 
-		//mad.addObject("mode", "addItem");//设置为添加条目的模式
+		//逐条增加条目
+		String[] departmentNames = request.getParameterValues("departmentName");
+		String[] reviewContents = request.getParameterValues("reviewContent");
+		String[] reviewComments = request.getParameterValues("reviewComment");
+		String[] itemStatus = request.getParameterValues("itemStatus");
+		String[] itemTimes = request.getParameterValues("itemTime");
+//		System.out.println(departmentNames[0]);
+//		System.out.println(reviewContents[0]);
+//		System.out.println(reviewComments[0]);
+//		System.out.println(itemStatus[0]);
+//		System.out.println(itemTimes[0]);
+		for(int i = 0; i < departmentNames.length;i++){
+			ContractReviewRecordItem contractReviewRecordItem = new ContractReviewRecordItem();
+			
+			contractReviewRecordItem.setReviewContent(reviewContents[i]);//评审内容
+			contractReviewRecordItem.setReviewComment(reviewComments[i]);//评审意见
+			contractReviewRecordItem.setItemStatus(itemStatus[i]);//签字状态
+			
+			contractReviewRecordItem.setContractReviewRecordTable(contractReviewRecordTable);//评审表
+			
+			
+			DepartmentInfo departmentInfo = departmentInfoService.getDepartmentByName(departmentNames[i]);//部门
+			contractReviewRecordItem.setDepartmentInfo(departmentInfo);//
+			departmentInfoService.update(departmentInfo);//
+			
+			SimpleDateFormat sdf =   new SimpleDateFormat("yyyy-MM-dd");
+			Date time = sdf.parse(itemTimes[i]);
+			contractReviewRecordItem.setItemTime(time);//时间
+			
+			int contractReviewRecordItemId = contractReviewRecordService.getNextItemId();//ID
+			contractReviewRecordItem.setItemId(contractReviewRecordItemId);
+			
+			contractReviewRecordService.addItem(contractReviewRecordItem);
+		}
+
+		contractReviewRecordService.updateTable(contractReviewRecordTable);//
+		
 		mad.setViewName("redirect:process/step1/contractReviewForm");/*MARK*/
 		return mad;
 	}
 
+	/*
 	@RequestMapping(value="/addContractReviewRecordItem")//增加合同评审记录表条目
 	public ModelAndView addContractReviewRecordItem(HttpServletRequest request, ContractReviewRecordItem contractReviewRecordItem){
 		ModelAndView mad = new ModelAndView();
-		
-		int contractReviewRecordItemId = (int) contractReviewRecordService.getNextItemId();//TODO:ID
+
+		int contractReviewRecordItemId = (int) contractReviewRecordService.getNextItemId();//ID
 		contractReviewRecordItem.setItemId(contractReviewRecordItemId);
-		
+
 		ContractReviewRecordTable contractReviewRecordTable = contractReviewRecordService.getTableById(getIdFromSession(request, CONTRACTREVIEWRECORD_ID_CONTEXT));
 		contractReviewRecordItem.setContractReviewRecordTable(contractReviewRecordTable);
 		DepartmentInfo departmentInfo = departmentInfoService.getDepartmentByName((String)request.getParameter("departmentName"));
@@ -114,17 +159,18 @@ public class ProjectController extends BaseController {
 
 		contractReviewRecordService.addItem(contractReviewRecordItem);
 
-		mad.setViewName("");/*MARK*/
+		mad.setViewName("");
 		return mad;
 	}
+	 */
 
 	@RequestMapping(value="/createWorkTaskTable")//创建工作任务表
 	public ModelAndView createWorkTaskTable(HttpServletRequest request, WorkTaskTable workTaskTable){
 		ModelAndView mad = new ModelAndView();
-		
-		int workTaskTableId = (int) workTaskService.getNextTableId();//TODO:ID
+
+		int workTaskTableId = (int) workTaskService.getNextTableId();//ID
 		workTaskTable.setTableId(workTaskTableId);
-		
+
 		setIdIntoSession(request, WORKTASKTABLE_ID_CONTEXT, workTaskTableId);
 		workTaskTable.setTableNum("ALJC/JL32-01");
 		workTaskTable.setTaskTime(new Date());
@@ -141,8 +187,8 @@ public class ProjectController extends BaseController {
 	@RequestMapping(value="/addWorkTaskItem")//增加工作任务表条目
 	public ModelAndView addWorkTaskItem(HttpServletRequest request, WorkTaskItem workTaskItem){
 		ModelAndView mad = new ModelAndView();
-		
-		int workTaskItemId = (int) workTaskService.getNextItemId();//TODO:ID
+
+		int workTaskItemId = (int) workTaskService.getNextItemId();//ID
 		workTaskItem.setItemId(workTaskItemId);
 
 		WorkTaskTable workTaskTable = workTaskService.getTableById(getIdFromSession(request, WORKTASKTABLE_ID_CONTEXT));
