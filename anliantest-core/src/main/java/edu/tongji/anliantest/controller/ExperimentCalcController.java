@@ -537,14 +537,22 @@ public class ExperimentCalcController extends BaseController {
 			ArrayList<TestDataProcessGroup> groupList,  Range<BigDecimal> range) {
 		int sampleCount = reportItemList.size();
 		BigDecimal maxGroupTouchTime = new BigDecimal(0);
+		int maxGroupTouchTimeScale = 0;
 		int offset = 0;
 		for (Integer cnt : dayCount) {
 			BigDecimal groupTouchTime = new BigDecimal(0);
+			int touchTimeScale = 0;
 			for (int i= offset; i < offset+cnt; i++) {
 				groupTouchTime = groupTouchTime.add(reportItemList.get(i).getTestTouchTime());
+				if (reportItemList.get(i).getTestTouchTimeScale() > touchTimeScale)
+					touchTimeScale = reportItemList.get(i).getTestTouchTimeScale();
 			}
 			offset += cnt;
-			maxGroupTouchTime = maxGroupTouchTime.max(groupTouchTime);
+			if (maxGroupTouchTime.compareTo(groupTouchTime) < 0) {
+				maxGroupTouchTime = groupTouchTime;
+				maxGroupTouchTimeScale = touchTimeScale;
+			}
+			//maxGroupTouchTime = maxGroupTouchTime.max(groupTouchTime);
 		}
 		
 		int resultItemId = (int)testDataResultService.getItemCount();
@@ -555,7 +563,7 @@ public class ExperimentCalcController extends BaseController {
 		resultItem.setTestWorkshopJob(groupList.get(0).getTestWorkshopJob());
 		resultItem.setTestSampleCount(sampleCount);
 		resultItem.setTestTouchTime(maxGroupTouchTime);
-		resultItem.setTestTouchTimeScale(reportItemList.get(0).getTestTouchTimeScale());
+		resultItem.setTestTouchTimeScale(maxGroupTouchTimeScale);
 		resultItem.setTestResultRangeScale(reportItemList.get(0).getTestResultScale());
 		resultItem.setSubstanceDetailedName(reportItemList.get(0).getSubstanceDetailedName());
 		resultItem.setTestResultRangeStart(range.getStart());
