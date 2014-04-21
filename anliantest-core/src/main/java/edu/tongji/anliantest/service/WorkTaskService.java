@@ -50,4 +50,9 @@ public class WorkTaskService {
 	public int getNextItemId() {
 		return workTaskItemDao.getNextId();
 	}
+
+
+	public void updateTable(WorkTaskTable workTaskTable) {
+		workTaskTableDao.update(workTaskTable);
+	}
 }

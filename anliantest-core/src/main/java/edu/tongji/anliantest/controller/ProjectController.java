@@ -76,7 +76,7 @@ public class ProjectController extends BaseController {
 		mad.addObject("ZJL", contractReviewRecordService.getContentZJL());//总经理
 
 
-		mad.setViewName("forward:process/step1/contractReviewForm");
+		mad.setViewName("forward:process/step1/contractReviewForm");//TODO:跳转逻辑
 
 		return mad;
 	}
@@ -139,7 +139,7 @@ public class ProjectController extends BaseController {
 
 		contractReviewRecordService.updateTable(contractReviewRecordTable);//
 		
-		mad.setViewName("redirect:process/step1/contractReviewForm");/*MARK*/
+		mad.setViewName("redirect:process/step1");//TODO:跳转逻辑
 		return mad;
 	}
 
@@ -170,17 +170,47 @@ public class ProjectController extends BaseController {
 
 		int workTaskTableId = (int) workTaskService.getNextTableId();//ID
 		workTaskTable.setTableId(workTaskTableId);
-
+		//id
 		setIdIntoSession(request, WORKTASKTABLE_ID_CONTEXT, workTaskTableId);
 		workTaskTable.setTableNum("ALJC/JL32-01");
-		workTaskTable.setTaskTime(new Date());
+		
+		//projectName
 		ProjectInfo projectInfo = projectInfoService.getProjectByName((String)request.getParameter("projectName"));
 		workTaskTable.setProjectInfo(projectInfo);
+		projectInfoService.update(projectInfo);//更新外键
+		//taskEmployee
 		EmployeeInfo taskEmployee = employeeService.getEmployeeByEmployeeName((String)request.getParameter("taskEmployee"));
 		workTaskTable.setEmployeeInfo(taskEmployee);
+		employeeService.update(taskEmployee);//更新外键
 
 		workTaskService.addTable(workTaskTable);
-		mad.setViewName("forward:process/step1/workTaskList");/*MARK*/
+		
+		//逐条增加条目
+		String[] departmentNames = request.getParameterValues("departmentName");
+		String[] workContents = request.getParameterValues("workContent");
+		String[] workTimeLimits = request.getParameterValues("workTimeLimit");
+		
+		for(int i = 0; i < departmentNames.length;i++){
+			WorkTaskItem workTaskItem = new WorkTaskItem();
+			
+			workTaskItem.setWorkContent(workContents[i]);
+			workTaskItem.setWorkTimeLimit(workTimeLimits[i]);
+			
+			workTaskItem.setWorkTaskTable(workTaskTable);
+			
+			DepartmentInfo departmentInfo = departmentInfoService.getDepartmentByName(departmentNames[i]);
+			workTaskItem.setDepartmentInfo(departmentInfo);
+			departmentInfoService.update(departmentInfo);
+			
+			int workTaskItemId = workTaskService.getNextItemId();
+			workTaskItem.setItemId(workTaskItemId);
+			
+			workTaskService.addItem(workTaskItem);
+		}
+		
+		workTaskService.updateTable(workTaskTable);
+		
+		mad.setViewName("forward:process/step1/workTaskList");//TODO:跳转逻辑
 		return mad;
 	}
 
@@ -198,7 +228,7 @@ public class ProjectController extends BaseController {
 		workTaskItem.setDepartmentInfo(departmentInfo);
 
 		workTaskService.addItem(workTaskItem);
-		mad.setViewName("");/*MARK*/
+		mad.setViewName("");//TODO:跳转逻辑
 		return mad;
 	}
 

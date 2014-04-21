@@ -3,8 +3,8 @@
 <% 
     String context = request.getContextPath();
     request.setAttribute("context",context);
-    
 %>
+
 <link rel="stylesheet" href="${context}/ui/css/form.css">
 <!-- 
 本表单对应文件：合同评审表
@@ -43,8 +43,8 @@
 						</thead>
 						<tbody>
 							<tr contenteditable="false">
-								<td><input type="hidden" name="departmentName"
-								class="form-inline" value="评价部">评价部</td>
+								<th><input type="hidden" name="departmentName"
+								class="form-inline" value="评价部">评价部</th>
 								<td><textarea name="reviewContent"
 								class="form-inline" >${PJB}</textarea></td>
 								<td><textarea name="reviewComment"
@@ -54,12 +54,12 @@
 										<option value="signed">通过</option>
 								</select></td>
 								<td><input type="date" name="itemTime"
-								class="form-inline"></td>
+								class="form-inline" ></td>
 
 							</tr>
 							<tr contenteditable="false">
-								<td><input type="hidden" name="departmentName"
-								class="form-inline" value="检测部">检测部</td>
+								<th><input type="hidden" name="departmentName"
+								class="form-inline" value="检测部">检测部</th>
 								<td><textarea name="reviewContent"
 								class="form-inline" >${JCB}</textarea></td>
 								<td><textarea name="reviewComment"
@@ -73,8 +73,8 @@
 
 							</tr>
 							<tr contenteditable="false">
-								<td><input type="hidden" name="departmentName"
-								class="form-inline" value="行政部">行政部</td>
+								<th><input type="hidden" name="departmentName"
+								class="form-inline" value="行政部">行政部</th>
 								<td><textarea name="reviewContent"
 								class="form-inline" >${XZB}</textarea></td>
 								<td><textarea name="reviewComment"
@@ -88,8 +88,8 @@
 
 							</tr>
 							<tr contenteditable="false">
-								<td><input type="hidden" name="departmentName"
-								class="form-inline" value="质控部">质控部</td>
+								<th><input type="hidden" name="departmentName"
+								class="form-inline" value="质控部">质控部</th>
 								<td><textarea name="reviewContent"
 								class="form-inline" >${ZKB}</textarea></td>
 								<td><textarea name="reviewComment"
@@ -103,8 +103,8 @@
 
 							</tr>
 							<tr contenteditable="false">
-								<td><input type="hidden" name="departmentName"
-								class="form-inline" value="总经理">总经理</td>
+								<th><input type="hidden" name="departmentName"
+								class="form-inline" value="总经理">总经理</th>
 								<td><textarea name="reviewContent"
 								class="form-inline" >${ZJL}</textarea></td>
 								<td><textarea name="reviewComment"
