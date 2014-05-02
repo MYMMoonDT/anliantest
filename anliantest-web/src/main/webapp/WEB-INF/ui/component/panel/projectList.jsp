@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <link rel="stylesheet" href="${context}/ui/plugin/DataTables/media/css/jquery.dataTables.css">
 <link rel="stylesheet" href="${context}/ui/plugin/DataTables/media/css/jquery.dataTables_themeroller.css">
 <link rel="stylesheet" href="${context}/ui/css/dataTable.css">
@@ -28,114 +29,15 @@
 						</tr>
 					</thead>
 					<tbody>
+						<c:forEach items="${projects}" var="project">
 						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>公共场所卫生检测</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
+						<td>${project.projectName}</td>
+						<td>${project.projectType}</td>
+						<td>${project.employeeInfoByBusinessEmployeeId.employeeName}</td>
+						<td>${project.employeeInfoByProjectEmployeeId.employeeName}</td>
+						<td>${project.projectCreateTime}</td>
 						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>公共场所卫生检测</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>建设项目职业病危害预评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>建设项目职业病危害预评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>建设项目职业病危害控制效果评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>建设项目职业病危害控制效果评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>工作场所职业病危害因素检测与评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>工作场所职业病危害因素检测与评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>工作场所职业病危害因素检测与评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>工作场所职业病危害因素检测与评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>工作场所职业病危害因素检测与评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
-						<tr>
-							<td>
-								XXX公司技术服务合同
-							</td>
-							<td>工作场所职业病危害因素检测与评价</td>
-							<td>XXX</td>
-							<td>XXX</td>
-							<td>2014/1/13</td>
-						</tr>
+						</c:forEach>
 					</tbody>
 				</table>
 			</div>

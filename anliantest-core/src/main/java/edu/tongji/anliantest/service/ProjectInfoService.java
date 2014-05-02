@@ -1,5 +1,7 @@
 package edu.tongji.anliantest.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,11 @@ public class ProjectInfoService {
 
 	public void update(ProjectInfo projectInfo) {
 		projectInfoDao.update(projectInfo);
+	}
+
+
+	public List<ProjectInfo> getAllProjects() {
+		return projectInfoDao.loadAll();
 	}
 
 

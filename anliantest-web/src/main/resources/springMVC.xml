@@ -24,6 +24,7 @@
 		p:suffix=".jsp">
 	</bean>
 
+	
 	<!-- 对静态资源文件的访问 -->
-	<mvc:resources location="/WEB-INF/ui/" mapping="/ui/**"/>
+	<mvc:resources location="/WEB-INF/ui/" mapping="/ui/**" />
 </beans>        

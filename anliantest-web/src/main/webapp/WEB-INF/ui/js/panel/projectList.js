@@ -1,5 +1,24 @@
 var project_list;
+var projects;
 $(function(){
+	
+	$.ajax({
+		url: "project/getProjects",
+		dataType: "json",
+		type: "GET",
+		error: function(result) {
+			alert(result);
+		},
+		success: function(result) {
+			alert(result);
+		}
+	});
+//	$.get("project/getProjects",
+//			function(data){
+//		alert(data==null);
+//	});
+//	alert(projects==null);
+	
 	project_list = $("#project_list").dataTable();
 	
 	$("#project_list tbody tr").click(function(e){

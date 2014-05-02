@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import edu.tongji.anliantest.model.ContractReviewRecordItem;
@@ -233,6 +234,14 @@ public class ProjectController extends BaseController {
 	}
 
 
+	@RequestMapping(value="/getProjects")
+	@ResponseBody
+	public List<ProjectInfo> getProjects(){
+		List<ProjectInfo> projects = new ArrayList<ProjectInfo>();
+		projects = projectInfoService.getAllProjects();
+		System.out.println("projects is null: "+(projects==null));
+		return projects;
+	}
 	protected int getIdFromSession(HttpServletRequest request, String name){
 		return (Integer)request.getSession().getAttribute(name);
 	}
