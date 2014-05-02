@@ -442,7 +442,7 @@ public class ExperimentCalcController extends BaseController {
 				processTableItem.setTestTouchTime(reportItem.getTestTouchTime());
 				processTableItem.setTestTouchTimeScale(reportItem.getTestTouchTimeScale());
 				testDataProcessService.addItem(processTableItem);
-				BigDecimal calculatedResult = reportItem.getTestResult().multiply(BigDecimal.valueOf(reportItem.getTestCollectTime()/15));
+				BigDecimal calculatedResult = reportItem.getTestResult().multiply(BigDecimal.valueOf(reportItem.getTestCollectTime()/15.0));
 				if (hasLess && hasEqual) {
 					if (!processTableItem.getTestResultType().equals("="))
 						calculatedResult = new BigDecimal(calculatedResult.doubleValue()/2);
@@ -694,8 +694,11 @@ public class ExperimentCalcController extends BaseController {
 	 * @return
 	 */
 	private BigDecimal rounding(BigDecimal v, int scale) {
-		v = v.setScale(8, RoundingMode.HALF_UP);
 		BigDecimal zero = new BigDecimal(0);
+		v = v.setScale(8, RoundingMode.HALF_UP);
+		if (v.doubleValue() == 0.0) {
+			return zero.setScale(scale);
+		}
 		BigDecimal u = null;
 		do {
 			u = v.setScale(scale++, RoundingMode.HALF_EVEN);
