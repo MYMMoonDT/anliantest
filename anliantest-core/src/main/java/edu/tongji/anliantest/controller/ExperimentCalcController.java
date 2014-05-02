@@ -697,8 +697,7 @@ public class ExperimentCalcController extends BaseController {
 		BigDecimal zero = new BigDecimal(0);
 		v = v.setScale(8, RoundingMode.HALF_UP);
 		if (v.doubleValue() == 0.0) {
-			zero.setScale(scale);
-			return zero;
+			return zero.setScale(scale);
 		}
 		BigDecimal u = null;
 		do {
