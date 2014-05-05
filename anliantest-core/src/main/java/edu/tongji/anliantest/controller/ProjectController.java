@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -234,12 +233,14 @@ public class ProjectController extends BaseController {
 	}
 
 
-	@RequestMapping(value="/getProjects")
+	
 	@ResponseBody
+	@RequestMapping(value="/getProjects")
 	public List<ProjectInfo> getProjects(){
 		List<ProjectInfo> projects = new ArrayList<ProjectInfo>();
 		projects = projectInfoService.getAllProjects();
-		System.out.println("projects is null: "+(projects==null));
+		System.out.println("projects length: "+(projects.size()));
+//		System.out.println(projects.get(0).getProjectName());
 		return projects;
 	}
 	protected int getIdFromSession(HttpServletRequest request, String name){

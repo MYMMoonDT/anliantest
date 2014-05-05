@@ -6,12 +6,13 @@ $(function(){
 		url: "project/getProjects",
 		dataType: "json",
 		type: "GET",
-		error: function(result) {
-			alert(result);
-		},
 		success: function(result) {
-			alert(result);
-		}
+			alert("success:"+result);
+		},
+		error: function (a,b,c) { 
+			alert("error:"+c);
+    } 
+		
 	});
 //	$.get("project/getProjects",
 //			function(data){
